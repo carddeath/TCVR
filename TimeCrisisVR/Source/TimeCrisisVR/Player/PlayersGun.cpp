@@ -11,7 +11,7 @@
 #include "Gameplay/Announcer.h"
 #include "Managers/NavigationManager.h"
 #include "AI/AIEnemyCharacter.h"
-#include "UIAmmoClip.h"
+#include "UI/UIAmmoClip.h"
 #include "Components/WidgetComponent.h"
 
 
