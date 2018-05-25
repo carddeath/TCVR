@@ -55,14 +55,15 @@ void AAIEnemyCharacter::Tick(float DeltaTime)
 
 }
 
-void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* FurtherMovPnt, float DelayToGoToFurtherPoint)
+void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, EAIBehaviour Behaviour, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* EscPoint, ATargetPoint* AdvancePnt, float DelayToGoToFurtherPoint)
 {
 	MyType = typeOfEnemy;
 	MyWeapon = EnemyWep;
+	MyBehaviour = Behaviour;
 	SpawnPoint = SpwnPoint;
 	GoToPoint = GoToPnt;
-	FurtherGoToPoint = FurtherMovPnt;
-	DelayToMoveToFurtherPoint = DelayToGoToFurtherPoint;
+	EscapePoint = EscPoint;
+	DelayBeforeEscape = DelayToGoToFurtherPoint;
 
 	TextureEnemy();
 	SetupEnemyPosition();
@@ -91,7 +92,7 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 
 
 	//If the enemy shouldn't move
-	if (GoToPoint) 
+	if (MyBehaviour == EAIBehaviour::SPAWN_RUN_SHOOT) 
 	{
 		//Move to the correct position
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
@@ -99,13 +100,13 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 		//If they have a GoToPoint we send set the value 
 		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->MoveToPosition(GoToPoint);
 	}
-	else if (FurtherGoToPoint) 
+	else if (MyBehaviour == EAIBehaviour::SPAWN_SHOOT_ESCAPE) 
 	{
 		//Move to the correct position
 		//Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
 
 		//If they have a GoToPoint we send set the value 
-		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnAndFireAndRun(FurtherGoToPoint);
+		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnAndFireAndRun(EscapePoint);
 	}
 	else 
 	{

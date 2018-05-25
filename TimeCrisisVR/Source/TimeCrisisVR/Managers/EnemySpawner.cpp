@@ -116,7 +116,6 @@ void AEnemySpawner::PlaceEnemiesStage1Area1()
 
 void AEnemySpawner::PlaceEnemiesStage1Area1Section1() 
 {
-	//TODO: THIS LOGIC SHOULD BE HANDLED IN THE ENEMY ITSELF BY SENDING THE POINT DATA ACROSS for spawning and move to if required.
 	for (int32 i = 0; i < TotalEnemiesPerStage1Area1[0]; i++)
 	{
 		//Increment how many enemies are alive
@@ -128,11 +127,13 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section1()
 		//Make a brown uniform for the middle soldier
 		if (i == 1)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, Stage1Area1Section1SpawnPoints[i], nullptr, nullptr, 0.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT,
+				Stage1Area1Section1SpawnPoints[i], nullptr, nullptr, nullptr, 0.0f);
 		}
 		else
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Area1Section1SpawnPoints[i], nullptr, nullptr, 0.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT,
+				Stage1Area1Section1SpawnPoints[i], nullptr, nullptr, nullptr, 0.0f);
 		}
 
 		//Add the delegate to say when an enemy is dead
@@ -152,15 +153,18 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2()
 
 		if (i == 0)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2FurtherGoToPoints[i], 2.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT_ESCAPE,
+				Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2EscapePoints[i], nullptr, 2.0f);
 		}
 		else if(i == 1)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2FurtherGoToPoints[i], 3.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT_ESCAPE,
+				Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2EscapePoints[i], nullptr, 5.0f);
 		}
 		else 
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], nullptr, 0.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+				Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], nullptr, nullptr, 0.0f);
 		}
 
 		//Add the delegate to say when an enemy is dead

@@ -27,6 +27,17 @@ enum class EnemyWeapon : uint8
 	SHIELD_PISTOL
 };
 
+UENUM()
+enum class EAIBehaviour : uint8 
+{
+	SPAWN_SHOOT,
+	SPAWN_SHOOT_ESCAPE,
+	SPAWN_SHOOT_ADVANCE_SHOOT,
+	SPAWN_RUN_SHOOT,
+	SPAWN_POP_SHOOT,
+	SPAWN_POP_SHOOT_ESCAPE
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDeathCallback, AAIEnemyCharacter*, Char);
 
 UCLASS()
@@ -53,14 +64,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Components")
 	TArray<class UMaterialInstance*> EnemyMaterials;
 
+	UPROPERTY(BlueprintReadWrite, Category = "AI")
+	float DelayBeforeEscape;
+
 private:
 
 	int32 PercentageOfCriticalHit = 0;
 
-	float DelayToMoveToFurtherPoint;
+
 
 	EnemyType MyType;
 	EnemyWeapon MyWeapon;
+	EAIBehaviour MyBehaviour;
 	//Where the unit spawns in the world
 	class ATargetPoint* SpawnPoint = nullptr;
 
@@ -68,7 +83,7 @@ private:
 	ATargetPoint* GoToPoint = nullptr;
 
 	//If the character moves after attacking
-	ATargetPoint* FurtherGoToPoint = nullptr;
+	ATargetPoint* EscapePoint = nullptr;
 
 	//Stops the death noise being played mid flight
 	bool bIsDead = false;
@@ -88,7 +103,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Used to setup enemies that move from their spawn point
-	void SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* FurtherMovPnt, float DelayToGoToFurtherPoint);
+	void SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, EAIBehaviour Behaviour, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* EscPoint, ATargetPoint* AdvancePnt, float DelayToGoToFurtherPoint);
 
 	void KillEnemy(HitArea HitBoxTarget);
 

@@ -44,17 +44,21 @@ protected:
 
 	//Section 2
 	//---------
-	//The target points for where the first units should spawn
+	//The target points for where the units should spawn
 	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
 		TArray<class ATargetPoint*> Stage1Area1Section2SpawnPoints;
 
-	//The target points for where the first units should spawn
+	//The target points where units should run to.
 	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
 		TArray<class ATargetPoint*> Stage1Area1Section2GoToPoints;
 
-	//The target points for where the first units should spawn
+	//The target points for when a unit should try to escape the scene
 	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
-		TArray<class ATargetPoint*> Stage1Area1Section2FurtherGoToPoints;
+		TArray<class ATargetPoint*> Stage1Area1Section2EscapePoints;
+
+	//The target points for when a unit advances after attacking
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
+		TArray<class ATargetPoint*> Stage1Area1Section2AdvancePoints;
 
 	//The enemy quantities to be spawned in a sub section. Need an array as we have multiple "waves" of enemies
 	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 2")
