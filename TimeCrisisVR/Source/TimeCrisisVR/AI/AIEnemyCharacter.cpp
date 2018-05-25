@@ -95,7 +95,17 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 	{
 		//Move to the correct position
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
+
+		//If they have a GoToPoint we send set the value 
 		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->MoveToPosition(GoToPoint);
+	}
+	else if (FurtherGoToPoint) 
+	{
+		//Move to the correct position
+		//Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
+
+		//If they have a GoToPoint we send set the value 
+		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnAndFireAndRun(FurtherGoToPoint);
 	}
 	else 
 	{

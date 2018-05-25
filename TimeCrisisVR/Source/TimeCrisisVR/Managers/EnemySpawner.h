@@ -62,12 +62,17 @@ protected:
 
 	int32 CurrentWaveInSubSection = 0; //Used to keep track of which "wave of enemies" are in play in a certain area
 
+	//Only set this when trying to start the game in a different position
+	UPROPERTY(EditInstanceOnly, Category = "Debug")
+	int32 CurrentSection = 1; //The current area of shooting
+
 
 private:
 
 	int32 CurrentEnemiesAliveInSection = 0;
 	int32 TotalEnemiesShot = 0;
-	int32 CurrentSection = 1; //The current area of shooting
+
+
 	int32 CurrentArea = 1; //The current area within an stage 1 -3
 
 	TArray<AAIEnemyCharacter*> CurrentEnemiesAlive;

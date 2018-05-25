@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
 		void MoveToPosition(class ATargetPoint* GoToPoint);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
+		void SpawnAndFireAndRun(class ATargetPoint* GoFrutherPoint);
+
 protected:
 
 private:

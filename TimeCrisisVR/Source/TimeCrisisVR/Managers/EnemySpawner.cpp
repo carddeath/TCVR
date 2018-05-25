@@ -24,7 +24,7 @@ void AEnemySpawner::BeginPlay()
 	CurrentEnemiesAlive.SetNum(10);
 
 	//Start the game off with the first section being called directly
-	UpdateSection(1);
+	UpdateSection(CurrentSection);
 
 
 }
