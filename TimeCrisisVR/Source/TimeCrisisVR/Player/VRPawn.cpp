@@ -87,7 +87,7 @@ void AVRPawn::PickUpObjectLeft()
 {
 	if (GEngine) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup left called"), true, FVector2D(3.0f, 3.0f));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup left called"), true, FVector2D(3.0f, 3.0f));
 	}
 
 	//We are already holding something, a clip or the gun. So no reason to pick anything up
@@ -100,7 +100,7 @@ void AVRPawn::PickUpObjectLeft()
 	else if(SpawnedAmmoPouch->GetLeftHandInPouchState())
 	{
 		AttemptToPickUpAmmoClip(EHand::LEFT);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
 		return;
 	}
 
@@ -141,7 +141,7 @@ void AVRPawn::PickUpObjectLeft()
 
 			if (GEngine)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup left Attached"), true, FVector2D(3.0f, 3.0f));
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup left Attached"), true, FVector2D(3.0f, 3.0f));
 			}
 			
 
@@ -202,7 +202,7 @@ void AVRPawn::PickUpObjectRight()
 {
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup right called"), true, FVector2D(3.0f, 3.0f));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup right called"), true, FVector2D(3.0f, 3.0f));
 	}
 
 	//We are already holding something, a clip or the gun. So no reason to pick anything up
@@ -211,11 +211,11 @@ void AVRPawn::PickUpObjectRight()
 		return;
 	}
 	//If we are inside the ammo pouch then we should pick up an ammo clip and ignore shooting
-	//TODO: UPDATE THIS WHEN NEEDED
+	//TODO: UPDATE THIS WHEN NEEDED by playing clip in right position
 	else if (SpawnedAmmoPouch->GetRightHandInPouchState())
 	{
 		AttemptToPickUpAmmoClip(EHand::RIGHT);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
 		return;
 	}
 
@@ -254,10 +254,9 @@ void AVRPawn::PickUpObjectRight()
 			RightPickedUpActor->SetActorLocation(Locat);
 			RightPickedUpActor->SetActorRotation(SMRight->GetSocketRotation(FName("Gun_Position_Right")));
 
-
 			if (GEngine)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup right Attached"), true, FVector2D(3.0f, 3.0f));
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup right Attached"), true, FVector2D(3.0f, 3.0f));
 			}
 
 			//If it's the gun hide the right ammo ui
@@ -341,12 +340,9 @@ void AVRPawn::AttemptToPickUpAmmoClip(EHand HandType)
 			}
 
 			//TODO: Change where the ammo clip goes in the hand
-
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 			LeftPickedUpActor->AttachToComponent(SCHeldObjectLeft, AttachRules);
 
-			//TODO: Not perfect but will do for now
-			//LeftPickedUpActor->SetActorRotation(FRotator(PickupRotOffsetPitch, PickupRotOffsetYaw, 0.0f));
 		}
 		else if (HandType == EHand::RIGHT) 
 		{
@@ -371,8 +367,6 @@ void AVRPawn::AttemptToPickUpAmmoClip(EHand HandType)
 			RightPickedUpActor->SetActorRotation(FRotator(PickupRotOffsetPitch, PickupRotOffsetYaw, 0.0f));
 		}
 	}
-
-		
 }
 
 //Dropping logic
@@ -399,8 +393,8 @@ void AVRPawn::DropObjectLeft()
 		LeftPickedUpActor = nullptr;
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
-				FString::Printf(TEXT("Drop Called and LeftBool is now %s"), bIsHoldingObjectLeft ? TEXT("True") : TEXT("False")), true, FVector2D(3.0f, 3.0f));
+		//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
+			//	FString::Printf(TEXT("Drop Called and LeftBool is now %s"), bIsHoldingObjectLeft ? TEXT("True") : TEXT("False")), true, FVector2D(3.0f, 3.0f));
 		}
 	}
 }
@@ -427,8 +421,8 @@ void AVRPawn::DropObjectRight()
 		RightPickedUpActor = nullptr;
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
-				FString::Printf(TEXT("Drop Called and RightBool is now %s"), bIsHoldingObjectRight ? TEXT("True") : TEXT("False")) , true, FVector2D(3.0f, 3.0f));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
+			//	FString::Printf(TEXT("Drop Called and RightBool is now %s"), bIsHoldingObjectRight ? TEXT("True") : TEXT("False")) , true, FVector2D(3.0f, 3.0f));
 		}
 	}
 }

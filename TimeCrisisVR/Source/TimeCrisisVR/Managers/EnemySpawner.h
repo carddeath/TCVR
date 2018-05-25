@@ -30,35 +30,35 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Setup")
 	TSubclassOf<class AAIEnemyCharacter> CharacterToSpawn = nullptr;
 
-	//Used to say how many enemies are in each section. This should add up to the total in the waves
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy Setup")
-	TArray<int32> EnemyQuantityPerStage1Act1Section1;
+	//Used to say how many enemies are in each section in area1. This should add up to the total in the waves
+	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Setup")
+	TArray<int32> TotalEnemiesPerStage1Area1;
 
-	//Sub Section 0
+	//Section 1
+	//---------
 	//The target points for where the first units should spawn
-	UPROPERTY(EditInstanceOnly, Category = "Stage1_Act1_Section1_Sub0")
-	TArray<class ATargetPoint*> Stage1Act1Section1Sub0SpawnPoints;
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section1")
+	TArray<class ATargetPoint*> Stage1Area1Section1SpawnPoints;
 
-	//The enemy quantities to be spawned in a sub section. Only 1 wave so we say 3 and no array
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy Setup")
-	int32 EnemyQuantityStage1Act1Section1Sub0Wave1 = 3;
+	//---------------------------------------------------------------------
 
-	//Sub Section 1
+	//Section 2
+	//---------
 	//The target points for where the first units should spawn
-	UPROPERTY(EditInstanceOnly, Category = "Stage1_Act1_Section1_Sub1")
-		TArray<class ATargetPoint*> Stage1Act1Section1Sub1SpawnPoints;
-
-	//The target points for where the first units should spawn
-	UPROPERTY(EditInstanceOnly, Category = "Stage1_Act1_Section1_Sub1")
-		TArray<class ATargetPoint*> Stage1Act1Section1Sub1GoToPoints;
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
+		TArray<class ATargetPoint*> Stage1Area1Section2SpawnPoints;
 
 	//The target points for where the first units should spawn
-	UPROPERTY(EditInstanceOnly, Category = "Stage1_Act1_Section1_Sub1")
-		TArray<class ATargetPoint*> Stage1Act1Section1Sub1FurtherGoToPoints;
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
+		TArray<class ATargetPoint*> Stage1Area1Section2GoToPoints;
+
+	//The target points for where the first units should spawn
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section2")
+		TArray<class ATargetPoint*> Stage1Area1Section2FurtherGoToPoints;
 
 	//The enemy quantities to be spawned in a sub section. Need an array as we have multiple "waves" of enemies
-	UPROPERTY(EditDefaultsOnly, Category = "Enemy Setup")
-		TArray<int32> EnemyQuantityStage1Act1Section1Sub1Waves;
+	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 2")
+		TArray<int32> EnemyQuantityTotalStage1Area1Section2Waves;
 
 	int32 CurrentWaveInSubSection = 0; //Used to keep track of which "wave of enemies" are in play in a certain area
 
@@ -67,8 +67,8 @@ private:
 
 	int32 CurrentEnemiesAliveInSection = 0;
 	int32 TotalEnemiesShot = 0;
-	int32 CurrentSubStage = 0; //The current area of shooting
-	int32 CurrentArea = 1; //The current area within an stage
+	int32 CurrentSection = 1; //The current area of shooting
+	int32 CurrentArea = 1; //The current area within an stage 1 -3
 
 	TArray<AAIEnemyCharacter*> CurrentEnemiesAlive;
 
@@ -78,14 +78,9 @@ public:
 	AEnemySpawner();
 	virtual void Tick(float DeltaTime) override;
 
-	//Responsible for getting the new position of the player. Most likely will only use the UpdateSubStage
-	//void UpdateLevel(int32 NewLevel);
-
-	//void UpdateAct(int32 NewAct);
-
 	//void UpdateStage(int32 NewStage);
-
-	void UpdateSubStage(int32 NewSubStage);
+	//void UpdateArea(int32 NewArea);
+	void UpdateSection(int32 NewSection);
 
 	UFUNCTION()
 	void DecreaseEnemyCount(AAIEnemyCharacter* Char);
@@ -97,8 +92,8 @@ private:
 
 	void PlaceEnemies();
 	void PlaceEnemiesStage1Area1();
-	void PlaceEnemiesStage1Area1SubSection0();
-	void PlaceEnemiesStage1Area1SubSection1();
+	void PlaceEnemiesStage1Area1Section1();
+	void PlaceEnemiesStage1Area1Section2();
 
 	//Saftey
 	bool CheckNoFieldsAreEmpty();

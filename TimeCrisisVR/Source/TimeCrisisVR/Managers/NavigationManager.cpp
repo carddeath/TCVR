@@ -52,12 +52,11 @@ void ANavigationManager::Tick(float DeltaTime)
 
 }
 
-void ANavigationManager::UpdateCurrentSubStage(bool bTeleportPlayer) 
+void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer) 
 {
-	//Increment the current sub stage
-	CurrentSubStage++;
+	//We dont increment at first as the current section is one value ahead of the 0 array of locomotion points
 
-	if (LocomotionPoints.Num() <= 0 || CurrentSubStage >= LocomotionPoints.Num())
+	if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Missing Locomotion points on %s"), *this->GetName());
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing locomotion points on Navigation Manager or too few sub stage locomotion points"));
@@ -70,29 +69,32 @@ void ANavigationManager::UpdateCurrentSubStage(bool bTeleportPlayer)
 		//Used to decide on which method of teleportation should be used.
 		if (!bTeleportPlayer) 
 		{
-			CustomPlayerController->MovePlayerViaNavManagerNodeBased(LocomotionPoints[CurrentSubStage]->GetActorLocation(), LocomotionPoints[CurrentSubStage]->GetActorRotation());
+			CustomPlayerController->MovePlayerViaNavManagerNodeBased(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
 		}
 		else 
 		{
-			CustomPlayerController->MovePlayerViaNavManagerTeleport(LocomotionPoints[CurrentSubStage]->GetActorLocation(), LocomotionPoints[CurrentSubStage]->GetActorRotation());
+			CustomPlayerController->MovePlayerViaNavManagerTeleport(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
 		}
 	}
 
 	//Hide the arrow that was just shot, is no longer needed
-	LocomotionPoints[CurrentSubStage]->ShowArrow(false);
+	LocomotionPoints[CurrentSection]->ShowArrow(false);
+
+	//Increment the current stage
+	CurrentSection++;
 
 	//TODO: Add a delay based on when the player is in the correct position
-	EnemySpawner->UpdateSubStage(CurrentSubStage);
+	EnemySpawner->UpdateSection(CurrentSection);
 }
 
 void ANavigationManager::RevealNextLocomotionArrow(int junk) 
 {
 	//We check + 1 as we have no currently updated the current sub stage so we need to check if there is another point beyond this one
-	if (LocomotionPoints.Num() <= 0 || CurrentSubStage + 1 >= LocomotionPoints.Num()) 
+	if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num()) 
 	{
 		UE_LOG(LogTemp, Error, TEXT("End of locomotion points on %s"), *this->GetName());
 		return;
 	}
-		LocomotionPoints[CurrentSubStage + 1]->ShowArrow(true);
+		LocomotionPoints[CurrentSection]->ShowArrow(true);
 }
 

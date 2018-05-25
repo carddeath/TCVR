@@ -23,8 +23,8 @@ void AEnemySpawner::BeginPlay()
 
 	CurrentEnemiesAlive.SetNum(10);
 
-	//Start the game off with the first substage being called directly
-	UpdateSubStage(0);
+	//Start the game off with the first section being called directly
+	UpdateSection(1);
 
 
 }
@@ -36,9 +36,9 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 }
 
-void AEnemySpawner::UpdateSubStage(int32 NewSubStage) 
+void AEnemySpawner::UpdateSection(int32 NewSection) 
 {
-	CurrentSubStage = NewSubStage;
+	CurrentSection = NewSection;
 	TotalEnemiesShot = 0;
 	if (CheckNoFieldsAreEmpty()) 
 	{
@@ -49,8 +49,9 @@ void AEnemySpawner::UpdateSubStage(int32 NewSubStage)
 
 bool AEnemySpawner::CheckNoFieldsAreEmpty() 
 {
-	if (!CharacterToSpawn || EnemyQuantityPerStage1Act1Section1.Num() <= 0 || Stage1Act1Section1Sub0SpawnPoints.Num() <= 0) 
+	if (!CharacterToSpawn || TotalEnemiesPerStage1Area1.Num() <= 0 || Stage1Area1Section1SpawnPoints.Num() <= 0) 
 	{
+		UE_LOG(LogTemp, Error, TEXT("Something missing on %s - Please check all defaults and instance"), *this->GetName());
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Something missing on Enemy spawner, please check all values in defaults and instance"));
 		return false;
 	}
@@ -65,8 +66,8 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("Enemy Count is now: %d"), CurrentEnemiesAliveInSection));
 
 	//If we have wiped out all of the enemies in the substage
-	//Check if all enemies are dead for the section
-	if (TotalEnemiesShot >= EnemyQuantityPerStage1Act1Section1[CurrentSubStage])
+	//Check if all enemies are dead for the section. We are currently 1 section ahead of the array
+	if (TotalEnemiesShot >= TotalEnemiesPerStage1Area1[CurrentSection - 1])
 	{
 		//Tell the nav manager to activate
 		if (RevealNextPointToNavMang.IsBound())
@@ -99,24 +100,24 @@ void AEnemySpawner::PlaceEnemies()
 
 void AEnemySpawner::PlaceEnemiesStage1Area1() 
 {
-	switch (CurrentSubStage)
+	switch (CurrentSection)
 	{
-	case 0:
-		PlaceEnemiesStage1Area1SubSection0();
-		break;
 	case 1:
-		PlaceEnemiesStage1Area1SubSection1();
+		PlaceEnemiesStage1Area1Section1();
 		break;
-		//TODO: Do this for each sub sction
+	case 2:
+		PlaceEnemiesStage1Area1Section2();
+		break;
+		//TODO: Do this for each sub section
 	default:
 		break;
 	}
 }
 
-void AEnemySpawner::PlaceEnemiesStage1Area1SubSection0() 
+void AEnemySpawner::PlaceEnemiesStage1Area1Section1() 
 {
 	//TODO: THIS LOGIC SHOULD BE HANDLED IN THE ENEMY ITSELF BY SENDING THE POINT DATA ACROSS for spawning and move to if required.
-	for (int32 i = 0; i < EnemyQuantityStage1Act1Section1Sub0Wave1; i++)
+	for (int32 i = 0; i < TotalEnemiesPerStage1Area1[0]; i++)
 	{
 		//Increment how many enemies are alive
 		CurrentEnemiesAliveInSection++;
@@ -127,11 +128,11 @@ void AEnemySpawner::PlaceEnemiesStage1Area1SubSection0()
 		//Make a brown uniform for the middle soldier
 		if (i == 1)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, Stage1Act1Section1Sub0SpawnPoints[i], nullptr, nullptr, 0.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, Stage1Area1Section1SpawnPoints[i], nullptr, nullptr, 0.0f);
 		}
 		else
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Act1Section1Sub0SpawnPoints[i], nullptr, nullptr, 0.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Area1Section1SpawnPoints[i], nullptr, nullptr, 0.0f);
 		}
 
 		//Add the delegate to say when an enemy is dead
@@ -139,9 +140,9 @@ void AEnemySpawner::PlaceEnemiesStage1Area1SubSection0()
 	}
 }
 
-void AEnemySpawner::PlaceEnemiesStage1Area1SubSection1() 
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2() 
 {
-	for (int32 i = 0; i < EnemyQuantityStage1Act1Section1Sub1Waves[CurrentWaveInSubSection]; i++) 
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSubSection]; i++) 
 	{
 		//Increment how many enemies are alive
 		CurrentEnemiesAliveInSection++;
@@ -151,15 +152,15 @@ void AEnemySpawner::PlaceEnemiesStage1Area1SubSection1()
 
 		if (i == 0)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, Stage1Act1Section1Sub1SpawnPoints[i], nullptr, Stage1Act1Section1Sub1FurtherGoToPoints[i], 2.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2FurtherGoToPoints[i], 2.0f);
 		}
 		else if(i == 1)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Act1Section1Sub1SpawnPoints[i], nullptr, Stage1Act1Section1Sub1FurtherGoToPoints[i], 3.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2FurtherGoToPoints[i], 3.0f);
 		}
 		else 
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Act1Section1Sub1SpawnPoints[i], Stage1Act1Section1Sub1GoToPoints[i], nullptr, 0.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], nullptr, 0.0f);
 		}
 
 		//Add the delegate to say when an enemy is dead

@@ -127,8 +127,8 @@ void APlayersGun::Fire()
 						if (NavManager) 
 						{
 							//Change false to true if we want "Teleport" behaviour
-							UE_LOG(LogTemp, Warning, TEXT("Hit NAV POINT"));
-							NavManager->UpdateCurrentSubStage(bTeleportOnLocoHit);
+							//UE_LOG(LogTemp, Warning, TEXT("Hit NAV POINT"));
+							NavManager->UpdateCurrentSection(bTeleportOnLocoHit);
 							break;
 						}
 					}else if (actor.GetActor()->Tags[0].Compare("Enemy") == 0)
@@ -263,7 +263,7 @@ void APlayersGun::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCompone
 	{
 		CurrentAmmo = Ammo->GetAmmo();
 		OtherActor->Destroy();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("RELOAD!"), true, FVector2D(3.0f, 3.0f));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT("RELOAD!"), true, FVector2D(3.0f, 3.0f));
 		UGameplayStatics::SpawnSoundAttached(SFXReloaded, this->GetRootComponent());
 
 		//Update the widget with the ammo in it

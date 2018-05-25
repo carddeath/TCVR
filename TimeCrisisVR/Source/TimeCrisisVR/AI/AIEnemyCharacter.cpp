@@ -111,8 +111,6 @@ void AAIEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 }
 
-
-
 void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 {
 	//TODO - Randomise the death noise
@@ -125,7 +123,8 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 	}
 	else 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("DELEGATE WASN'T BOUND"));
+		UE_LOG(LogTemp, Error, TEXT("Delegate wasn't bound on %s"), *this->GetName());
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Delegate wasn't bound on AIEnemy Character"));
 	}
 
 
@@ -139,20 +138,20 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsDead = true;
 
 		//Debug only
-		switch (HitBoxTarget) 
-		{
-		case HitArea::LEGS:
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Emerald, TEXT("LEG shot hit!"));
-			break;
-		case HitArea::TORSO:
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("TORSO shot hit!"));
-			break;
-		case HitArea::HEAD:
-			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("HEAD shot hit!"));
-			break;
-		default:
-			break;
-		}
+		//switch (HitBoxTarget) 
+		//{
+		//case HitArea::LEGS:
+		//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Emerald, TEXT("LEG shot hit!"));
+		//	break;
+		//case HitArea::TORSO:
+		//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("TORSO shot hit!"));
+		//	break;
+		//case HitArea::HEAD:
+		//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("HEAD shot hit!"));
+		//	break;
+		//default:
+		//	break;
+		//}
 
 	}
 

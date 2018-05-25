@@ -19,7 +19,6 @@ AAmmoPouch::AAmmoPouch()
 
 	AmmoPouchOffset->SetupAttachment(RootComp);
 
-//	PouchMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("Ammo Pouch"));
 	LeftPouch = CreateDefaultSubobject<UStaticMeshComponent>(FName("Left Pouch"));
 	RightPouch = CreateDefaultSubobject<UStaticMeshComponent>(FName("Right Pouch"));
 
@@ -34,9 +33,6 @@ void AAmmoPouch::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//PouchMesh->bGenerateOverlapEvents = true;
-	//PouchMesh->OnComponentBeginOverlap.AddDynamic(this, &AAmmoPouch::OnComponentBeginOverlap);
-	//PouchMesh->OnComponentEndOverlap.AddDynamic(this, &AAmmoPouch::OnComponentEndOverlap);
 	LeftPouch->OnComponentBeginOverlap.AddDynamic(this, &AAmmoPouch::OnComponentBeginOverlap);
 	LeftPouch->OnComponentEndOverlap.AddDynamic(this, &AAmmoPouch::OnComponentEndOverlap);
 	RightPouch->OnComponentBeginOverlap.AddDynamic(this, &AAmmoPouch::OnComponentBeginOverlap);
@@ -55,12 +51,12 @@ void AAmmoPouch::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponen
 	//These names are taken from the VRPawn static mesh hand objects
 	if (OtherComp->GetName() == "SMLeft") 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Collided Left"));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Collided Left"));
 		bPlayersLeftHandInPouch = true;
 	}
 	else if (OtherComp->GetName() == "SMRight") 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Collided Right"));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Collided Right"));
 		bPlayersRightHandInPouch = true;
 	}
 }
@@ -70,12 +66,12 @@ void AAmmoPouch::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent,
 	//These names are taken from the VRPawn static mesh hand objects
 	if (OtherComp->GetName() == "SMLeft")
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Removed Left"));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Removed Left"));
 		bPlayersLeftHandInPouch = false;
 	}
 	else if (OtherComp->GetName() == "SMRight")
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Removed Right"));
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Magenta, TEXT("Removed Right"));
 		bPlayersRightHandInPouch = false;
 	}
 }

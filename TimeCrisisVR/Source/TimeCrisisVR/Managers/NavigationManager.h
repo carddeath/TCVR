@@ -24,24 +24,21 @@ public:
 protected:
 
 	//For now this is a target point but it will change in the future
-	UPROPERTY(EditAnywhere, Category = "Locomotion Points")
+	UPROPERTY(EditInstanceOnly, Category = "Locomotion Points")
 	TArray<class ANavigationArrow*> LocomotionPoints;
 
 private:
 
 	class AEnemySpawner* EnemySpawner = nullptr;
 
-	//The current level in the game
-	int32 CurrentLevel = 0;
+	//The current stage in the game - goes from 1-3
+	int32 CurrentStage = 1;
 
-	//The current Act in the game
-	int32 CurrentAct = 1;
+	//The current Act in the game - goes from 1-3
+	int32 CurrentArea = 1;
 
-	//The current stage of the level
-	int32 CurrentStage = 0;
-
-	//The current shooting position of the player
-	int32 CurrentSubStage = 0;
+	//The current shooting position of the player. - goes from 0 - max needed
+	int32 CurrentSection = 1;
 
 	class AMainPlayerController* CustomPlayerController = nullptr;
 
@@ -51,7 +48,7 @@ public:
 	ANavigationManager();
 	virtual void Tick(float DeltaTime) override;
 
-	void UpdateCurrentSubStage(bool bTeleportPlayer);
+	void UpdateCurrentSection(bool bTeleportPlayer);
 
 protected:
 	virtual void BeginPlay() override;
