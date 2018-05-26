@@ -64,7 +64,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 2")
 		TArray<int32> EnemyQuantityTotalStage1Area1Section2Waves;
 
-	int32 CurrentWaveInSubSection = 0; //Used to keep track of which "wave of enemies" are in play in a certain area
+
 
 	//Only set this when trying to start the game in a different position
 	UPROPERTY(EditInstanceOnly, Category = "Debug")
@@ -73,13 +73,15 @@ protected:
 
 private:
 
-	int32 CurrentEnemiesAliveInSection = 0;
-	int32 TotalEnemiesShot = 0;
-
-
+	int32 CurrentEnemiesAliveInSection = 0; // Tracks how many units are left for use of waves and moving on to the next section
+	int32 TotalEnemiesShot = 0; //Used to tally all dead units within a section to know when a section is complete by accumulating the waves
 	int32 CurrentArea = 1; //The current area within an stage 1 -3
+	int32 CurrentWaveInSection = 1; //Used to keep track of which "wave of enemies" are in play in a certain area
 
 	TArray<AAIEnemyCharacter*> CurrentEnemiesAlive;
+
+	//Used to toggle in a 
+	bool bDoesSectorContainWaves = false;
 
 	//Methods
 	
@@ -103,6 +105,13 @@ private:
 	void PlaceEnemiesStage1Area1();
 	void PlaceEnemiesStage1Area1Section1();
 	void PlaceEnemiesStage1Area1Section2();
+
+	void PlaceEnemiesStage1Area1Section2Wave1();
+	void PlaceEnemiesStage1Area1Section2Wave2();
+	void PlaceEnemiesStage1Area1Section2Wave3();
+	void PlaceEnemiesStage1Area1Section2Wave4();
+	void PlaceEnemiesStage1Area1Section2Wave5();
+	void PlaceEnemiesStage1Area1Section2Wave6();
 
 	//Saftey
 	bool CheckNoFieldsAreEmpty();

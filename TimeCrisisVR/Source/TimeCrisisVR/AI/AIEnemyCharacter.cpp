@@ -65,6 +65,7 @@ void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, 
 	GoToPoint = GoToPnt;
 	EscapePoint = EscPoint;
 	DelayBeforeEscape = DelayToGoToFurtherPoint;
+	AdvancePoint = AdvancePnt;
 
 	TextureEnemy();
 	SetupEnemyPosition();
@@ -81,6 +82,10 @@ void AAIEnemyCharacter::TextureEnemy()
 			break;
 		case EnemyType::BROWN:
 			this->FindComponentByClass<USkeletalMeshComponent>()->SetMaterial(0, EnemyMaterials[1]);
+			break;
+		case EnemyType::ORANGE:
+			this->FindComponentByClass<USkeletalMeshComponent>()->SetMaterial(0, EnemyMaterials[2]);
+			break;
 		default:
 			break;
 		}
@@ -90,7 +95,6 @@ void AAIEnemyCharacter::TextureEnemy()
 void AAIEnemyCharacter::SetupEnemyPosition() 
 {
 	SetActorLocation(SpawnPoint->GetActorLocation());
-
 
 	//If the enemy shouldn't move
 	if (MyBehaviour == EAIBehaviour::SPAWN_RUN_SHOOT) 
@@ -108,6 +112,11 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 
 		//If they have a GoToPoint we send set the value 
 		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnMoveShootEscape(GoToPoint, EscapePoint);
+	}
+	else if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT_ADVANCE_SHOOT) 
+	{
+		//Start the unit as crouching, we will disable this after a delay in the BT (Behaviour Tree)
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = true;
 	}
 	else 
 	{

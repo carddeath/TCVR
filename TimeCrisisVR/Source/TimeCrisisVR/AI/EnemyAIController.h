@@ -24,11 +24,17 @@ private:
 	//Methods
 public:
 
+	//For Spawn, Run and Shoot soldiers
 	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
 		void MoveToPosition(class ATargetPoint* GoToPoint);
 
+	//For spawn, run, shoot and escape soldiers
 	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
 		void SpawnMoveShootEscape(ATargetPoint* GoToPoint ,ATargetPoint* EscapePoint);
+
+	//FOr Spawn, pop up from crouch, shoot, advance and shoot soldiers
+	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
+		void SpawnPopShootAdvanceShoot(ATargetPoint* GoToPoint, ATargetPoint* EscapePoint, ATargetPoint* AdvancePoint);
 
 protected:
 

@@ -32,7 +32,7 @@ enum class EAIBehaviour : uint8
 {
 	SPAWN_SHOOT,
 	SPAWN_RUN_SHOOT_ESCAPE,
-	SPAWN_SHOOT_ADVANCE_SHOOT,
+	SPAWN_POP_SHOOT_ADVANCE_SHOOT,
 	SPAWN_RUN_SHOOT,
 	SPAWN_POP_SHOOT,
 	SPAWN_POP_SHOOT_ESCAPE
@@ -84,6 +84,9 @@ private:
 
 	//If the character moves after attacking
 	ATargetPoint* EscapePoint = nullptr;
+
+	//A point for when AI advances on a position
+	ATargetPoint* AdvancePoint = nullptr;
 
 	//Stops the death noise being played mid flight
 	bool bIsDead = false;

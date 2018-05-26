@@ -72,6 +72,9 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 		//Tell the nav manager to activate
 		if (RevealNextPointToNavMang.IsBound())
 		{
+			//Reset the wave as we are moving on to a new section
+			CurrentWaveInSection = 0;
+			bDoesSectorContainWaves = false; //Reset state incase a sector does not have waves
 			RevealNextPointToNavMang.Broadcast(0);
 		}
 		else
@@ -79,6 +82,16 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 			UE_LOG(LogTemp, Warning, TEXT("Next point not bound in %s"), *this->GetName());
 		}
 
+	}
+	//If we have waves then we should also check the wave and if all enemies are dead
+	else if (bDoesSectorContainWaves) 
+	{
+		if (CurrentEnemiesAliveInSection == 0) 
+		{
+			//Then increment the wave and find the correct category of soldiers to load
+			CurrentWaveInSection++;
+			PlaceEnemiesStage1Area1();
+		}
 	}
 }
 
@@ -106,6 +119,7 @@ void AEnemySpawner::PlaceEnemiesStage1Area1()
 		PlaceEnemiesStage1Area1Section1();
 		break;
 	case 2:
+		bDoesSectorContainWaves = true;
 		PlaceEnemiesStage1Area1Section2();
 		break;
 		//TODO: Do this for each sub section
@@ -141,9 +155,36 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section1()
 	}
 }
 
-void AEnemySpawner::PlaceEnemiesStage1Area1Section2() 
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2()
 {
-	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSubSection]; i++) 
+	switch (CurrentWaveInSection) 
+	{
+	case 1:
+		PlaceEnemiesStage1Area1Section2Wave1();
+		break;
+	case 2:
+		PlaceEnemiesStage1Area1Section2Wave2();
+		break;
+	case 3:
+		PlaceEnemiesStage1Area1Section2Wave3();
+		break;
+	case 4:
+		PlaceEnemiesStage1Area1Section2Wave4();
+		break;
+	case 5:
+		PlaceEnemiesStage1Area1Section2Wave5();
+		break;
+	case 6:
+		PlaceEnemiesStage1Area1Section2Wave6();
+		break;
+	default:
+		break;
+	}
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave1() 
+{
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1]; i++)
 	{
 		//Increment how many enemies are alive
 		CurrentEnemiesAliveInSection++;
@@ -156,12 +197,12 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2()
 			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT_ESCAPE,
 				Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], Stage1Area1Section2EscapePoints[i], nullptr, 2.0f);
 		}
-		else if(i == 1)
+		else if (i == 1)
 		{
 			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT_ESCAPE,
 				Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], Stage1Area1Section2EscapePoints[i], nullptr, 5.0f);
 		}
-		else 
+		else
 		{
 			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
 				Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], nullptr, nullptr, 0.0f);
@@ -171,4 +212,48 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2()
 		CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
 	}
 }
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave2()
+{
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
+
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (i == 0)
+		{
+			//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::ORANGE, EnemyWeapon::ROCKET_LAUNCHER, EAIBehaviour::SPAWN_POP_SHOOT_ADVANCE_SHOOT,
+				Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], nullptr, nullptr, Stage1Area1Section2AdvancePoints[i + TotalEnemiesShot ], 2.0f);
+		}
+
+		//Add the delegate to say when an enemy is dead
+		CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+	}
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave3()
+{
+
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave4()
+{
+
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave5()
+{
+
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave6()
+{
+
+}
+
+
 

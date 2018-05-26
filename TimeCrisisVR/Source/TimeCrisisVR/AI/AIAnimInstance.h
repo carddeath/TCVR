@@ -39,6 +39,9 @@ public:
 	bool bIsRunning = false;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Animation")
+	bool bIsCrouching = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Animation")
 	float speed = 10.0f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Animation")
