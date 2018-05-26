@@ -101,13 +101,13 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 		//If they have a GoToPoint we send set the value 
 		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->MoveToPosition(GoToPoint);
 	}
-	else if (MyBehaviour == EAIBehaviour::SPAWN_SHOOT_ESCAPE) 
+	else if (MyBehaviour == EAIBehaviour::SPAWN_RUN_SHOOT_ESCAPE) 
 	{
 		//Move to the correct position
-		//Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
 
 		//If they have a GoToPoint we send set the value 
-		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnAndFireAndRun(EscapePoint);
+		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnMoveShootEscape(GoToPoint, EscapePoint);
 	}
 	else 
 	{

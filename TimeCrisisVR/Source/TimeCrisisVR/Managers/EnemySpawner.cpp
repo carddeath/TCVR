@@ -153,13 +153,13 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2()
 
 		if (i == 0)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT_ESCAPE,
-				Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2EscapePoints[i], nullptr, 2.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT_ESCAPE,
+				Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], Stage1Area1Section2EscapePoints[i], nullptr, 2.0f);
 		}
 		else if(i == 1)
 		{
-			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT_ESCAPE,
-				Stage1Area1Section2SpawnPoints[i], nullptr, Stage1Area1Section2EscapePoints[i], nullptr, 5.0f);
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT_ESCAPE,
+				Stage1Area1Section2SpawnPoints[i], Stage1Area1Section2GoToPoints[i], Stage1Area1Section2EscapePoints[i], nullptr, 5.0f);
 		}
 		else 
 		{
