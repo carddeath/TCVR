@@ -50,6 +50,8 @@ public:
 
 	FDeathCallback DeathCallback;
 
+	bool bIsReloading = false;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 		TArray<class USoundBase*> DeathNoises;
@@ -71,8 +73,6 @@ private:
 
 	int32 PercentageOfCriticalHit = 0;
 
-
-
 	EnemyType MyType;
 	EnemyWeapon MyWeapon;
 	EAIBehaviour MyBehaviour;
@@ -90,8 +90,10 @@ private:
 	//Used to check if we should move to rotate towards the player
 	bool bIsAtGoToLocation = false;
 
-	//Methods
 
+	FTimerHandle ShotDelayHandle;
+
+	//Methods
 public:
 	// Sets default values for this character's properties
 	AAIEnemyCharacter();
@@ -111,13 +113,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void FireUponPlayer();
+
+	//Called if the AI leaves the world
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void EraseEnemy();
+
 private:	
 
 	void TextureEnemy();
 
 	void SetupEnemyPosition();
 
-
-	
-	
 };

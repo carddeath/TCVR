@@ -1,0 +1,8 @@
+Note this is probably an ok system to get the AI system to work.
+
+1. Create a function that is blueprint implementable in the EnemyAIController
+2. Use this function in the BP to set the correct blackboard key values such as a go to point, escape point, advance point etc
+3. Create 1 or more branches from the main selector to fullfil the state we want to create.
+4. Create blackboard notes if required and use them as conditions 
+5. If a delay is required a service can be used to check when a conition has changed
+6. Create new tasks to have more advanced systems that will allow animation changes etc.

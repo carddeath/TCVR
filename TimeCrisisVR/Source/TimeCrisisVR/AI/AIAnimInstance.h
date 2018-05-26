@@ -30,6 +30,15 @@ public:
 	bool bIsDead = false;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Animation")
+	bool bIsFiring = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Animation")
+	bool bIsReloading = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Animation")
+	bool bIsRunning = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Animation")
 	float speed = 10.0f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Animation")

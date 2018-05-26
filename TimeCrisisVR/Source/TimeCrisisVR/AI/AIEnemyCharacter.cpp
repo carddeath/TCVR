@@ -9,6 +9,7 @@
 #include "Classes/AIController.h"
 #include "Engine.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Public/TimerManager.h"
 
 
 // Sets default values
@@ -170,3 +171,33 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 	Destroy();
 }
 
+void AAIEnemyCharacter::EraseEnemy() 
+{
+	if (DeathCallback.IsBound())
+	{
+		DeathCallback.Broadcast(this);
+		Destroy();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Delegate wasn't bound on %s"), *this->GetName());
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Delegate wasn't bound on AIEnemy Character"));
+	}
+}
+
+void AAIEnemyCharacter::FireUponPlayer()
+{
+	//TODO: Spawn bullets that go towards the player and destroy them
+	//TODO: Register damage on the player via the bullet class
+	if (bIsReloading) 
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ShotDelayHandle);
+	}
+	else 
+	{
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsFiring = true;
+	//	GetWorld()->GetTimerManager().SetTimer(ShotDelayHandle, this, &AAIEnemyCharacter::SpawnProjectile, 0.5f, true);
+		UE_LOG(LogTemp, Warning, TEXT("Fire Shot"));
+	}
+
+}
