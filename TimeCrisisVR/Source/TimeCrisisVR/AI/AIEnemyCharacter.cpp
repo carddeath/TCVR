@@ -56,7 +56,7 @@ void AAIEnemyCharacter::Tick(float DeltaTime)
 
 }
 
-void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, EAIBehaviour Behaviour, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* EscPoint, ATargetPoint* AdvancePnt, float DelayToGoToFurtherPoint)
+void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, EAIBehaviour Behaviour, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* EscPoint, ATargetPoint* AdvancePnt)
 {
 	MyType = typeOfEnemy;
 	MyWeapon = EnemyWep;
@@ -64,11 +64,11 @@ void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, 
 	SpawnPoint = SpwnPoint;
 	GoToPoint = GoToPnt;
 	EscapePoint = EscPoint;
-	DelayBeforeEscape = DelayToGoToFurtherPoint;
 	AdvancePoint = AdvancePnt;
 
-	TextureEnemy();
 	SetupEnemyPosition();
+	TextureEnemy();
+	SetupEnemyWeaponAnimationState();
 }
 
 void AAIEnemyCharacter::TextureEnemy() 
@@ -116,13 +116,23 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 	else if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT_ADVANCE_SHOOT) 
 	{
 		//Start the unit as crouching, we will disable this after a delay in the BT (Behaviour Tree)
+		//Set the scale to 0 so we can't see the enemy while he is crouching. Note I tried visibility and hiding the actor in game but it messed up the animation
+		this->SetActorScale3D(FVector(0.0f));
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = true;
+		//Make the character be revealed after 0.5 seconds
+		GetWorld()->GetTimerManager().SetTimer(CrouchInvisibleDelayHandle, this, &AAIEnemyCharacter::RevealEnemyFromCrouchSpawn, 1.0f, false);
 	}
 	else 
 	{
 		//TODO: Need to also set this when the player arrives at the correct position
 		bIsAtGoToLocation = true;
 	}
+}
+
+//Sends the correct weapon type to the character so they know which shooting animation to use
+void AAIEnemyCharacter::SetupEnemyWeaponAnimationState() 
+{
+	Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->WeaponInUse = MyWeapon;
 }
 
 // Called to bind functionality to input
@@ -208,5 +218,13 @@ void AAIEnemyCharacter::FireUponPlayer()
 	//	GetWorld()->GetTimerManager().SetTimer(ShotDelayHandle, this, &AAIEnemyCharacter::SpawnProjectile, 0.5f, true);
 		UE_LOG(LogTemp, Warning, TEXT("Fire Shot"));
 	}
+}
+
+//Helper Functions called via timer delegation
+void AAIEnemyCharacter::RevealEnemyFromCrouchSpawn() 
+{
+	//TODO: Hitboxes should also be disabled until revealed otherwise they can still hit the enemy
+	//Set the scale to 1 so we can see the enemy while he is crouching. Note I tried visibility and hiding the actor in game but it messed up the animation
+	this->SetActorScale3D(FVector(1.0f));
 
 }

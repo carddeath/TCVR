@@ -15,6 +15,15 @@ enum class HitArea : uint8
 	LEGS
 };
 
+UENUM(Blueprintable)
+enum class EnemyWeapon : uint8
+{
+	PISTOL,
+	ROCKET_LAUNCHER,
+	SHIELD_PISTOL,
+	PROJECTILE
+};
+
 /**
  * 
  */
@@ -44,8 +53,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Animation")
 	float speed = 10.0f;
 
+	//Used to decide what death plays
 	UPROPERTY(BlueprintReadWrite, Category = "Animation")
 	HitArea HitAreaSection;
+
+	//Used to decide what fire and reload animation plays
+	UPROPERTY(BlueprintReadWrite, Category = "Animation")
+	EnemyWeapon WeaponInUse;
 
 
 protected:

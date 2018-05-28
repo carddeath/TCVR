@@ -18,15 +18,7 @@ enum class EnemyType : uint8
 	GREEN
 };
 
-UENUM()
-enum class EnemyWeapon : uint8
-{
-	PISTOL,
-	MINIGUN,
-	ROCKET_LAUNCHER,
-	SHIELD_PISTOL
-};
-
+//Moved Enemy weapon into AIAnimInstance as this class inherits from it
 UENUM()
 enum class EAIBehaviour : uint8 
 {
@@ -66,8 +58,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Components")
 	TArray<class UMaterialInstance*> EnemyMaterials;
 
-	UPROPERTY(BlueprintReadWrite, Category = "AI")
-	float DelayBeforeEscape;
+	//UPROPERTY(BlueprintReadWrite, Category = "AI")
+	//float DelayBeforeEscape;
 
 private:
 
@@ -95,6 +87,7 @@ private:
 
 
 	FTimerHandle ShotDelayHandle;
+	FTimerHandle CrouchInvisibleDelayHandle;
 
 	//Methods
 public:
@@ -108,7 +101,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Used to setup enemies that move from their spawn point
-	void SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, EAIBehaviour Behaviour, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* EscPoint, ATargetPoint* AdvancePnt, float DelayToGoToFurtherPoint);
+	void SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, EAIBehaviour Behaviour, ATargetPoint* SpwnPoint, ATargetPoint* GoToPnt, ATargetPoint* EscPoint, ATargetPoint* AdvancePnt);
 
 	void KillEnemy(HitArea HitBoxTarget);
 
@@ -128,5 +121,10 @@ private:
 	void TextureEnemy();
 
 	void SetupEnemyPosition();
+
+	void SetupEnemyWeaponAnimationState();
+
+	//Helpers
+	void RevealEnemyFromCrouchSpawn();
 
 };
