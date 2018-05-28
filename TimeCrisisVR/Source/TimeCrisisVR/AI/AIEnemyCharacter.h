@@ -58,15 +58,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Components")
 	TArray<class UMaterialInstance*> EnemyMaterials;
 
-	//UPROPERTY(BlueprintReadWrite, Category = "AI")
-	//float DelayBeforeEscape;
+	UPROPERTY(BlueprintReadWrite, Category = "AI")
+	float ReloadDelay;
 
 private:
 
 	int32 PercentageOfCriticalHit = 0;
 
 	EnemyType MyType;
+
 	EnemyWeapon MyWeapon;
+
 	EAIBehaviour MyBehaviour;
 	//Where the unit spawns in the world
 	class ATargetPoint* SpawnPoint = nullptr;
@@ -105,16 +107,16 @@ public:
 
 	void KillEnemy(HitArea HitBoxTarget);
 
+	//Called if the AI leaves the world
+	UFUNCTION(BlueprintCallable, Category = "AI")
+		void EraseEnemy();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	void FireUponPlayer();
-
-	//Called if the AI leaves the world
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	void EraseEnemy();
 
 private:	
 
@@ -125,6 +127,11 @@ private:
 	void SetupEnemyWeaponAnimationState();
 
 	//Helpers
-	void RevealEnemyFromCrouchSpawn();
+	void RevealEnemyFromCrouchSpawnAdvance();
+
+	void RevealEnemyFromCrouchSpawnPop();
+
+	//REmove this later once weapon classes are created
+	void SetupReloadTime();
 
 };

@@ -96,6 +96,10 @@ public:
 	UFUNCTION()
 	void DecreaseEnemyCount(AAIEnemyCharacter* Char);
 
+	//Debug function
+	UFUNCTION(BlueprintCallable, Category = "Debug")
+	void DEBUGDeleteAllEnemiesAndAdvanceStage();
+
 protected:
 	virtual void BeginPlay() override;
 

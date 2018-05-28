@@ -84,7 +84,7 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 	//If we have waves then we should also check the wave and if all enemies are dead
 	else if (bDoesSectorContainWaves) 
 	{
-		if (CurrentEnemiesAliveInSection == 0) 
+		if (CurrentEnemiesAliveInSection <= 0) 
 		{
 			//Then increment the wave and find the correct category of soldiers to load
 			CurrentWaveInSection++;
@@ -242,12 +242,10 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave2()
 
 		if (CurrentEnemiesAlive[i]) 
 		{
-			if (i == 0)
-			{
-				//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
-				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::ORANGE, EnemyWeapon::ROCKET_LAUNCHER, EAIBehaviour::SPAWN_POP_SHOOT_ADVANCE_SHOOT,
-					Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], nullptr, nullptr, Stage1Area1Section2AdvancePoints[i + TotalEnemiesShot]);
-			}
+
+			//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::ORANGE, EnemyWeapon::ROCKET_LAUNCHER, EAIBehaviour::SPAWN_POP_SHOOT_ADVANCE_SHOOT,
+				Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], nullptr, nullptr, Stage1Area1Section2AdvancePoints[i + TotalEnemiesShot]);
 
 			//Add the delegate to say when an enemy is dead
 			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
@@ -261,12 +259,56 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave2()
 
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave3()
 {
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
 
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (CurrentEnemiesAlive[i])
+		{
+
+			//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+				Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], Stage1Area1Section2GoToPoints[i + TotalEnemiesShot], nullptr, nullptr);
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+	}
 }
 
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave4()
 {
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
 
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (CurrentEnemiesAlive[i])
+		{
+
+			//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_POP_SHOOT,
+				Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], nullptr, nullptr, nullptr);
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+	}
 }
 
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave5()
@@ -277,6 +319,21 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave5()
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave6()
 {
 
+}
+
+//Debug Methods
+
+//Used in the level manager to "kill" all enemies in the scene and to create the next wave.
+void AEnemySpawner::DEBUGDeleteAllEnemiesAndAdvanceStage() 
+{
+	//Delete all the enemies in the scene and in turn advance to the next wave
+	for (int i = 0; i < CurrentEnemiesAlive.Num(); i++ ) 
+	{
+		if (CurrentEnemiesAlive[i] != nullptr) 
+		{
+			CurrentEnemiesAlive[i]->EraseEnemy();
+		}
+	}
 }
 
 

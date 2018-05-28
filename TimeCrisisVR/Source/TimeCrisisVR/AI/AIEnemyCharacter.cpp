@@ -69,6 +69,7 @@ void AAIEnemyCharacter::SetupEnemy(EnemyType typeOfEnemy, EnemyWeapon EnemyWep, 
 	SetupEnemyPosition();
 	TextureEnemy();
 	SetupEnemyWeaponAnimationState();
+	SetupReloadTime();
 }
 
 void AAIEnemyCharacter::TextureEnemy() 
@@ -101,6 +102,8 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 	{
 		//Move to the correct position
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsRunning = true;
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsFiring = false;
 
 		//If they have a GoToPoint we send set the value 
 		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->MoveToPosition(GoToPoint);
@@ -109,18 +112,27 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 	{
 		//Move to the correct position
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->speed = 15.0f;
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsRunning = true;
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsFiring = false;
 
 		//If they have a GoToPoint we send set the value 
 		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnMoveShootEscape(GoToPoint, EscapePoint);
 	}
 	else if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT_ADVANCE_SHOOT) 
 	{
-		//Start the unit as crouching, we will disable this after a delay in the BT (Behaviour Tree)
 		//Set the scale to 0 so we can't see the enemy while he is crouching. Note I tried visibility and hiding the actor in game but it messed up the animation
 		this->SetActorScale3D(FVector(0.0f));
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = true;
 		//Make the character be revealed after 0.5 seconds
-		GetWorld()->GetTimerManager().SetTimer(CrouchInvisibleDelayHandle, this, &AAIEnemyCharacter::RevealEnemyFromCrouchSpawn, 1.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(CrouchInvisibleDelayHandle, this, &AAIEnemyCharacter::RevealEnemyFromCrouchSpawnAdvance, 1.0f, false);
+	}
+	else if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT) 
+	{
+		//Set the scale to 0 so we can't see the enemy while he is crouching. Note I tried visibility and hiding the actor in game but it messed up the animation
+		this->SetActorScale3D(FVector(0.0f));
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = true;
+		//Make the character be revealed after 0.5 seconds
+		GetWorld()->GetTimerManager().SetTimer(CrouchInvisibleDelayHandle, this, &AAIEnemyCharacter::RevealEnemyFromCrouchSpawnPop, 1.0f, false);
 	}
 	else 
 	{
@@ -195,13 +207,13 @@ void AAIEnemyCharacter::EraseEnemy()
 	if (DeathCallback.IsBound())
 	{
 		DeathCallback.Broadcast(this);
-		Destroy();
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Delegate wasn't bound on %s"), *this->GetName());
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Delegate wasn't bound on AIEnemy Character"));
 	}
+	Destroy();
 }
 
 void AAIEnemyCharacter::FireUponPlayer()
@@ -221,10 +233,44 @@ void AAIEnemyCharacter::FireUponPlayer()
 }
 
 //Helper Functions called via timer delegation
-void AAIEnemyCharacter::RevealEnemyFromCrouchSpawn() 
+void AAIEnemyCharacter::RevealEnemyFromCrouchSpawnAdvance() 
 {
 	//TODO: Hitboxes should also be disabled until revealed otherwise they can still hit the enemy
 	//Set the scale to 1 so we can see the enemy while he is crouching. Note I tried visibility and hiding the actor in game but it messed up the animation
 	this->SetActorScale3D(FVector(1.0f));
+	//Stand up
+	Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = false;
 
+	Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnPopShootAdvanceShoot(AdvancePoint);
+
+}
+
+void AAIEnemyCharacter::RevealEnemyFromCrouchSpawnPop() 
+{
+	this->SetActorScale3D(FVector(1.0f));
+	//Stand up
+	Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = false;
+	Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnPopShoot();
+}
+
+//TODO: Remove this once weapon classes are introduced, convert this to setting up the correct weapon class instead
+void AAIEnemyCharacter::SetupReloadTime() 
+{
+	switch (MyWeapon) 
+	{
+	case EnemyWeapon::PISTOL:
+		ReloadDelay = 2.0f;
+		break;
+	case EnemyWeapon::ROCKET_LAUNCHER:
+		ReloadDelay = 1.0f;
+		break;
+	case EnemyWeapon::SHIELD_PISTOL:
+		ReloadDelay = 2.0f;
+		break;
+	case EnemyWeapon::PROJECTILE:
+		ReloadDelay = 1.0f;
+		break;
+	default:
+		break;
+	}
 }

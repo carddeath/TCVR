@@ -34,7 +34,11 @@ public:
 
 	//FOr Spawn, pop up from crouch, shoot, advance and shoot soldiers
 	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
-		void SpawnPopShootAdvanceShoot(ATargetPoint* GoToPoint, ATargetPoint* EscapePoint, ATargetPoint* AdvancePoint);
+		void SpawnPopShootAdvanceShoot(ATargetPoint* AdvancePoint);
+
+	//For enemies that pop up and just shoot at the player
+	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
+		void SpawnPopShoot();
 
 protected:
 
