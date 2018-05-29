@@ -50,8 +50,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	UWidgetComponent* RightGunAmmoWidget = nullptr;
 
-
-
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Gun Specifics")

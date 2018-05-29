@@ -64,6 +64,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 2")
 		TArray<int32> EnemyQuantityTotalStage1Area1Section2Waves;
 
+	//Section 3
+	//---------
+	//The target points for where the units should spawn
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section3")
+		TArray<class ATargetPoint*> Stage1Area1Section3SpawnPoints;
+
+	//The target points where units should run to.
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section3")
+		TArray<class ATargetPoint*> Stage1Area1Section3GoToPoints;
+
+	//The enemy quantities to be spawned in a sub section. Need an array as we have multiple "waves" of enemies
+	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 3")
+		TArray<int32> EnemyQuantityTotalStage1Area1Section3Waves;
 
 
 	//Only set this when trying to start the game in a different position
@@ -106,16 +119,26 @@ protected:
 private:	
 
 	void PlaceEnemies();
+
+	//Stage 1 | Area 1 |
 	void PlaceEnemiesStage1Area1();
 	void PlaceEnemiesStage1Area1Section1();
 	void PlaceEnemiesStage1Area1Section2();
+	void PlaceEnemiesStage1Area1Section3();
 
+	//Stage 1 | Area 1 | Section 2
 	void PlaceEnemiesStage1Area1Section2Wave1();
 	void PlaceEnemiesStage1Area1Section2Wave2();
 	void PlaceEnemiesStage1Area1Section2Wave3();
 	void PlaceEnemiesStage1Area1Section2Wave4();
 	void PlaceEnemiesStage1Area1Section2Wave5();
 	void PlaceEnemiesStage1Area1Section2Wave6();
+
+	//Stage 1 | Area 1 | Section 3
+	void PlaceEnemiesStage1Area1Section3Wave1();
+	void PlaceEnemiesStage1Area1Section3Wave2();
+
+	void SpawnEnemyAfterDelayStage1Area1Section3Wave2GoToPnt(int32 PlayerIndex);
 
 	//Saftey
 	bool CheckNoFieldsAreEmpty();

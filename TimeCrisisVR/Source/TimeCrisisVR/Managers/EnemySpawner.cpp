@@ -47,12 +47,14 @@ void AEnemySpawner::UpdateSection(int32 NewSection)
 
 bool AEnemySpawner::CheckNoFieldsAreEmpty() 
 {
-	if (!CharacterToSpawn || TotalEnemiesPerStage1Area1.Num() <= 0 || Stage1Area1Section1SpawnPoints.Num() <= 0) 
-	{
-		UE_LOG(LogTemp, Error, TEXT("Something missing on %s - Please check all defaults and instance"), *this->GetName());
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Something missing on Enemy spawner, please check all values in defaults and instance"));
-		return false;
-	}
+	//TODO: Uncomment this and add all important fields later
+	//if (!CharacterToSpawn || TotalEnemiesPerStage1Area1.Num() <= 0 || Stage1Area1Section1SpawnPoints.Num() <= 0) 
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("Something missing on %s - Please check all defaults and instance"), *this->GetName());
+	//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Something missing on Enemy spawner, please check all values in defaults and instance"));
+	//	return false;
+	//}
+	//return true;
 	return true;
 }
 
@@ -71,7 +73,7 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 		if (RevealNextPointToNavMang.IsBound())
 		{
 			//Reset the wave as we are moving on to a new section
-			CurrentWaveInSection = 0;
+			CurrentWaveInSection = 1;
 			bDoesSectorContainWaves = false; //Reset state incase a sector does not have waves
 			RevealNextPointToNavMang.Broadcast(0);
 		}
@@ -121,12 +123,16 @@ void AEnemySpawner::PlaceEnemiesStage1Area1()
 		bDoesSectorContainWaves = true;
 		PlaceEnemiesStage1Area1Section2();
 		break;
+	case 3:
+		bDoesSectorContainWaves = true;
+		PlaceEnemiesStage1Area1Section3();
 		//TODO: Do this for each section
 	default:
 		break;
 	}
 }
 
+//Stage 1 | Area 1 | Section 1
 void AEnemySpawner::PlaceEnemiesStage1Area1Section1() 
 {
 	for (int32 i = 0; i < TotalEnemiesPerStage1Area1[0]; i++)
@@ -163,6 +169,8 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section1()
 	}
 }
 
+
+//Stage 1 | Area 1 | Section 2
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2()
 {
 	switch (CurrentWaveInSection) 
@@ -313,26 +321,177 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave4()
 
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave5()
 {
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
 
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (CurrentEnemiesAlive[i])
+		{
+
+			//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+				Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], Stage1Area1Section2GoToPoints[i + TotalEnemiesShot], nullptr, nullptr);
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+	}
 }
 
 void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave6()
 {
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
 
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (CurrentEnemiesAlive[i])
+		{
+
+			//We need to apply the offset of TotalEnemiesShot to get the right points. Only for array based logic
+			CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+				Stage1Area1Section2SpawnPoints[i + TotalEnemiesShot], Stage1Area1Section2GoToPoints[i + TotalEnemiesShot], nullptr, nullptr);
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+	}
 }
+
+//Stage 1 | Area 1 | Section 3
+void AEnemySpawner::PlaceEnemiesStage1Area1Section3() 
+{
+	switch (CurrentWaveInSection)
+	{
+	case 1:
+		PlaceEnemiesStage1Area1Section3Wave1();
+		break;
+	case 2:
+		PlaceEnemiesStage1Area1Section3Wave2();
+		break;
+	default:
+		break;
+	}
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section3Wave1() 
+{
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section3Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
+
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (CurrentEnemiesAlive[i])
+		{
+			if (i == 0)
+			{
+
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_POP_SHOOT,
+					Stage1Area1Section3SpawnPoints[i + TotalEnemiesShot], nullptr, nullptr, nullptr);
+			}
+			else
+			{
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::SHIELD_PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+					Stage1Area1Section3SpawnPoints[i + TotalEnemiesShot], Stage1Area1Section3GoToPoints[i + TotalEnemiesShot], nullptr, nullptr);
+			}
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+
+	}
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section3Wave2() 
+{
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section3Waves[CurrentWaveInSection - 1]; i++)
+	{
+	//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
+
+		FTimerHandle TempHandle;
+		FTimerDelegate SpawnEnemyDelegate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::SpawnEnemyAfterDelayStage1Area1Section3Wave2GoToPnt, i);
+
+		//Need different time handles to create the delay illusion
+		switch (i) 
+		{
+		case 0:
+			GetWorldTimerManager().SetTimer(TempHandle, SpawnEnemyDelegate, 1.0f, false);
+			break;
+		case 1:
+			GetWorldTimerManager().SetTimer(TempHandle, SpawnEnemyDelegate, 1.5f, false);
+			break;
+		case 2:
+			GetWorldTimerManager().SetTimer(TempHandle, SpawnEnemyDelegate, 2.25f, false);
+			break;
+		case 3:
+			GetWorldTimerManager().SetTimer(TempHandle, SpawnEnemyDelegate, 2.5f, false);
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+//A delegate method that allows us to spawn soldiers after a delay but with the correct index
+void AEnemySpawner::SpawnEnemyAfterDelayStage1Area1Section3Wave2GoToPnt(int32 PlayerIndex)
+{
+	CurrentEnemiesAlive[PlayerIndex] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+
+		if (PlayerIndex == 0 || PlayerIndex == 3)
+		{
+			CurrentEnemiesAlive[PlayerIndex]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+				Stage1Area1Section3SpawnPoints[PlayerIndex + TotalEnemiesShot], Stage1Area1Section3GoToPoints[PlayerIndex + TotalEnemiesShot], nullptr, nullptr);
+		}
+		else
+		{
+			CurrentEnemiesAlive[PlayerIndex]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_POP_SHOOT,
+				Stage1Area1Section3SpawnPoints[PlayerIndex + TotalEnemiesShot], nullptr, nullptr, nullptr);
+		}
+
+	CurrentEnemiesAlive[PlayerIndex]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+}
+
 
 //Debug Methods
 
 //Used in the level manager to "kill" all enemies in the scene and to create the next wave.
 void AEnemySpawner::DEBUGDeleteAllEnemiesAndAdvanceStage() 
 {
-	//Delete all the enemies in the scene and in turn advance to the next wave
-	for (int i = 0; i < CurrentEnemiesAlive.Num(); i++ ) 
+	//BUG: This is broken, not sure why. It creates a new soldier in the 2nd clearence
+	//Delete all the enemies in the scene and in turn advance to the next wave 
+
+	if (CurrentSection == 1) 
 	{
-		if (CurrentEnemiesAlive[i] != nullptr) 
-		{
-			CurrentEnemiesAlive[i]->EraseEnemy();
-		}
+	
+	}
+	else if (CurrentSection == 2) 
+	{
+		TotalEnemiesShot += EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1];
+		CurrentEnemiesAliveInSection = 0;
+		DecreaseEnemyCount(nullptr);
 	}
 }
 
