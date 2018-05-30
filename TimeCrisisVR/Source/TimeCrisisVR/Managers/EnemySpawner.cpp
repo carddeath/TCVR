@@ -126,7 +126,15 @@ void AEnemySpawner::PlaceEnemiesStage1Area1()
 	case 3:
 		bDoesSectorContainWaves = true;
 		PlaceEnemiesStage1Area1Section3();
-		//TODO: Do this for each section
+		break;
+	case 4:
+		bDoesSectorContainWaves = true;
+		PlaceEnemiesStage1Area1Section4();
+		break;
+	case 5:
+		bDoesSectorContainWaves = false;
+		PlaceEnemiesStage1Area1Section5();
+		break;
 	default:
 		break;
 	}
@@ -420,7 +428,6 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section3Wave1()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
 		}
-
 	}
 }
 
@@ -474,6 +481,94 @@ void AEnemySpawner::SpawnEnemyAfterDelayStage1Area1Section3Wave2GoToPnt(int32 Pl
 	CurrentEnemiesAlive[PlayerIndex]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
 }
 
+//Stage 1 | Area 1 | Section 4
+void AEnemySpawner::PlaceEnemiesStage1Area1Section4() 
+{
+	switch (CurrentWaveInSection) 
+	{
+	case 1:
+		PlaceEnemiesStage1Area1Section4Wave1();
+		break;
+	case 2:
+		PlaceEnemiesStage1Area1Section4Wave2();
+		break;
+	case 3:
+		PlaceEnemiesStage1Area1Section4Wave3();
+		break;
+	case 4:
+		PlaceEnemiesStage1Area1Section4Wave4();
+		break;
+	default:
+		break;
+	}
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section4Wave1() 
+{
+	for (int32 i = 0; i < EnemyQuantityTotalStage1Area1Section4Waves[CurrentWaveInSection - 1]; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
+
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+		//Allow a delegate to call so decrease the enemy count
+
+		if (CurrentEnemiesAlive[i])
+		{
+			if (i == 2)
+			{
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_RUN_SHOOT,
+					Stage1Area1Section4SpawnPoints[i + TotalEnemiesShot], Stage1Area1Section4GoToPoints[i + TotalEnemiesShot], nullptr, nullptr);
+			}
+			else if (i == 3) 
+			{
+				FTimerHandle TempHandle;
+				FTimerDelegate SpawnEnemyDelegate = FTimerDelegate::CreateUObject(this, &AEnemySpawner::SpawnEnemyAfterDelayStage1Area1Section4Wave1, i);
+				GetWorldTimerManager().SetTimer(TempHandle, SpawnEnemyDelegate, 1.0f, false);
+			}
+			else
+			{
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT,
+					Stage1Area1Section4SpawnPoints[i + TotalEnemiesShot], nullptr , nullptr, nullptr);
+			}
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+	}
+}
+
+void AEnemySpawner::SpawnEnemyAfterDelayStage1Area1Section4Wave1(int32 PlayerIndex) 
+{
+	//TODO: Change this to the run away one
+	CurrentEnemiesAlive[PlayerIndex]->SetupEnemy(EnemyType::ORANGE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_POP_SHOOT,
+		Stage1Area1Section4SpawnPoints[PlayerIndex + TotalEnemiesShot], nullptr, nullptr, nullptr);
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section4Wave2()
+{
+
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section4Wave3()
+{
+
+}
+
+void AEnemySpawner::PlaceEnemiesStage1Area1Section4Wave4()
+{
+
+}
+
+//Stage 1 | Area 1 | Section 5
+void AEnemySpawner::PlaceEnemiesStage1Area1Section5() 
+{
+
+}
 
 //Debug Methods
 

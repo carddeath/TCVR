@@ -97,7 +97,6 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 {
 	SetActorLocation(SpawnPoint->GetActorLocation());
 
-	//If the enemy shouldn't move
 	if (MyBehaviour == EAIBehaviour::SPAWN_RUN_SHOOT) 
 	{
 		//Move to the correct position
@@ -134,7 +133,11 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 		//Make the character be revealed after 0.5 seconds
 		GetWorld()->GetTimerManager().SetTimer(CrouchInvisibleDelayHandle, this, &AAIEnemyCharacter::RevealEnemyFromCrouchSpawnPop, 1.0f, false);
 	}
-	else 
+	else  if (MyBehaviour == EAIBehaviour::SPAWN_SHOOT) 
+	{
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsFiring = true;
+	}
+	else
 	{
 		//TODO: Need to also set this when the player arrives at the correct position
 		bIsAtGoToLocation = true;

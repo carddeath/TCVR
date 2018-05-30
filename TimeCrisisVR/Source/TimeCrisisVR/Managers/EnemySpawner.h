@@ -67,22 +67,54 @@ protected:
 	//Section 3
 	//---------
 	//The target points for where the units should spawn
-	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section3")
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 3")
 		TArray<class ATargetPoint*> Stage1Area1Section3SpawnPoints;
 
 	//The target points where units should run to.
-	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section3")
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 3")
 		TArray<class ATargetPoint*> Stage1Area1Section3GoToPoints;
 
 	//The enemy quantities to be spawned in a sub section. Need an array as we have multiple "waves" of enemies
 	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 3")
 		TArray<int32> EnemyQuantityTotalStage1Area1Section3Waves;
 
+	//Section 4
+	//---------
+	//The target points for where the units should spawn
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 4")
+		TArray<class ATargetPoint*> Stage1Area1Section4SpawnPoints;
+
+	//The target points where units should run to.
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 4")
+		TArray<class ATargetPoint*> Stage1Area1Section4GoToPoints;
+
+	//The target points for when a unit should try to escape the scene
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 4")
+		TArray<class ATargetPoint*> Stage1Area1Section4EscapePoints;
+
+	//The target points for when a unit advances after attacking 
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 4")
+		TArray<class ATargetPoint*> Stage1Area1Section4AdvancePoints;
+
+	//The enemy quantities to be spawned in a sub section. Need an array as we have multiple "waves" of enemies
+	UPROPERTY(EditDefaultsOnly, Category = "Stage 1 | Area 1 | Section 4")
+		TArray<int32> EnemyQuantityTotalStage1Area1Section4Waves;
+
+	//Section 5
+	//---------
+	//The target points for where the units should spawn
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 5")
+		TArray<class ATargetPoint*> Stage1Area1Section5SpawnPoints;
+
+	//The target points where units should run to.
+	UPROPERTY(EditInstanceOnly, Category = "Stage1_Area 1_Section 5")
+		TArray<class ATargetPoint*> Stage1Area1Section5GoToPoints;
+
+	///////////////////////////////////////////////////
 
 	//Only set this when trying to start the game in a different position
 	UPROPERTY(EditInstanceOnly, Category = "Debug")
 	int32 CurrentSection = 1; //The current area of shooting
-
 
 private:
 
@@ -122,9 +154,12 @@ private:
 
 	//Stage 1 | Area 1 |
 	void PlaceEnemiesStage1Area1();
-	void PlaceEnemiesStage1Area1Section1();
 	void PlaceEnemiesStage1Area1Section2();
 	void PlaceEnemiesStage1Area1Section3();
+	void PlaceEnemiesStage1Area1Section4();
+
+	//Stage 1 | Area 1 | Section 1
+	void PlaceEnemiesStage1Area1Section1();
 
 	//Stage 1 | Area 1 | Section 2
 	void PlaceEnemiesStage1Area1Section2Wave1();
@@ -139,6 +174,17 @@ private:
 	void PlaceEnemiesStage1Area1Section3Wave2();
 
 	void SpawnEnemyAfterDelayStage1Area1Section3Wave2GoToPnt(int32 PlayerIndex);
+
+	//Stage 1 | Area 1 | Section 4
+	void PlaceEnemiesStage1Area1Section4Wave1();
+	void PlaceEnemiesStage1Area1Section4Wave2();
+	void PlaceEnemiesStage1Area1Section4Wave3();
+	void PlaceEnemiesStage1Area1Section4Wave4();
+
+	void SpawnEnemyAfterDelayStage1Area1Section4Wave1(int32 PlayerIndex);
+
+	//Stage 1 | Area 1 | Section 5
+	void PlaceEnemiesStage1Area1Section5();
 
 	//Saftey
 	bool CheckNoFieldsAreEmpty();
