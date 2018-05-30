@@ -87,6 +87,12 @@ void AAIEnemyCharacter::TextureEnemy()
 		case EnemyType::ORANGE:
 			this->FindComponentByClass<USkeletalMeshComponent>()->SetMaterial(0, EnemyMaterials[2]);
 			break;
+		case EnemyType::GREEN:
+			this->FindComponentByClass<USkeletalMeshComponent>()->SetMaterial(0, EnemyMaterials[3]);
+			break;
+		case EnemyType::RED:
+			this->FindComponentByClass<USkeletalMeshComponent>()->SetMaterial(0, EnemyMaterials[4]);
+			break;
 		default:
 			break;
 		}
@@ -95,6 +101,8 @@ void AAIEnemyCharacter::TextureEnemy()
 
 void AAIEnemyCharacter::SetupEnemyPosition() 
 {
+	//For pop soldiers their EnemyAIController choice is set in the RevealEnemyFromCrouchSpawnPop function
+
 	SetActorLocation(SpawnPoint->GetActorLocation());
 
 	if (MyBehaviour == EAIBehaviour::SPAWN_RUN_SHOOT) 
@@ -136,6 +144,14 @@ void AAIEnemyCharacter::SetupEnemyPosition()
 	else  if (MyBehaviour == EAIBehaviour::SPAWN_SHOOT) 
 	{
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsFiring = true;
+		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnPopShoot();
+	}
+	else if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT_ESCAPE)
+	{
+		this->SetActorScale3D(FVector(0.0f));
+		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = true;
+		//Make the character be revealed after 0.5 seconds
+		GetWorld()->GetTimerManager().SetTimer(CrouchInvisibleDelayHandle, this, &AAIEnemyCharacter::RevealEnemyFromCrouchSpawnPop, 1.0f, false);
 	}
 	else
 	{
@@ -253,7 +269,17 @@ void AAIEnemyCharacter::RevealEnemyFromCrouchSpawnPop()
 	this->SetActorScale3D(FVector(1.0f));
 	//Stand up
 	Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsCrouching = false;
-	Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnPopShoot();
+
+	//Pick the appropriate blackboard values to set
+	if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT) 
+	{
+		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnPopShoot();
+	}
+	else if (MyBehaviour == EAIBehaviour::SPAWN_POP_SHOOT_ESCAPE)
+	{
+		Cast<AEnemyAIController>(UAIBlueprintHelperLibrary::GetAIController(this))->SpawnPopShootEscape(EscapePoint);
+	}
+
 }
 
 //TODO: Remove this once weapon classes are introduced, convert this to setting up the correct weapon class instead

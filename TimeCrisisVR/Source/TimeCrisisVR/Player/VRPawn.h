@@ -58,6 +58,9 @@ protected:
 	UStaticMesh* GunHoldingModel = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VR")
+	UStaticMesh* FingerPointHandModel = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VR")
 	TSubclassOf<class AAmmoPouch> AmmoPouchTemplate = nullptr;
 
 	AAmmoPouch* SpawnedAmmoPouch = nullptr;

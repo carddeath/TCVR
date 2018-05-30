@@ -40,6 +40,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
 		void SpawnPopShoot();
 
+	//For enemies that pop up shoot and then escape
+	UFUNCTION(BlueprintImplementableEvent, Category = "Navigation")
+		void SpawnPopShootEscape(ATargetPoint* EscapePoint);
+
 protected:
 
 
