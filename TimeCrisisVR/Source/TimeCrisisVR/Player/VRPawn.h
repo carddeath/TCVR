@@ -70,11 +70,6 @@ private:
 	bool bIsHoldingObjectLeft = false;
 	bool bIsHoldingObjectRight = false;
 
-	bool BIsLeftHandInKeypad = false;
-	bool BIsRightHandInKeypad = false;
-	bool BIsLeftHandInKeypadButton = false;
-	bool BIsRightHandInKeypadButton = false;
-
 	//The object we picked up in either hand
 	AActor* LeftPickedUpActor = nullptr;
 	AActor* RightPickedUpActor = nullptr;
@@ -111,6 +106,8 @@ protected:
 	virtual void BeginPlay() override;
 	
 private:
+
+	//Interactions
 	UFUNCTION()
 	void PickUpObjectLeft();
 
@@ -123,6 +120,9 @@ private:
 	UFUNCTION()
 	void DropObjectRight();
 
+	void TogglePointingHandMeshLeft(float AxisValue);
+	void TogglePointingHandMeshRight(float AxisValue);
+
 	//Allows both the left and right hand logic for the ammo clip to be in one function
 	UFUNCTION()
 	void AttemptToPickUpAmmoClip(EHand HandType);
@@ -131,12 +131,4 @@ private:
 	void FirePistolLeft();
 
 	void FirePistolRight();
-
-	//For overlapping
-	UFUNCTION()
-		void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
-	UFUNCTION()
-		void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 };

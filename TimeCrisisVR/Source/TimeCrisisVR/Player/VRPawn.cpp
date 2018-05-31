@@ -14,8 +14,6 @@
 #include "Player/PlayersGun.h"
 #include "Player/AmmoPouch.h"
 #include "Player/AmmoClip.h"
-#include "Interactables/Keypad.h"
-#include "Interactables/KeypadButton.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -53,12 +51,6 @@ void AVRPawn::BeginPlay()
 	SMLeft->SetStaticMesh(EmptyHandModel);
 	SMRight->SetStaticMesh(EmptyHandModel);
 
-	//Allow the hands to overlap with certain objects
-	SMLeft->OnComponentBeginOverlap.AddDynamic(this, &AVRPawn::OnComponentBeginOverlap);
-	SMLeft->OnComponentEndOverlap.AddDynamic(this, &AVRPawn::OnComponentEndOverlap);
-	SMRight->OnComponentBeginOverlap.AddDynamic(this, &AVRPawn::OnComponentBeginOverlap);
-	SMRight->OnComponentEndOverlap.AddDynamic(this, &AVRPawn::OnComponentEndOverlap);
-
 	SCHeldObjectLeft->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 	SCHeldObjectRight->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 
@@ -89,6 +81,9 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("PickupRight", IE_Released, this, &AVRPawn::DropObjectRight);
 	PlayerInputComponent->BindAction("FirePistolLeft", IE_Pressed, this, &AVRPawn::FirePistolLeft);
 	PlayerInputComponent->BindAction("FirePistolRight", IE_Pressed, this, &AVRPawn::FirePistolRight);
+
+	PlayerInputComponent->BindAxis("PlayerPointingHandLeft", this, &AVRPawn::TogglePointingHandMeshLeft);
+	PlayerInputComponent->BindAxis("PlayerPointingHandRight", this, &AVRPawn::TogglePointingHandMeshRight);
 }
 
 void AVRPawn::PickUpObjectLeft() 
@@ -471,76 +466,26 @@ void AVRPawn::FirePistolRight()
 	}
 }
 
-//For triggers
-
-void AVRPawn::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) 
+void AVRPawn::TogglePointingHandMeshLeft(float AxisValue) 
 {
-	if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypad>(OtherActor)) 
+	if (!bIsHoldingObjectLeft && AxisValue <= 0.0f) 
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Found the keypad collider on %s"), *OverlappedComponent->GetName());
-
-		//Checks if the left hand is empty or right hand is empty. If so then change the mesh
-		if (OverlappedComponent->GetName() == "SMLeft" && !bIsHoldingObjectLeft) 
-		{
-			SMLeft->SetStaticMesh(FingerPointHandModel);
-			BIsLeftHandInKeypad = true;
-		}
-		else if (OverlappedComponent->GetName() == "SMRight" && !bIsHoldingObjectRight)
-		{
-			SMRight->SetStaticMesh(FingerPointHandModel);
-			BIsRightHandInKeypad = true;
-		}
+		SMLeft->SetStaticMesh(FingerPointHandModel);
 	}
-	else if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypadButton>(OtherActor)) 
-	{
-		if (OverlappedComponent->GetName() == "SMLeft" && !bIsHoldingObjectLeft)
-		{
-			SMLeft->SetStaticMesh(FingerPointHandModel);
-			BIsLeftHandInKeypadButton = true;
-		}
-		else if (OverlappedComponent->GetName() == "SMRight" && !bIsHoldingObjectRight)
-		{
-			SMRight->SetStaticMesh(FingerPointHandModel);
-			BIsRightHandInKeypadButton = true;
-		}
-	}
-}
-
-void AVRPawn::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) 
-{
-	if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypad>(OtherActor))
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Found the keypad collider on %s"), *OverlappedComponent->GetName());
-
-		//Checks if the left hand is empty or right hand is empty. If so then change the mesh
-		if (OverlappedComponent->GetName() == "SMLeft" && BIsLeftHandInKeypad)
-		{
-			BIsLeftHandInKeypad = false;
-		}
-		else if (OverlappedComponent->GetName() == "SMRight" && BIsRightHandInKeypad)
-		{
-			BIsRightHandInKeypad = false;
-		}
-	}
-	else if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypadButton>(OtherActor))
-	{
-		if (OverlappedComponent->GetName() == "SMLeft" && BIsLeftHandInKeypadButton)
-		{
-			BIsLeftHandInKeypadButton = false;
-		}
-		else if (OverlappedComponent->GetName() == "SMRight" && BIsRightHandInKeypadButton)
-		{
-			BIsRightHandInKeypadButton = false;
-		}
-	}
-
-	if (!BIsLeftHandInKeypad && !BIsLeftHandInKeypadButton && !bIsHoldingObjectLeft) 
+	else if (!bIsHoldingObjectLeft && AxisValue >= 1.0f) 
 	{
 		SMLeft->SetStaticMesh(EmptyHandModel);
 	}
-	else if (!BIsRightHandInKeypad && !BIsRightHandInKeypadButton && !bIsHoldingObjectRight)
+}
+
+void AVRPawn::TogglePointingHandMeshRight(float AxisValue)
+{
+	if (!bIsHoldingObjectRight && AxisValue <= 0.0f)
+	{
+		SMRight->SetStaticMesh(FingerPointHandModel);
+	}
+	else if (!bIsHoldingObjectRight && AxisValue >= 1.0f)
 	{
 		SMRight->SetStaticMesh(EmptyHandModel);
 	}
 }
-
