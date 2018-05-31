@@ -247,7 +247,7 @@ void AAIEnemyCharacter::FireUponPlayer()
 	{
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsFiring = true;
 	//	GetWorld()->GetTimerManager().SetTimer(ShotDelayHandle, this, &AAIEnemyCharacter::SpawnProjectile, 0.5f, true);
-		UE_LOG(LogTemp, Warning, TEXT("Fire Shot"));
+		//UE_LOG(LogTemp, Warning, TEXT("Fire Shot"));
 	}
 }
 

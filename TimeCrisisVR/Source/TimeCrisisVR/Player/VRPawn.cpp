@@ -14,6 +14,7 @@
 #include "Player/PlayersGun.h"
 #include "Player/AmmoPouch.h"
 #include "Player/AmmoClip.h"
+#include "Interactables/Keypad.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -50,6 +51,12 @@ void AVRPawn::BeginPlay()
 	//Set up offsets and models where required
 	SMLeft->SetStaticMesh(EmptyHandModel);
 	SMRight->SetStaticMesh(EmptyHandModel);
+
+	//Allow the hands to overlap with certain objects
+	SMLeft->OnComponentBeginOverlap.AddDynamic(this, &AVRPawn::OnComponentBeginOverlap);
+	SMLeft->OnComponentEndOverlap.AddDynamic(this, &AVRPawn::OnComponentEndOverlap);
+	SMRight->OnComponentBeginOverlap.AddDynamic(this, &AVRPawn::OnComponentBeginOverlap);
+	SMRight->OnComponentEndOverlap.AddDynamic(this, &AVRPawn::OnComponentEndOverlap);
 
 	SCHeldObjectLeft->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 	SCHeldObjectRight->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
@@ -460,6 +467,44 @@ void AVRPawn::FirePistolRight()
 		{
 			PlayersGunReference->Fire();
 		}
+	}
+}
+
+//For triggers
+
+void AVRPawn::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult) 
+{
+	if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypad>(OtherActor)) 
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Found the keypad collider on %s"), *OverlappedComponent->GetName());
+
+		//Checks if the left hand is empty or right hand is empty. If so then change the mesh
+		if (OverlappedComponent->GetName() == "SMLeft" && !bIsHoldingObjectLeft) 
+		{
+			SMLeft->SetStaticMesh(FingerPointHandModel);
+			bIsInInteractionLeft = true;
+		}
+		else if (OverlappedComponent->GetName() == "SMRight" && !bIsHoldingObjectRight)
+		{
+			SMRight->SetStaticMesh(FingerPointHandModel);
+			bIsInInteractionRight = true;
+		}
+		return;
+	}
+}
+
+void AVRPawn::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) 
+{
+	//Same check as overlap but reverses the model to an empty hand
+	if (OverlappedComponent->GetName() == "SMLeft" && bIsInInteractionLeft)
+	{
+		SMLeft->SetStaticMesh(EmptyHandModel);
+		bIsInInteractionLeft = false;
+	}
+	else if (OverlappedComponent->GetName() == "SMRight" && ! bIsInInteractionRight)
+	{
+		SMRight->SetStaticMesh(EmptyHandModel);
+		bIsInInteractionRight = false;
 	}
 }
 

@@ -647,7 +647,7 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section5()
 			//Make a brown uniform for the middle soldier
 			if (i == 0)
 			{
-				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_POP_SHOOT,
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_POP_SHOOT,
 					Stage1Area1Section5SpawnPoints[i + TotalEnemiesShot], nullptr , nullptr, nullptr);
 			}
 			else

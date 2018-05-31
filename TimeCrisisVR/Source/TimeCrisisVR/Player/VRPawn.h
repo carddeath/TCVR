@@ -70,11 +70,12 @@ private:
 	bool bIsHoldingObjectLeft = false;
 	bool bIsHoldingObjectRight = false;
 
+	bool bIsInInteractionLeft = false;
+	bool bIsInInteractionRight = false;
+
 	//The object we picked up in either hand
 	AActor* LeftPickedUpActor = nullptr;
 	AActor* RightPickedUpActor = nullptr;
-
-
 
 	//The component we actually hit
 	UPrimitiveComponent* LeftHitComponent = nullptr;
@@ -126,5 +127,12 @@ private:
 	void FirePistolLeft();
 
 	void FirePistolRight();
+
+	//For overlapping
+	UFUNCTION()
+		void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+		void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 };

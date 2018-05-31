@@ -20,6 +20,9 @@ protected:
 	TArray<class UMaterialInstance*> NumberMaterials;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		USceneComponent* CustomRoot = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
 		UStaticMeshComponent* KeyMesh = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
@@ -36,14 +39,14 @@ public:
 	AKeypadButton();
 	virtual void Tick(float DeltaTime) override;
 
+	int32 GetNumberKey();
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
 	void PickMaterial();
 
-
-
 	
-	
+
 };

@@ -11,9 +11,14 @@ AKeypadButton::AKeypadButton()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	CustomRoot = CreateDefaultSubobject<USceneComponent>(FName("Custom Root"));
+	RootComponent = CustomRoot;
 
 	KeyMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("SM_Key_Mesh"));
 	PressCollider = CreateDefaultSubobject<UBoxComponent>(FName("Pressing Collision"));
+
+	KeyMesh->SetupAttachment(RootComponent);
+	PressCollider->SetupAttachment(KeyMesh);
 }
 
 // Called when the game starts or when spawned
@@ -21,6 +26,8 @@ void AKeypadButton::BeginPlay()
 {
 	Super::BeginPlay();
 	PickMaterial();
+	//PressCollider->SetRelativeLocation(FVector(2.2f, 6.4f, 2.2f));
+	UE_LOG(LogTemp, Warning, TEXT("Rootcomp is %s"), *PressCollider->GetAttachmentRootActor()->GetName());
 }
 
 // Called every frame
@@ -32,6 +39,16 @@ void AKeypadButton::Tick(float DeltaTime)
 
 void AKeypadButton::PickMaterial() 
 {
-	KeyMesh->SetMaterial(0, NumberMaterials[NumberToKey]);
+	if (NumberMaterials.Num() > 0) 
+	{
+		KeyMesh->SetMaterial(0, NumberMaterials[NumberToKey]);
+	}
+
 }
+
+int32 AKeypadButton::GetNumberKey() 
+{
+	return NumberToKey;
+}
+
 

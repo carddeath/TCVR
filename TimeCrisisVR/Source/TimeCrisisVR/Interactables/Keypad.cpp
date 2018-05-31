@@ -3,6 +3,9 @@
 #include "Keypad.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/ChildActorComponent.h"
+#include "Interactables/KeypadButton.h"
+#include "Engine.h"
 
 
 // Sets default values
@@ -16,13 +19,53 @@ AKeypad::AKeypad()
 
 	RootComponent = KeypadMesh;
 	KeypadMeshChangingTrigger->SetupAttachment(RootComponent);
+
+	KeyParent = CreateDefaultSubobject<USceneComponent>(FName("KeypadTransform"));
+	Key1 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 1"));
+	Key2 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 2"));
+	Key3 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 3"));
+	Key4 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 4"));
+	Key5 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 5"));
+	Key6 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 6"));
+	Key7 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 7"));
+	Key8 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 8"));
+	Key9 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 9"));
+	KeyCancel = CreateDefaultSubobject<UChildActorComponent>(FName("Key Cancel"));
+
+	KeyParent->SetupAttachment(RootComponent);
+
+	Key1->SetupAttachment(KeyParent);
+	Key2->SetupAttachment(KeyParent);
+	Key3->SetupAttachment(KeyParent);
+	Key4->SetupAttachment(KeyParent);
+	Key5->SetupAttachment(KeyParent);
+	Key6->SetupAttachment(KeyParent);
+	Key7->SetupAttachment(KeyParent);
+	Key8->SetupAttachment(KeyParent);
+	Key9->SetupAttachment(KeyParent);
+	KeyCancel->SetupAttachment(KeyParent);
+
+
 }
 
 // Called when the game starts or when spawned
 void AKeypad::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	//Need to force the rotation and location of the keys
+	//KeyParent->SetRelativeLocation(FVector(9.0f, 4.419f, 23.0f));
+	KeyParent->SetRelativeRotation(FRotator(0.0f));
+
+	Cast<AKeypadButton>(Key1->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key2->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key3->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key4->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key5->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key6->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key7->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key8->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(Key9->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+	Cast<AKeypadButton>(KeyCancel->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
 }
 
 // Called every frame
@@ -30,5 +73,30 @@ void AKeypad::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	//Might not work as a hand holding something may be able to collide
+	if (OtherComp->GetName() == "SMLeft" || OtherComp->GetName() == "SMRight")
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Entered overlap on key"));
+
+		if (Cast<AKeypadButton>(OverlappedComponent->GetOwner())) 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Sucess"));
+			int32 NumberIs = Cast<AKeypadButton>(OverlappedComponent->GetOwner())->GetNumberKey();
+			UE_LOG(LogTemp, Warning, TEXT("Number is: %d"), NumberIs);
+
+			//TODO: Update the widget that should be on the keypad
+			
+		}
+		else 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fail"));
+		}
+
+
+	}
 }
 
