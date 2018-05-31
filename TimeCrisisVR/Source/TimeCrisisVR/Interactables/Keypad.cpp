@@ -6,6 +6,9 @@
 #include "Components/ChildActorComponent.h"
 #include "Interactables/KeypadButton.h"
 #include "Engine.h"
+#include "Components/WidgetComponent.h"
+#include "Interactables/KeypadWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -45,7 +48,8 @@ AKeypad::AKeypad()
 	Key9->SetupAttachment(KeyParent);
 	KeyCancel->SetupAttachment(KeyParent);
 
-
+	NumberDisplay = CreateDefaultSubobject<UWidgetComponent>(FName("Number Display Component"));
+	NumberDisplay->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -80,16 +84,18 @@ void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 	//Might not work as a hand holding something may be able to collide
 	if (OtherComp->GetName() == "SMLeft" || OtherComp->GetName() == "SMRight")
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Entered overlap on key"));
 
 		if (Cast<AKeypadButton>(OverlappedComponent->GetOwner())) 
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Sucess"));
-			int32 NumberIs = Cast<AKeypadButton>(OverlappedComponent->GetOwner())->GetNumberKey();
-			UE_LOG(LogTemp, Warning, TEXT("Number is: %d"), NumberIs);
+			int32 EnteredNumber = Cast<AKeypadButton>(OverlappedComponent->GetOwner())->GetNumberKey();
 
-			//TODO: Update the widget that should be on the keypad
+			Cast<UKeypadWidget>(NumberDisplay->GetUserWidgetObject())->InsertNewDigitIntoSystem(EnteredNumber);
 			
+			//Clear was pressed
+			if (EnteredNumber == 0 && ClearSFX) 
+			{
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClearSFX, this->GetActorLocation());
+			}
 		}
 		else 
 		{

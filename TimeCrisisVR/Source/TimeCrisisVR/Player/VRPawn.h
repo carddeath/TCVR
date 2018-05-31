@@ -70,8 +70,10 @@ private:
 	bool bIsHoldingObjectLeft = false;
 	bool bIsHoldingObjectRight = false;
 
-	bool bIsInInteractionLeft = false;
-	bool bIsInInteractionRight = false;
+	bool BIsLeftHandInKeypad = false;
+	bool BIsRightHandInKeypad = false;
+	bool BIsLeftHandInKeypadButton = false;
+	bool BIsRightHandInKeypadButton = false;
 
 	//The object we picked up in either hand
 	AActor* LeftPickedUpActor = nullptr;
@@ -95,6 +97,8 @@ private:
 
 	EHand CurrentHandPressed;
 
+	//Used to track how many things are overlapping. If the hand leaves the keypad it should go back to normal
+	int32 AmountOfObjectsOverlapping = 0;
 
 	//Methods
 

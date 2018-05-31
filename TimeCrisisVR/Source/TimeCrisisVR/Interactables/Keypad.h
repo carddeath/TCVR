@@ -57,6 +57,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 		UChildActorComponent* KeyCancel = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widget")
+		class UWidgetComponent* NumberDisplay = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		class USoundBase* ClearSFX;
+
 private:
 
 	//Methods

@@ -15,6 +15,7 @@
 #include "Player/AmmoPouch.h"
 #include "Player/AmmoClip.h"
 #include "Interactables/Keypad.h"
+#include "Interactables/KeypadButton.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -482,29 +483,64 @@ void AVRPawn::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 		if (OverlappedComponent->GetName() == "SMLeft" && !bIsHoldingObjectLeft) 
 		{
 			SMLeft->SetStaticMesh(FingerPointHandModel);
-			bIsInInteractionLeft = true;
+			BIsLeftHandInKeypad = true;
 		}
 		else if (OverlappedComponent->GetName() == "SMRight" && !bIsHoldingObjectRight)
 		{
 			SMRight->SetStaticMesh(FingerPointHandModel);
-			bIsInInteractionRight = true;
+			BIsRightHandInKeypad = true;
 		}
-		return;
+	}
+	else if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypadButton>(OtherActor)) 
+	{
+		if (OverlappedComponent->GetName() == "SMLeft" && !bIsHoldingObjectLeft)
+		{
+			SMLeft->SetStaticMesh(FingerPointHandModel);
+			BIsLeftHandInKeypadButton = true;
+		}
+		else if (OverlappedComponent->GetName() == "SMRight" && !bIsHoldingObjectRight)
+		{
+			SMRight->SetStaticMesh(FingerPointHandModel);
+			BIsRightHandInKeypadButton = true;
+		}
 	}
 }
 
 void AVRPawn::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) 
 {
-	//Same check as overlap but reverses the model to an empty hand
-	if (OverlappedComponent->GetName() == "SMLeft" && bIsInInteractionLeft)
+	if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypad>(OtherActor))
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("Found the keypad collider on %s"), *OverlappedComponent->GetName());
+
+		//Checks if the left hand is empty or right hand is empty. If so then change the mesh
+		if (OverlappedComponent->GetName() == "SMLeft" && BIsLeftHandInKeypad)
+		{
+			BIsLeftHandInKeypad = false;
+		}
+		else if (OverlappedComponent->GetName() == "SMRight" && BIsRightHandInKeypad)
+		{
+			BIsRightHandInKeypad = false;
+		}
+	}
+	else if (Cast<UBoxComponent>(OtherComp) && Cast<AKeypadButton>(OtherActor))
+	{
+		if (OverlappedComponent->GetName() == "SMLeft" && BIsLeftHandInKeypadButton)
+		{
+			BIsLeftHandInKeypadButton = false;
+		}
+		else if (OverlappedComponent->GetName() == "SMRight" && BIsRightHandInKeypadButton)
+		{
+			BIsRightHandInKeypadButton = false;
+		}
+	}
+
+	if (!BIsLeftHandInKeypad && !BIsLeftHandInKeypadButton && !bIsHoldingObjectLeft) 
 	{
 		SMLeft->SetStaticMesh(EmptyHandModel);
-		bIsInInteractionLeft = false;
 	}
-	else if (OverlappedComponent->GetName() == "SMRight" && ! bIsInInteractionRight)
+	else if (!BIsRightHandInKeypad && !BIsRightHandInKeypadButton && !bIsHoldingObjectRight)
 	{
 		SMRight->SetStaticMesh(EmptyHandModel);
-		bIsInInteractionRight = false;
 	}
 }
 
