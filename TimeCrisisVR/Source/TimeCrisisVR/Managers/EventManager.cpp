@@ -6,6 +6,8 @@
 
 #include "Managers/NavigationManager.h"
 #include "Events/CraneHook.h"
+#include "Events/Submarine.h"
+#include "Player/VRPawn.h"
 
 // Sets default values
 AEventManager::AEventManager()
@@ -57,6 +59,19 @@ void AEventManager::MoveCraneStage1Area1Section1()
 	else 
 	{
 		UE_LOG(LogTemp, Error, TEXT("Missing Crane Hook Stage 1 Area 1 on %s"), *this->GetName());
+	}
+}
+
+void AEventManager::BlowUpSubmarineSection1() 
+{
+	if (SubmarineStage1Area1) 
+	{
+		SubmarineStage1Area1->StartSubmarineSinkSequence();
+		Cast<AVRPawn>(GetWorld()->GetFirstPlayerController()->GetPawn())->TurnAlarmOnOrOff(true);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing Submarine Stage 1 Area 1 on %s"), *this->GetName());
 	}
 }
 

@@ -26,6 +26,9 @@ public:
 
 protected:
 
+	//The event manager that needs to be communicated with when certain enemies in the game die
+	class AEventManager* EventMang = nullptr;
+
 	//The character mesh to spawn 
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Setup")
 	TSubclassOf<class AAIEnemyCharacter> CharacterToSpawn = nullptr;
@@ -149,6 +152,10 @@ protected:
 	virtual void BeginPlay() override;
 
 private:	
+
+	//A delegate method called from the soldier when he dies if applied
+	UFUNCTION()
+	void LaunchRocketSoldierDead(AAIEnemyCharacter* junk);
 
 	void PlaceEnemies();
 

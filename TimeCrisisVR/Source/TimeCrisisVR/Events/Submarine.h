@@ -19,7 +19,17 @@ public:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		class UParticleSystemComponent* ExplosionPS = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		class UParticleSystemComponent* SmokePS = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		class UParticleSystemComponent* FirePS = nullptr;
+
 private:
+	ASubmarine();
 
 	//Methods
 public:
@@ -27,6 +37,9 @@ public:
 	void StartSubmarineSinkSequence();
 
 protected:
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Audio")
+		void PlayExplodingSFX();
 
 private:
 	

@@ -7,6 +7,8 @@
 #include "Engine.h"
 #include "Components/SkeletalMeshComponent.h"
 
+#include "Managers/EventManager.h"
+
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()
@@ -20,6 +22,17 @@ AEnemySpawner::AEnemySpawner()
 void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//Find the event manager
+	for (TActorIterator<AEventManager> it(GetWorld()); it; ++it) 
+	{
+		EventMang = *it;
+
+		if (!EventMang) 
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing Event manager on %s"), *this->GetName());
+		}
+	}
 
 	CurrentEnemiesAlive.SetNum(10);
 
@@ -265,6 +278,9 @@ void AEnemySpawner::PlaceEnemiesStage1Area1Section2Wave2()
 
 			//Add the delegate to say when an enemy is dead
 			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+
+			//We want the submarine to be blown up when this soldier dies
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::LaunchRocketSoldierDead);
 		}
 		else 
 		{
@@ -684,6 +700,15 @@ void AEnemySpawner::DEBUGDeleteAllEnemiesAndAdvanceStage()
 		TotalEnemiesShot += EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1];
 		CurrentEnemiesAliveInSection = 0;
 		DecreaseEnemyCount(nullptr);
+	}
+}
+
+//Delegate Method
+void AEnemySpawner::LaunchRocketSoldierDead(AAIEnemyCharacter* junk) 
+{
+	if (EventMang) 
+	{
+		EventMang->BlowUpSubmarineSection1();
 	}
 }
 

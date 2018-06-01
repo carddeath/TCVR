@@ -102,6 +102,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Methods for the event manager to trigger for the alarm
+	UFUNCTION(BlueprintImplementableEvent, Category = "Section 1 Alarm Effect")
+	void TurnAlarmOnOrOff(bool bTurnAlarmOn);
+
 protected:
 	virtual void BeginPlay() override;
 	

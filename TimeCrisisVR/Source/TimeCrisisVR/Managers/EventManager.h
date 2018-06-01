@@ -38,6 +38,8 @@ public:
 	AEventManager();
 	virtual void Tick(float DeltaTime) override;
 
+	void BlowUpSubmarineSection1();
+
 protected:
 	virtual void BeginPlay() override;
 
