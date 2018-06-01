@@ -98,3 +98,20 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		LocomotionPoints[CurrentSection]->ShowArrow(true);
 }
 
+//Getters
+
+int32 ANavigationManager::GetCurrentGameStage() 
+{
+	return CurrentStage;
+}
+
+int32 ANavigationManager::GetCurrentGameArea()
+{
+	return CurrentArea;
+}
+
+int32 ANavigationManager::GetCurrentGameSection()
+{
+	return CurrentSection;
+}
+

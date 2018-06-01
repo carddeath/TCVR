@@ -50,6 +50,10 @@ public:
 
 	void UpdateCurrentSection(bool bTeleportPlayer);
 
+	int32 GetCurrentGameStage();
+	int32 GetCurrentGameArea();
+	int32 GetCurrentGameSection();
+
 protected:
 	virtual void BeginPlay() override;
 
