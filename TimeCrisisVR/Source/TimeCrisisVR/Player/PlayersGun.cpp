@@ -10,9 +10,11 @@
 #include "Player/AmmoClip.h"
 #include "Gameplay/Announcer.h"
 #include "Managers/NavigationManager.h"
+#include "Gameplay/NavigationArrow.h"
 #include "AI/AIEnemyCharacter.h"
 #include "UI/UIAmmoClip.h"
 #include "Components/WidgetComponent.h"
+#include "Events/ExplosiveBox.h"
 
 
 // Sets default values
@@ -112,92 +114,55 @@ void APlayersGun::Fire()
 		{
 			DrawDebugLine(GetWorld(), ShotStartPos, ShotEndLocation, FColor::Green, false, 2.0f, 0, 2.0f);
 
-			bool bHitEnemy = false;
-			bool bWasLegShot = false;
-			bool bWasTorso = false;
-			bool bWasHeadshot = false;
-
-			for (auto& actor : Hits) 
+			for (auto& actor : Hits)
 			{
-				if (actor.GetActor()->Tags.Num() > 0)
+				if (Cast<ANavigationArrow>(actor.GetActor()))
 				{
-					//Navigation Check
-					if (actor.GetActor()->Tags[0].Compare("NavigationPoint") == 0)
+					if (NavManager)
 					{
-						if (NavManager) 
-						{
-							//Change false to true if we want "Teleport" behaviour
-							//UE_LOG(LogTemp, Warning, TEXT("Hit NAV POINT"));
-							NavManager->UpdateCurrentSection(bTeleportOnLocoHit);
-							break;
-						}
-					}else if (actor.GetActor()->Tags[0].Compare("Enemy") == 0)
-					{
-						bHitEnemy = true;
-					}
-					//Play sound if one is present such as metal
-					else 
-					{
-						PlayImpactSound(actor.GetActor()->Tags[0], actor.GetActor()->GetRootComponent());
+						//Change false to true if we want "Teleport" behaviour
+						NavManager->UpdateCurrentSection(bTeleportOnLocoHit);
 						break;
 					}
-
-					//Only check for hit boxes if we have hit an enemy
-					//All Enemy Checks for multiple hitboxses
-					if (bHitEnemy) 
-					{
-						UShapeComponent* HitBox = Cast<UShapeComponent>(actor.GetComponent());
-
-						//If we have a hitbox
-						if (HitBox)
-						{
-							//If we hit them in the legs
-							if (HitBox->ComponentHasTag(FName("Legs")))
-							{
-								Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::LEGS);
-							}
-							else if (HitBox->ComponentHasTag(FName("Torso")))
-							{
-								Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::TORSO);
-							}
-							else if (HitBox->ComponentHasTag(FName("Head")))
-							{
-								Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::HEAD);
-							}
-						}
-							break;
-					}
 				}
-				//Hit something that blocked a shot
-				else 
+				else if (Cast<AAIEnemyCharacter>(actor.GetActor()))
 				{
+					UShapeComponent* HitBox = Cast<UShapeComponent>(actor.GetComponent());
+
+					//If we have a hitbox
+					if (HitBox)
+					{
+						//If we hit them in the legs
+						if (HitBox->ComponentHasTag(FName("Legs")))
+						{
+							Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::LEGS);
+						}
+						else if (HitBox->ComponentHasTag(FName("Torso")))
+						{
+							Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::TORSO);
+						}
+						else if (HitBox->ComponentHasTag(FName("Head")))
+						{
+							Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::HEAD);
+						}
+					}
 					break;
 				}
-			}
+				else if (Cast<AExplosiveBox>(actor.GetActor()))
+				{
+					Cast<AExplosiveBox>(actor.GetActor())->TookDamageFromPlayer();
+					break;
+				}
 
-			//DEPREACTED BEFORE HITBOXES
-			////Play Impact sound effect if there is one to play.
-			//if (Hit.Actor.Get()->Tags.Num() > 0)
-			//{
-			//	//Play enemy one if it's there
-			//	if (Hit.Actor.Get()->Tags[0].Compare("Enemy") == 0)
-			//	{
-			//		Cast<AAIEnemyCharacter>(Hit.GetActor())->KillEnemy();
-			//	}
-			//	//Hit a navigation point
-			//	else if (Hit.Actor.Get()->Tags[0].Compare("NavigationPoint") == 0) 
-			//	{
-			//		if (NavManager) 
-			//		{
-			//			//Change false to true if we want "Teleport" behaviour
-			//			NavManager->UpdateCurrentSubStage(bTeleportOnLocoHit);
-			//		}
-			//	}
-			//	else 
-			//	{
-			//		PlayImpactSound(Hit.Actor.Get()->Tags[0], Hit.Actor.Get()->GetRootComponent());
-			//	}
-			//}
+				if (actor.GetActor()->Tags.Num() > 0)
+				{
+					PlayImpactSound(actor.GetActor()->Tags[0], actor.GetActor()->GetRootComponent());
+					break;
+				}
+
+				//Only interested in the first thing we hit
+				break;
+			}
 		}
 		else
 		{
