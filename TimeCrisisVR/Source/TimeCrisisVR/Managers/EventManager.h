@@ -22,9 +22,6 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Interactable Props")
 	class ASubmarine* SubmarineStage1Area1 = nullptr;
 
-	UPROPERTY(EditInstanceOnly, Category = "Interactable Props")
-	class AArmyJeep* ArmyJeepStage1Area1 = nullptr;
-
 private:
 
 	FTimerHandle DelayOnCraneMovementHandle;

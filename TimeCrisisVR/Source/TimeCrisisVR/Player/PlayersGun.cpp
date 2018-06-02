@@ -106,6 +106,7 @@ void APlayersGun::Fire()
 		Params.AddObjectTypesToQuery(ECC_WorldStatic);
 		Params.AddObjectTypesToQuery(ECC_PhysicsBody);
 		Params.AddObjectTypesToQuery(ECC_WorldDynamic);
+		Params.AddObjectTypesToQuery(ECC_Destructible);
 
 		TArray<FHitResult> Hits;
 		//Invert the Range as it points the other way.

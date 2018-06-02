@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ExplosiveBox.h"
+#include "Events/ArmyJeep.h"
 
 
 // Sets default values
@@ -34,12 +35,12 @@ void AExplosiveBox::TookDamageFromPlayer()
 
 	if (AmtOfShotsRequiredToExplode <= 0) 
 	{
+
 		ExplodeBox();
+		Cast<AArmyJeep>(GetParentActor())->StartExplodedAnimation();
+	}
+	else 
+	{
+		FlashBoxWhite();
 	}
 }
-
-void AExplosiveBox::ExplodeBox() 
-{
-	//TODO: DO the sound effects and the mesh blowing into pieces
-}
-

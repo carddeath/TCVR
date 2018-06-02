@@ -32,8 +32,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Visuals")
+		void FlashBoxWhite();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Visuals")
+		void ExplodeBox();
+
 private:	
 
-	void ExplodeBox();
+
 	
 };

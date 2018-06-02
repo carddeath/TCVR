@@ -19,11 +19,15 @@ public:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		class UChildActorComponent* ExplodingBoxChild = nullptr;
+
 private:
 
 	//Methods
 
 public:
+	AArmyJeep();
 
 	void StartExplodedAnimation();
 
