@@ -22,9 +22,13 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Interactable Props")
 	class ASubmarine* SubmarineStage1Area1 = nullptr;
 
+	UPROPERTY(EditInstanceOnly, Category = "Interactable Props")
+		class AHangerDoors* HangerDoorsStage1Area1 = nullptr;
+
 private:
 
 	FTimerHandle DelayOnCraneMovementHandle;
+	FTimerHandle DelayOnDoorClosing;
 
 	//The manager of navigation for communications
 	class ANavigationManager* NavManager;
@@ -37,6 +41,8 @@ public:
 
 	void BlowUpSubmarineSection1();
 
+	void StartTimerOnHangerDoorToClose();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -45,4 +51,5 @@ private:
 	//Animates the crane at the start of the game after a delay
 	void MoveCraneStage1Area1Section1();
 	
+	void CloseDoorAfterTimerStage1Area1Section3();
 };

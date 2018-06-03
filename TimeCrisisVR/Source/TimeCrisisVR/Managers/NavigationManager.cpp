@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "Player/MainPlayerController.h"
 #include "Gameplay/NavigationArrow.h"
+#include "Managers/EventManager.h"
 
 // Sets default values
 ANavigationManager::ANavigationManager()
@@ -32,6 +33,18 @@ void ANavigationManager::BeginPlay()
 		}
 	}
 
+	//Get the navigation manager
+	for (TActorIterator<AEventManager> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+	{
+		EventManager = *ActorIt;
+
+
+		if (!EventManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing Event manager when searching in %s"), *this->GetName());
+		}
+	}
+
 	EnemySpawner->RevealNextPointToNavMang.AddDynamic(this, &ANavigationManager::RevealNextLocomotionArrow);
 
 	//Save a reference to the player controller
@@ -42,7 +55,7 @@ void ANavigationManager::BeginPlay()
 	{
 		Arrow->ShowArrow(false);
 	}
-	
+
 }
 
 // Called every frame
@@ -85,6 +98,9 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 
 	//TODO: Add a delay based on when the player is in the correct position
 	EnemySpawner->UpdateSection(CurrentSection);
+
+	//Check to see if there are events that should happen
+	EventChecker();
 }
 
 void ANavigationManager::RevealNextLocomotionArrow(int junk) 
@@ -96,6 +112,15 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		return;
 	}
 		LocomotionPoints[CurrentSection]->ShowArrow(true);
+}
+
+void ANavigationManager::EventChecker() 
+{
+	//If we're by the hanger door lets start the timer
+	if (CurrentStage == 1 && CurrentArea == 1 && CurrentSection == 4 && EventManager) 
+	{
+		EventManager->StartTimerOnHangerDoorToClose();
+	}
 }
 
 //Getters

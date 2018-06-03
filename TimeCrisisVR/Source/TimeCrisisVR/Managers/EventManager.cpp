@@ -8,6 +8,7 @@
 #include "Events/CraneHook.h"
 #include "Events/Submarine.h"
 #include "Player/VRPawn.h"
+#include "Events/HangerDoors.h"
 
 // Sets default values
 AEventManager::AEventManager()
@@ -72,6 +73,19 @@ void AEventManager::BlowUpSubmarineSection1()
 	else 
 	{
 		UE_LOG(LogTemp, Error, TEXT("Missing Submarine Stage 1 Area 1 on %s"), *this->GetName());
+	}
+}
+
+void AEventManager::StartTimerOnHangerDoorToClose() 
+{
+	GetWorldTimerManager().SetTimer(DelayOnDoorClosing, this, &AEventManager::CloseDoorAfterTimerStage1Area1Section3, 10.0f);
+}
+
+void AEventManager::CloseDoorAfterTimerStage1Area1Section3() 
+{
+	if (HangerDoorsStage1Area1) 
+	{
+		HangerDoorsStage1Area1->ShouldCloseDoors(true);
 	}
 }
 

@@ -31,6 +31,8 @@ private:
 
 	class AEnemySpawner* EnemySpawner = nullptr;
 
+	class AEventManager* EventManager = nullptr;
+
 	//The current stage in the game - goes from 1-3
 	int32 CurrentStage = 1;
 
@@ -61,6 +63,8 @@ private:
 
 	UFUNCTION()
 	void RevealNextLocomotionArrow(int junk);
+
+	void EventChecker();
 
 
 	

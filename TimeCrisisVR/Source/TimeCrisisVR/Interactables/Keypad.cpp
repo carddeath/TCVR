@@ -56,6 +56,9 @@ AKeypad::AKeypad()
 void AKeypad::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EnteredNumbers.SetNum(4);
+
 	//Need to force the rotation and location of the keys
 	//KeyParent->SetRelativeLocation(FVector(9.0f, 4.419f, 23.0f));
 	KeyParent->SetRelativeRotation(FRotator(0.0f));
@@ -85,16 +88,43 @@ void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 	if (OtherComp->GetName() == "SMLeft" || OtherComp->GetName() == "SMRight")
 	{
 
-		if (Cast<AKeypadButton>(OverlappedComponent->GetOwner())) 
+		if (Cast<AKeypadButton>(OverlappedComponent->GetOwner()))
 		{
+
 			int32 EnteredNumber = Cast<AKeypadButton>(OverlappedComponent->GetOwner())->GetNumberKey();
 
 			Cast<UKeypadWidget>(NumberDisplay->GetUserWidgetObject())->InsertNewDigitIntoSystem(EnteredNumber);
+
+			//If we can fit the number store the data
+			if (CurrentIndexOfEnteredNumbers < CMaxDigitsInCode)
+			{
+				//Store the data and increment the counter
+				EnteredNumbers[CurrentIndexOfEnteredNumbers] = EnteredNumber;
+				CurrentIndexOfEnteredNumbers++;
+			}
+			else 
+			{
+				//Check the code
+			}
+
+			for (auto& elm : EnteredNumbers) 
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%d"), elm);
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("-----------------------"));
 			
 			//Clear was pressed
 			if (EnteredNumber == 0 && ClearSFX) 
 			{
 				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClearSFX, this->GetActorLocation());
+
+				//Reset the data and counter
+				for (auto& num : EnteredNumbers) 
+				{
+					num = 0;
+				}
+				CurrentIndexOfEnteredNumbers = 0;
 			}
 		}
 		else 
@@ -104,5 +134,11 @@ void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 
 	}
+}
+
+
+void AKeypad::CheckIfCodeIsCorrect() 
+{
+	//Add a delegate here that if correct it broadcasts so the door script can manage
 }
 

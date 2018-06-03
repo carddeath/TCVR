@@ -63,7 +63,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		class USoundBase* ClearSFX;
 
+
+
 private:
+	//The numbers currently entered into the system
+	TArray<int32> EnteredNumbers;
+
+	int32 CurrentIndexOfEnteredNumbers = 0;
+
+	const int32 CMaxDigitsInCode = 4;
 
 	//Methods
 public:
@@ -77,6 +85,7 @@ private:
 	UFUNCTION()
 		void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	void CheckIfCodeIsCorrect();
 	
 	
 };
