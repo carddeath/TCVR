@@ -56,6 +56,9 @@ void ANavigationManager::BeginPlay()
 		Arrow->ShowArrow(false);
 	}
 
+	//Assign the current section to the enemy spawner so we have the right info for debugging
+	CurrentSection = EnemySpawner->CurrentSection;
+
 }
 
 // Called every frame
@@ -117,9 +120,18 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 void ANavigationManager::EventChecker() 
 {
 	//If we're by the hanger door lets start the timer
-	if (CurrentStage == 1 && CurrentArea == 1 && CurrentSection == 4 && EventManager) 
+	if (CurrentStage == 1 && CurrentArea == 1 && CurrentSection == 3 && EventManager) 
 	{
 		EventManager->StartTimerOnHangerDoorToClose();
+	}
+	//If we shoot the arrow before the timer is up. As we shot the arrow we will be 1 section ahead so we subtract 1 from the current.
+	else if (CurrentStage == 1 && CurrentArea == 1 && CurrentSection - 1 == 3 && EventManager) 
+	{
+		//If the door didn't close then stop the timer
+		if (!EventManager->bDoorBeganToClose) 
+		{
+			EventManager->StopTimerOnHangerDoor();
+		}
 	}
 }
 

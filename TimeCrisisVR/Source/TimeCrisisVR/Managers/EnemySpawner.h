@@ -24,6 +24,10 @@ public:
 
 	FRevealNextPoint RevealNextPointToNavMang;
 
+	//Only set this when trying to start the game in a different position
+	UPROPERTY(EditInstanceOnly, Category = "Debug")
+		int32 CurrentSection = 1; //The current area of shooting
+
 protected:
 
 	//The event manager that needs to be communicated with when certain enemies in the game die
@@ -115,9 +119,7 @@ protected:
 
 	///////////////////////////////////////////////////
 
-	//Only set this when trying to start the game in a different position
-	UPROPERTY(EditInstanceOnly, Category = "Debug")
-	int32 CurrentSection = 1; //The current area of shooting
+
 
 private:
 
@@ -152,7 +154,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:	
-
 	//A delegate method called from the soldier when he dies if applied
 	UFUNCTION()
 	void LaunchRocketSoldierDead(AAIEnemyCharacter* junk);

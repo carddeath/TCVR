@@ -9,7 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "Interactables/KeypadWidget.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AKeypad::AKeypad()
@@ -22,6 +22,9 @@ AKeypad::AKeypad()
 
 	RootComponent = KeypadMesh;
 	KeypadMeshChangingTrigger->SetupAttachment(RootComponent);
+
+	KeypadAudioComp = CreateDefaultSubobject<UAudioComponent>(FName("Audio Component"));
+	KeypadAudioComp->SetupAttachment(RootComponent);
 
 	KeyParent = CreateDefaultSubobject<USceneComponent>(FName("KeypadTransform"));
 	Key1 = CreateDefaultSubobject<UChildActorComponent>(FName("Key 1"));
@@ -57,6 +60,7 @@ void AKeypad::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CodeToEnter.SetNum(4);
 	EnteredNumbers.SetNum(4);
 
 	//Need to force the rotation and location of the keys
@@ -73,6 +77,9 @@ void AKeypad::BeginPlay()
 	Cast<AKeypadButton>(Key8->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
 	Cast<AKeypadButton>(Key9->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
 	Cast<AKeypadButton>(KeyCancel->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.AddDynamic(this, &AKeypad::OnComponentBeginOverlap);
+
+	GenerateRandomCode();
+	KeypadAudioComp->OnAudioFinished.AddDynamic(this, &AKeypad::AudioCompFinishedPreviousClip);
 }
 
 // Called every frame
@@ -80,6 +87,18 @@ void AKeypad::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Checks if the code should be read out
+	ConstantAudioChecker();
+
+}
+
+void AKeypad::GenerateRandomCode() 
+{
+	for (int i = 0; i < CMaxDigitsInCode; i++)
+	{
+		CodeToEnter[i] = FMath::RandRange(1, 9);
+		UE_LOG(LogTemp, Warning, TEXT("%d"), CodeToEnter[i]);
+	}
 }
 
 void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -101,10 +120,12 @@ void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 				//Store the data and increment the counter
 				EnteredNumbers[CurrentIndexOfEnteredNumbers] = EnteredNumber;
 				CurrentIndexOfEnteredNumbers++;
-			}
-			else 
-			{
-				//Check the code
+
+				//We have now gone over the code limit
+				if (CurrentIndexOfEnteredNumbers >= CMaxDigitsInCode) 
+				{
+					CheckIfCodeIsCorrect();
+				}
 			}
 
 			for (auto& elm : EnteredNumbers) 
@@ -137,8 +158,91 @@ void AKeypad::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 }
 
 
-void AKeypad::CheckIfCodeIsCorrect() 
+
+void AKeypad::PlayDoorAudioCueCPP() 
 {
-	//Add a delegate here that if correct it broadcasts so the door script can manage
+	//Sets the timer up so we can cancel it in here once the code is correct
+	GetWorldTimerManager().SetTimer(AnnouncerVoiceHandle, this, &AKeypad::PlayDoorAudioCueInternalDelegate, 8.0f, true, 1.0f);
+}
+
+void AKeypad::PlayDoorAudioCueInternalDelegate()
+{
+	if (DialogIntro)
+	{
+		KeypadAudioComp->SetSound(DialogIntro);
+		KeypadAudioComp->Play();
+		bShouldPlayAudioCode = true;
+	}
+
+}
+
+void AKeypad::AudioCompFinishedPreviousClip() 
+{
+	CurrentNumberBeingRead++;
+}
+
+void AKeypad::ConstantAudioChecker() 
+{
+	//If we should play but the current clip has ended lets play another
+	if (bShouldPlayAudioCode && !KeypadAudioComp->IsPlaying()) 
+	{
+		//Only read the next digit if we're the correct size
+		if (CurrentNumberBeingRead < CMaxDigitsInCode) 
+		{
+			int32 DigitToRead = CodeToEnter[CurrentNumberBeingRead];
+			DigitToRead -= 1;
+
+			//We subtract 1 due to the array index being on 0
+			KeypadAudioComp->SetSound(DialogNumbers[DigitToRead]);
+			KeypadAudioComp->Play();
+		}
+		else 
+		{
+			//Reset once we go over the max amount of digits
+			bShouldPlayAudioCode = false;
+			CurrentNumberBeingRead = -1;
+		}
+	}
+}
+
+bool AKeypad::CheckIfCodeIsCorrect() 
+{
+	for (int i = 0; i < CMaxDigitsInCode; i++) 
+	{
+		if (CodeToEnter[i] != EnteredNumbers[i]) 
+		{
+			return false; 
+		}
+	}
+
+	GetWorldTimerManager().ClearTimer(AnnouncerVoiceHandle);
+	//If we got past the checks then both arrays match
+	UE_LOG(LogTemp, Warning, TEXT("Correct Code entered"));
+	return true;
+}
+
+void AKeypad::StarOutAndDisableButton() 
+{
+	//Sets the display to stars
+	Cast<UKeypadWidget>(NumberDisplay->GetUserWidgetObject())->SetAllDisplayToStarsEvent();
+
+	//Remove all the delegates, the gate wont close
+	Cast<AKeypadButton>(Key1->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key2->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key3->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key4->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key5->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key6->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key7->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key8->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(Key9->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+	Cast<AKeypadButton>(KeyCancel->GetChildActor())->FindComponentByClass<UBoxComponent>()->OnComponentBeginOverlap.RemoveAll(this);
+}
+
+//Getter
+
+int32 AKeypad::GetCurrentIndexOfEnteredNum() 
+{
+	return CurrentIndexOfEnteredNumbers;
 }
 

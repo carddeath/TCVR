@@ -33,10 +33,17 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void InsertNewDigitIntoSystem(int32 DigitToEnter);
 
+	//Called if the door didn't lock
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	void SetAllDisplayToStarsEvent();
+
 protected:
 
 	UFUNCTION(BlueprintCallable, Category = "TextEdit")
 		void ResetAllText(TArray<class UTextBlock*> Digits);
+
+	UFUNCTION(BlueprintCallable, Category = "TextEdit")
+		void SetAllDisplayToStars(TArray<UTextBlock*> Digits);
 
 private:
 	

@@ -26,8 +26,6 @@ void AKeypadButton::BeginPlay()
 {
 	Super::BeginPlay();
 	PickMaterial();
-	//PressCollider->SetRelativeLocation(FVector(2.2f, 6.4f, 2.2f));
-	UE_LOG(LogTemp, Warning, TEXT("Rootcomp is %s"), *PressCollider->GetAttachmentRootActor()->GetName());
 }
 
 // Called every frame

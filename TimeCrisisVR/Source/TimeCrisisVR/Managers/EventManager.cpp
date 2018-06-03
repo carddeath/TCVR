@@ -9,6 +9,7 @@
 #include "Events/Submarine.h"
 #include "Player/VRPawn.h"
 #include "Events/HangerDoors.h"
+#include "Interactables/Keypad.h"
 
 // Sets default values
 AEventManager::AEventManager()
@@ -49,6 +50,13 @@ void AEventManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//THIS IS DIRTY WAY OF DOING IT. THINK OF SOMETHING BETTER. We will open the door if they entered the correct code
+	if (NavManager->GetCurrentGameStage() == 1 && NavManager->GetCurrentGameArea() == 1 && NavManager->GetCurrentGameSection() == 4 &&
+		KeyPad->GetCurrentIndexOfEnteredNum() >= 4 && KeyPad->CheckIfCodeIsCorrect()) 
+	{
+		StopTimerOnHangerDoor();
+	}
+
 }
 
 void AEventManager::MoveCraneStage1Area1Section1() 
@@ -78,14 +86,37 @@ void AEventManager::BlowUpSubmarineSection1()
 
 void AEventManager::StartTimerOnHangerDoorToClose() 
 {
-	GetWorldTimerManager().SetTimer(DelayOnDoorClosing, this, &AEventManager::CloseDoorAfterTimerStage1Area1Section3, 10.0f);
+	FTimerDelegate DoorCloseTimerDele = FTimerDelegate::CreateUObject(this, &AEventManager::CloseDoorAfterTimerStage1Area1Section3, true);
+	GetWorldTimerManager().SetTimer(DelayOnDoorClosing, DoorCloseTimerDele, TimeBeforeDoorCloses, false);
 }
 
-void AEventManager::CloseDoorAfterTimerStage1Area1Section3() 
+void AEventManager::StopTimerOnHangerDoor() 
+{
+	if (NavManager->GetCurrentGameStage() == 1 && NavManager->GetCurrentGameArea() == 1 && NavManager->GetCurrentGameSection() == 4) 
+	{
+		GetWorldTimerManager().ClearTimer(DelayOnDoorClosing);
+		CloseDoorAfterTimerStage1Area1Section3(false);
+		Cast<AVRPawn>(GetWorld()->GetFirstPlayerController()->GetPawn())->TurnAlarmOnOrOff(false);
+
+		//Disable the keys of the pad and star the display, we don't need to interact with it
+		KeyPad->StarOutAndDisableButton();
+	}
+}
+
+void AEventManager::CloseDoorAfterTimerStage1Area1Section3(bool bShouldClose) 
 {
 	if (HangerDoorsStage1Area1) 
 	{
-		HangerDoorsStage1Area1->ShouldCloseDoors(true);
+		bDoorBeganToClose = true;
+		HangerDoorsStage1Area1->ShouldCloseDoors(bShouldClose);
+
+		//Only do this if the door should close
+		if (bShouldClose) 
+		{
+			//Make the keypad play the audio cue every 8 seconds
+			FTimerHandle DoorCodeHandle;
+			GetWorldTimerManager().SetTimer(DoorCodeHandle, KeyPad, &AKeypad::PlayDoorAudioCueCPP, 1.0f);
+		}
 	}
 }
 

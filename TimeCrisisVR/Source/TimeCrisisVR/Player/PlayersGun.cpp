@@ -83,7 +83,6 @@ void APlayersGun::BeginPlay()
 void APlayersGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APlayersGun::Fire() 

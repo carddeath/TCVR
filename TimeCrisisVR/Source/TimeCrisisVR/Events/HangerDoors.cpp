@@ -15,7 +15,6 @@ AHangerDoors::AHangerDoors()
 void AHangerDoors::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

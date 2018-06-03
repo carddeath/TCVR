@@ -14,6 +14,14 @@ void UKeypadWidget::ResetAllText(TArray<UTextBlock*> Digits)
 	CurrentDigitInSequence = 0;
 }
 
+void UKeypadWidget::SetAllDisplayToStars(TArray<UTextBlock*> Digits)
+{
+	for (auto& TB : Digits)
+	{
+		TB->SetText(FText::FromString("*"));
+	}
+}
+
 
 
 
