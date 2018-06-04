@@ -27,7 +27,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	//Called from the Player gun
-	void TookDamageFromPlayer();
+	bool TookDamageFromPlayer();
 
 protected:
 	virtual void BeginPlay() override;

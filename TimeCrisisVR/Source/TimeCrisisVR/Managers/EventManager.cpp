@@ -51,12 +51,15 @@ void AEventManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//THIS IS DIRTY WAY OF DOING IT. THINK OF SOMETHING BETTER. We will open the door if they entered the correct code
-	if (NavManager->GetCurrentGameStage() == 1 && NavManager->GetCurrentGameArea() == 1 && NavManager->GetCurrentGameSection() == 4 &&
-		KeyPad->GetCurrentIndexOfEnteredNum() >= 4 && KeyPad->CheckIfCodeIsCorrect()) 
+	if (NavManager->GetCurrentGameStage() == 1 && NavManager->GetCurrentGameArea() == 1 && NavManager->GetCurrentGameSection() == 4 && bCheckForCorrectCode)
 	{
-		StopTimerOnHangerDoor();
-	}
 
+		if (KeyPad->GetCurrentIndexOfEnteredNum() >= 4 && KeyPad->CheckIfCodeIsCorrect())
+		{
+			bCheckForCorrectCode = false;
+			StopTimerOnHangerDoor();
+		}
+	}
 }
 
 void AEventManager::MoveCraneStage1Area1Section1() 

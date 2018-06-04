@@ -15,6 +15,7 @@
 #include "UI/UIAmmoClip.h"
 #include "Components/WidgetComponent.h"
 #include "Events/ExplosiveBox.h"
+#include "GameFramework/DamageType.h"
 
 
 // Sets default values
@@ -125,7 +126,7 @@ void APlayersGun::Fire()
 						break;
 					}
 				}
-				else if (Cast<AAIEnemyCharacter>(actor.GetActor()))
+				else if (Cast<UShapeComponent>(actor.GetComponent()))
 				{
 					UShapeComponent* HitBox = Cast<UShapeComponent>(actor.GetComponent());
 
@@ -150,7 +151,11 @@ void APlayersGun::Fire()
 				}
 				else if (Cast<AExplosiveBox>(actor.GetActor()))
 				{
-					Cast<AExplosiveBox>(actor.GetActor())->TookDamageFromPlayer();
+					//If the box blew up
+					if (Cast<AExplosiveBox>(actor.GetActor())->TookDamageFromPlayer()) 
+					{
+						//TODO: Kill all enemies with radial damage via the event manager?
+					}
 					break;
 				}
 

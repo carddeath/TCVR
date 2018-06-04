@@ -26,7 +26,7 @@ void AExplosiveBox::Tick(float DeltaTime)
 
 }
 
-void AExplosiveBox::TookDamageFromPlayer() 
+bool AExplosiveBox::TookDamageFromPlayer() 
 {
 	AmtOfShotsRequiredToExplode--;
 
@@ -38,9 +38,11 @@ void AExplosiveBox::TookDamageFromPlayer()
 
 		ExplodeBox();
 		Cast<AArmyJeep>(GetParentActor())->StartExplodedAnimation();
+		return true;
 	}
 	else 
 	{
 		FlashBoxWhite();
+		return false;
 	}
 }

@@ -18,6 +18,9 @@ public:
 	//Used by the navigation manager to decide if to require the keypad or not
 	bool bDoorBeganToClose = false;
 
+	//Used to enable door code check for a limited amount of time
+	bool bCheckForCorrectCode = true;
+
 protected:
 
 	UPROPERTY(EditInstanceOnly, Category = "Interactable Props")

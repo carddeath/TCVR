@@ -216,8 +216,12 @@ bool AKeypad::CheckIfCodeIsCorrect()
 	}
 
 	GetWorldTimerManager().ClearTimer(AnnouncerVoiceHandle);
+	if (CorrectCodeSFX) 
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), CorrectCodeSFX, this->GetActorLocation());
+	}
+
 	//If we got past the checks then both arrays match
-	UE_LOG(LogTemp, Warning, TEXT("Correct Code entered"));
 	return true;
 }
 

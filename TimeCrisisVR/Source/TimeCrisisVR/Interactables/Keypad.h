@@ -67,6 +67,9 @@ protected:
 		class USoundBase* ClearSFX;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		 USoundBase* CorrectCodeSFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
 		USoundBase* DialogIntro;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")

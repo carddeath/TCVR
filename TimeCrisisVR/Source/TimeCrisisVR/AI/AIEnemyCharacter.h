@@ -90,6 +90,7 @@ private:
 
 	FTimerHandle ShotDelayHandle;
 	FTimerHandle CrouchInvisibleDelayHandle;
+	FTimerHandle DeathVanishHandle;
 
 	//Methods
 public:
@@ -133,5 +134,8 @@ private:
 
 	//REmove this later once weapon classes are created
 	void SetupReloadTime();
+
+	//Timer delegate to delete the enemy after death
+	void DeleteEnemy();
 
 };

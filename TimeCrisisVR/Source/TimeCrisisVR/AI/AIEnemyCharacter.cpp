@@ -11,13 +11,16 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Public/TimerManager.h"
 
+#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
+
 
 // Sets default values
 AAIEnemyCharacter::AAIEnemyCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -175,8 +178,8 @@ void AAIEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 {
-	//TODO - Randomise the death noise
-	//TODO: - Make sure to disable all colliders on the hitboxes of the mess
+	//TODO: - Make sure to disable all colliders on the hitboxes of the mesh
+
 
 	//Make sure we've actually bound the delegate
 	if (DeathCallback.IsBound()) 
@@ -190,10 +193,11 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 	}
 
 
-	if (DeathNoises.Num() > 0 && !bIsDead)
+	if (DeathNoises.Num() >= 3 && !bIsDead)
 	{
 		bIsDead = true;
-		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeathNoises[0], this->GetActorLocation());
+		int32 DeathToPlay = FMath::RandRange(0, 3);
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeathNoises[DeathToPlay], this->GetActorLocation());
 
 		//Helps to decide which animation to load in the animator
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->HitAreaSection = HitBoxTarget;
@@ -215,10 +219,23 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 		//	break;
 		//}
 
+
+		TArray<USceneComponent*> Children;
+		GetMesh()->GetChildrenComponents(false, Children);
+
+		for (auto& childComp : Children) 
+		{
+			childComp->DestroyComponent();
+		}
+
+		GetCapsuleComponent()->DestroyComponent();
+
+		GetWorldTimerManager().SetTimer(DeathVanishHandle, this, &AAIEnemyCharacter::DeleteEnemy, 3.0f, false);
+
 	}
 
 	//DEBUG: Incase we need to destroy the enemy
-	Destroy();
+	//Destroy();
 }
 
 void AAIEnemyCharacter::EraseEnemy() 
@@ -232,6 +249,11 @@ void AAIEnemyCharacter::EraseEnemy()
 		UE_LOG(LogTemp, Error, TEXT("Delegate wasn't bound on %s"), *this->GetName());
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Delegate wasn't bound on AIEnemy Character"));
 	}
+	Destroy();
+}
+
+void AAIEnemyCharacter::DeleteEnemy() 
+{
 	Destroy();
 }
 
