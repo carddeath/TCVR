@@ -12,7 +12,8 @@ enum class HitArea : uint8
 {
 	HEAD,
 	TORSO,
-	LEGS
+	LEGS,
+	RANDOM
 };
 
 UENUM(Blueprintable)

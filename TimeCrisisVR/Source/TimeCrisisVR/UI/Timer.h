@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Timer.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndOfGameTrigger, int, junk);
+
 /**
  * 
  */
@@ -17,6 +19,8 @@ class TIMECRISISVR_API UTimer : public UUserWidget
 	//Variables
 public:
 
+	FEndOfGameTrigger EndOfGameTriggerDelegate;
+
 protected:
 
 	//The time currently on the clock
@@ -27,6 +31,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timing Logic")
 		float TimeUntilDanger = 10.0f;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Timing Logic")
+		bool bIsTimerPaused = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sound")
+		class USoundBase* TimeAddedSFX = nullptr;
 private:
 
 	//Methods
@@ -35,11 +44,13 @@ public:
 	//Add time after each stage
 	void AddTimeToTotal(float AmtToAdd);
 
+	void TogglePauseOnTimer(bool bShouldPause);
+
 protected:
 
+	UFUNCTION(BlueprintCallable, Category = "EndOfGameEvent")
+		void WasEndOfGame();
 
 private:
-	
-	
-	
+		
 };

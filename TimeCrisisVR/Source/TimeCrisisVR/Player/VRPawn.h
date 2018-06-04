@@ -65,6 +65,19 @@ protected:
 
 	AAmmoPouch* SpawnedAmmoPouch = nullptr;
 
+	//Components for watches and their UI
+	UPROPERTY(EditDefaultsOnly, Category = "VR")
+	UStaticMeshComponent* SMLeftWatch = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VR")
+	UStaticMeshComponent* SMRightWatch = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VR")
+	class UWidgetComponent* SMLeftWatchTimeWidget = nullptr;
+
+	//TODO: Add a life widget on the right watch
+
+
 private:
 
 	bool bIsHoldingObjectLeft = false;
@@ -106,6 +119,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Section 1 Alarm Effect")
 	void TurnAlarmOnOrOff(bool bTurnAlarmOn);
 
+	class UUserWidget* GetWatchClass();
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -135,4 +150,6 @@ private:
 	void FirePistolLeft();
 
 	void FirePistolRight();
+
+
 };

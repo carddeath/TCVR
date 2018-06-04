@@ -123,3 +123,8 @@ void AEventManager::CloseDoorAfterTimerStage1Area1Section3(bool bShouldClose)
 	}
 }
 
+void AEventManager::ShowEndOfGameUIViaUIManager(int junk) 
+{
+	UE_LOG(LogTemp, Warning, TEXT("GAME OVER"));
+}
+

@@ -33,6 +33,8 @@ private:
 
 	class AEventManager* EventManager = nullptr;
 
+	class ATImeManager* TimeManager = nullptr;
+
 	//The current stage in the game - goes from 1-3
 	int32 CurrentStage = 1;
 

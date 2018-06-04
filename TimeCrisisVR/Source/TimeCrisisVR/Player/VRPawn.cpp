@@ -14,6 +14,7 @@
 #include "Player/PlayersGun.h"
 #include "Player/AmmoPouch.h"
 #include "Player/AmmoClip.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -40,6 +41,14 @@ AVRPawn::AVRPawn()
 	SCHeldObjectRight = CreateDefaultSubobject<USceneComponent>(FName("HeldObjectLocationRight"));
 	SCHeldObjectLeft->SetupAttachment(MCLeft);
 	SCHeldObjectRight->SetupAttachment(MCRight);
+
+	SMLeftWatch = CreateDefaultSubobject<UStaticMeshComponent>(FName("SMLeftWatch"));
+	SMRightWatch = CreateDefaultSubobject<UStaticMeshComponent>(FName("SMRightWatch"));
+	SMLeftWatch->SetupAttachment(SMLeft);
+	SMRightWatch->SetupAttachment(SMRight);
+
+	SMLeftWatchTimeWidget = CreateDefaultSubobject<UWidgetComponent>(FName("Watch Timer Widget Comp"));
+	SMLeftWatchTimeWidget->SetupAttachment(SMLeftWatch);
 }
 
 // Called when the game starts or when spawned
@@ -488,4 +497,9 @@ void AVRPawn::TogglePointingHandMeshRight(float AxisValue)
 	{
 		SMRight->SetStaticMesh(EmptyHandModel);
 	}
+}
+
+UUserWidget* AVRPawn::GetWatchClass() 
+{
+	return SMLeftWatchTimeWidget->GetUserWidgetObject();
 }

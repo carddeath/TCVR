@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "EventManager.generated.h"
 
-
 UCLASS()
 class TIMECRISISVR_API AEventManager : public AActor
 {
@@ -20,6 +19,8 @@ public:
 
 	//Used to enable door code check for a limited amount of time
 	bool bCheckForCorrectCode = true;
+
+
 
 protected:
 
@@ -57,6 +58,9 @@ public:
 	void StartTimerOnHangerDoorToClose();
 
 	void StopTimerOnHangerDoor();
+
+	UFUNCTION()
+	void ShowEndOfGameUIViaUIManager(int junk);
 
 protected:
 	virtual void BeginPlay() override;

@@ -7,6 +7,7 @@
 #include "Player/MainPlayerController.h"
 #include "Gameplay/NavigationArrow.h"
 #include "Managers/EventManager.h"
+#include "Managers/TImeManager.h"
 
 // Sets default values
 ANavigationManager::ANavigationManager()
@@ -25,8 +26,6 @@ void ANavigationManager::BeginPlay()
 	for (TActorIterator<AEnemySpawner> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 	{
 		EnemySpawner = *ActorIt;
-
-
 		if (!EnemySpawner)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Missing Enemy Spawner when searching in %s"), *this->GetName());
@@ -37,11 +36,19 @@ void ANavigationManager::BeginPlay()
 	for (TActorIterator<AEventManager> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 	{
 		EventManager = *ActorIt;
-
-
 		if (!EventManager)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Missing Event manager when searching in %s"), *this->GetName());
+		}
+	}
+
+	//Get the time manager
+	for (TActorIterator<ATImeManager> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+	{
+		TimeManager = *ActorIt;
+		if (!TimeManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing Timer when searching in %s"), *this->GetName());
 		}
 	}
 
@@ -58,14 +65,12 @@ void ANavigationManager::BeginPlay()
 
 	//Assign the current section to the enemy spawner so we have the right info for debugging
 	CurrentSection = EnemySpawner->CurrentSection;
-
 }
 
 // Called every frame
 void ANavigationManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer) 
@@ -104,6 +109,10 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 
 	//Check to see if there are events that should happen
 	EventChecker();
+
+	//Add time to the players limit and resume the timer
+	TimeManager->PauseOrResumeTimer(false);
+	TimeManager->AddTimeToTimersForSectionBasedOnArea(CurrentStage, CurrentArea);
 }
 
 void ANavigationManager::RevealNextLocomotionArrow(int junk) 
@@ -115,6 +124,7 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		return;
 	}
 		LocomotionPoints[CurrentSection]->ShowArrow(true);
+		TimeManager->PauseOrResumeTimer(true);
 }
 
 void ANavigationManager::EventChecker() 

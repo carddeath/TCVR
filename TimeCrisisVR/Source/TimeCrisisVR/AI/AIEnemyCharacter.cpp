@@ -199,25 +199,32 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 		int32 DeathToPlay = FMath::RandRange(0, 3);
 		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), DeathNoises[DeathToPlay], this->GetActorLocation());
 
+		//If we have a random death then pick one.
+		if (HitBoxTarget == HitArea::RANDOM) 
+		{
+			int32 RandDeath = FMath::RandRange(0, 2);
+			switch (RandDeath)
+			{
+			case 0:
+				HitBoxTarget = HitArea::HEAD;
+				break;
+			case 1:
+				HitBoxTarget = HitArea::TORSO;
+				break;
+			case 2:
+				HitBoxTarget = HitArea::LEGS;
+				break;
+			default:
+				break;
+			}
+		}
+
+
 		//Helps to decide which animation to load in the animator
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->HitAreaSection = HitBoxTarget;
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsDead = true;
 
-		//Debug only
-		//switch (HitBoxTarget) 
-		//{
-		//case HitArea::LEGS:
-		//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Emerald, TEXT("LEG shot hit!"));
-		//	break;
-		//case HitArea::TORSO:
-		//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Blue, TEXT("TORSO shot hit!"));
-		//	break;
-		//case HitArea::HEAD:
-		//	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, TEXT("HEAD shot hit!"));
-		//	break;
-		//default:
-		//	break;
-		//}
+
 
 
 		TArray<USceneComponent*> Children;

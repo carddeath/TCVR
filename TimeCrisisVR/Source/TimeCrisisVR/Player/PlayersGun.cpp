@@ -154,7 +154,12 @@ void APlayersGun::Fire()
 					//If the box blew up
 					if (Cast<AExplosiveBox>(actor.GetActor())->TookDamageFromPlayer()) 
 					{
-						//TODO: Kill all enemies with radial damage via the event manager?
+						//Kills all enemies in the scene
+						for (TActorIterator<AAIEnemyCharacter> EnemyIta(GetWorld()); EnemyIta; ++EnemyIta) 
+						{
+							AAIEnemyCharacter* TempChar = *EnemyIta;
+							TempChar->KillEnemy(HitArea::RANDOM);
+						}
 					}
 					break;
 				}
