@@ -145,6 +145,25 @@ void ANavigationManager::EventChecker()
 	}
 }
 
+//Have to put this here to prevent the begin plays being called in the wrong order
+void ANavigationManager::BroadCastStageArea() 
+{
+	//We do a check for the stage 1 delegate to broadcoast 
+	if (CurrentSection == 1)
+	{
+
+		if (FlashUpDelegateAreaStart.IsBound())
+		{
+			FlashUpDelegateAreaStart.Broadcast(CurrentArea);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to launch UI delegate in %s"), *this->GetName());
+		}
+
+	}
+}
+
 //Getters
 
 int32 ANavigationManager::GetCurrentGameStage() 

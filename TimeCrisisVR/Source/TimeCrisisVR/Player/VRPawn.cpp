@@ -15,6 +15,7 @@
 #include "Player/AmmoPouch.h"
 #include "Player/AmmoClip.h"
 #include "Blueprint/UserWidget.h"
+#include "UI/PlayerUIAugment.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -49,6 +50,9 @@ AVRPawn::AVRPawn()
 
 	SMLeftWatchTimeWidget = CreateDefaultSubobject<UWidgetComponent>(FName("Watch Timer Widget Comp"));
 	SMLeftWatchTimeWidget->SetupAttachment(SMLeftWatch);
+
+	UIDisplay = CreateDefaultSubobject<UChildActorComponent>(FName("UI Display Child Comp"));
+	UIDisplay->SetupAttachment(VRCamera);
 }
 
 // Called when the game starts or when spawned

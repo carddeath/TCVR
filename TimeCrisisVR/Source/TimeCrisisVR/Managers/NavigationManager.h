@@ -11,7 +11,7 @@ Should also tell the enemy spawner to update it's enemy set based on the, level,
 #include "GameFramework/Actor.h"
 #include "NavigationManager.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFlashUpAreaAndWait, int32, StageNum);
 
 UCLASS()
 class TIMECRISISVR_API ANavigationManager : public AActor
@@ -20,6 +20,8 @@ class TIMECRISISVR_API ANavigationManager : public AActor
 
 	//Variables
 public:
+
+	FFlashUpAreaAndWait FlashUpDelegateAreaStart;
 
 protected:
 
@@ -57,6 +59,8 @@ public:
 	int32 GetCurrentGameStage();
 	int32 GetCurrentGameArea();
 	int32 GetCurrentGameSection();
+
+	void BroadCastStageArea();
 
 protected:
 	virtual void BeginPlay() override;

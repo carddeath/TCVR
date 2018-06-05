@@ -51,6 +51,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "EndOfGameEvent")
 		void WasEndOfGame();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+		void FlashTimeExtended();
+
 private:
 		
 };

@@ -77,6 +77,9 @@ protected:
 
 	//TODO: Add a life widget on the right watch
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	class UChildActorComponent* UIDisplay = nullptr;
+
 
 private:
 

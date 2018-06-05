@@ -14,6 +14,7 @@ void UTimer::AddTimeToTotal(float AmtToAdd)
 	if (TimeAddedSFX) 
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), TimeAddedSFX);
+		FlashTimeExtended();
 	}
 
 }
