@@ -10,6 +10,7 @@
 #include "Player/VRPawn.h"
 #include "Events/HangerDoors.h"
 #include "Interactables/Keypad.h"
+#include "Gameplay/Announcer.h"
 
 // Sets default values
 AEventManager::AEventManager()
@@ -32,6 +33,16 @@ void AEventManager::BeginPlay()
 		if (!NavManager) 
 		{
 			UE_LOG(LogTemp, Error, TEXT("Missing Navigation Manager on %s"), *this->GetName());
+		}
+	}
+
+	for (TActorIterator<AAnnouncer> it(GetWorld()); it; ++it)
+	{
+		Announcer = *it;
+
+		if (!Announcer)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing Announcer on %s"), *this->GetName());
 		}
 	}
 
@@ -126,5 +137,21 @@ void AEventManager::CloseDoorAfterTimerStage1Area1Section3(bool bShouldClose)
 void AEventManager::ShowEndOfGameUIViaUIManager(int junk) 
 {
 	UE_LOG(LogTemp, Warning, TEXT("GAME OVER"));
+}
+
+void AEventManager::AnnouncerCallThroughAction() 
+{
+	Announcer->PlayAction();
+}
+
+void AEventManager::AnnouncerReloadCallThroughAndUIBroadcast() 
+{
+	Announcer->PlayReload();
+
+	//We want to show the reload text
+	if (ReloadDisplayDelegate.IsBound()) 
+	{
+		ReloadDisplayDelegate.Broadcast(true);
+	}
 }
 

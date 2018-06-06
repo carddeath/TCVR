@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "DataStructures/GameData.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PlayerUIAugment.generated.h"
@@ -16,18 +18,30 @@ class TIMECRISISVR_API APlayerUIAugment : public AActor
 	//Variables
 public:
 
-
-
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "WidgetComponent")
 		class UWidgetComponent* WidgetDisplay = nullptr;
 
+	//The main UI widget that we use during gameplay
+	UPROPERTY(EditDefaultsOnly, Category = "Widget Subclasses")
+		TSubclassOf<class UInGameUIWidget> InGameUITemplate;
+
+	//The UI widget we assign when we reach the end of the game
+	UPROPERTY(EditDefaultsOnly, Category = "Widget Subclasses")
+		TSubclassOf<class UEndOfAreaDisplay> EndOfAreaTemplate;
+
 private:
 
 	class ANavigationManager* NavManager = nullptr;
 
+	class AEventManager* EventManager = nullptr;
+
 	class UInGameUIWidget* InGameUiWidget = nullptr;
+
+	class UEndOfAreaDisplay* EndOfAreaWidget = nullptr;
+
+	class ADataTracker* DataTracker = nullptr;
 
 	//Methods
 	
@@ -39,5 +53,11 @@ protected:
 	virtual void BeginPlay() override;
 
 private:	
+
+	UFUNCTION()
+		void SwapWidgetsInGame(bool bShowEndOfAreaWidget);
+
+	UFUNCTION()
+		void SendEndOfAreaDataToWidget(FGameData GameData);
 	
 };

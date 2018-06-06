@@ -31,3 +31,9 @@ void UTimer::WasEndOfGame()
 		EndOfGameTriggerDelegate.Broadcast(0);
 	}
 }
+
+//Getters
+float UTimer::GetTotalTimeTaken() 
+{
+	return TotalTimeTaken;
+}

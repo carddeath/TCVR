@@ -71,6 +71,25 @@ void ANavigationManager::BeginPlay()
 void ANavigationManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//When the player is moving we check to see if they've arrived at their destination. If so then we stop checking and change the UI and shout action!
+	if (bHasPlayerSetOffToNextPoint) 
+	{
+		float XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - LocomotionPoints[CurrentSection-1]->GetActorLocation().X);
+		float YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - LocomotionPoints[CurrentSection - 1]->GetActorLocation().Y);
+
+		if (XResult <= 0.5f && YResult <= 0.5f)
+		{
+			bHasPlayerSetOffToNextPoint = false;
+
+			// Remove wait and show action
+			if (ToggleWaitOffDelegate.IsBound()) 
+			{
+				ToggleWaitOffDelegate.Broadcast(false);
+				EventManager->AnnouncerCallThroughAction();
+			}
+		}
+	}
 }
 
 void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer) 
@@ -113,6 +132,13 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 	//Add time to the players limit and resume the timer
 	TimeManager->PauseOrResumeTimer(false);
 	TimeManager->AddTimeToTimersForSectionBasedOnArea(CurrentStage, CurrentArea);
+
+	//Lets Hide proceed on the UI and show Wait as we are travelling
+	if (ToggleProceedDisplayDelegate.IsBound())
+	{
+		ToggleProceedDisplayDelegate.Broadcast(false);
+		bHasPlayerSetOffToNextPoint = true;
+	}
 }
 
 void ANavigationManager::RevealNextLocomotionArrow(int junk) 
@@ -120,11 +146,33 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 	//We check + 1 as we have no currently updated the current sub stage so we need to check if there is another point beyond this one
 	if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num()) 
 	{
+		//We have ran out of points, TODO: Launch a delegate to show the end of game data
 		UE_LOG(LogTemp, Error, TEXT("End of locomotion points on %s"), *this->GetName());
+
+		//Lets get the time after pausing at the end of an area/game
+		TimeManager->PauseOrResumeTimer(true);
+
+		//Let's allow it to collect all data for the display
+		if (AllowDataCollectionFromClassesDelegate.IsBound())
+		{
+			AllowDataCollectionFromClassesDelegate.Broadcast(0);
+		}
+
+		//Show the end of game widget
+		if (ShowEndOfAreaWidgetDelegate.IsBound()) 
+		{
+			ShowEndOfAreaWidgetDelegate.Broadcast(true);
+		}
 		return;
 	}
 		LocomotionPoints[CurrentSection]->ShowArrow(true);
 		TimeManager->PauseOrResumeTimer(true);
+
+		//We want to display the text of Proceed so the player knows to shoot the next arrow as all enemies have been killed. Send true as we want to display
+		if (ToggleProceedDisplayDelegate.IsBound())
+		{
+			ToggleProceedDisplayDelegate.Broadcast(true);
+		}
 }
 
 void ANavigationManager::EventChecker() 

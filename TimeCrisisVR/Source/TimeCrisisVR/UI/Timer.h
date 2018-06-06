@@ -27,6 +27,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Timing Logic")
 	float TimeRemaining = 60.0f;
 
+	//Used to the data at the end of a level to see how long it took
+	UPROPERTY(BlueprintReadWrite, Category = "Timing Logic")
+		float TotalTimeTaken = 0.0f;
+
 	//The time currently on the clock
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timing Logic")
 		float TimeUntilDanger = 10.0f;
@@ -45,6 +49,8 @@ public:
 	void AddTimeToTotal(float AmtToAdd);
 
 	void TogglePauseOnTimer(bool bShouldPause);
+
+	float GetTotalTimeTaken();
 
 protected:
 

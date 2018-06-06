@@ -111,6 +111,14 @@ private:
 	//Used to track how many things are overlapping. If the hand leaves the keypad it should go back to normal
 	int32 AmountOfObjectsOverlapping = 0;
 
+	//Health related values
+	UPROPERTY(EditDefaultsOnly, Category = "Health")
+	int32 StartingLives = 3;
+
+	int32 CurrentLives = 3;
+
+	int32 TotalTimesHit = 0;
+
 	//Methods
 
 public:
@@ -122,7 +130,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Section 1 Alarm Effect")
 	void TurnAlarmOnOrOff(bool bTurnAlarmOn);
 
+	//TODO: Implement this later!
+	void TookDamage();
+
+	//Getters
 	class UUserWidget* GetWatchClass();
+
+	int32 GetTotalTimesHit();
 
 protected:
 	virtual void BeginPlay() override;

@@ -46,6 +46,8 @@ public:
 	UFUNCTION()
 	void PlayReload();
 
+	void PlayAction();
+
 protected:
 	virtual void BeginPlay() override;
 

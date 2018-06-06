@@ -23,7 +23,6 @@ private:
 	
 	//A counter before we stop the loop of the timer
 	int32 AmtOfFlashesOnStart = 0;
-	int32 AmtOfFlashesOfWait = 0;
 
 	FTimerHandle FlashAreaStartHandle;
 	FTimerHandle FlashWaitHandle;
@@ -35,29 +34,33 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void FlashUpAreaStart(int32 AreaNum);
 	
-
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Events")
-		void HideWait();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+		void DisplayProceed(bool bShouldDisplayProceed);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+		void DisplayWait(bool bShouldDisplayWait);
+
+	//leaving action as an event due to the fact it will always disappear
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Events")
 		void DisplayAction();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+		void DisplayReload(bool bShouldDisplayWait);
 
 protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Callable Functions")
 		void FlashUpAreaStartCallable(class UTextBlock* AreaStart);
 
-	//Can be called via code as a delegate but also in BP via the flash up start
-	UFUNCTION(BlueprintCallable, Category = "Events")
-		void FlashUpWait(UTextBlock* WaitTB);
+	UFUNCTION(BlueprintCallable, Category = "Callable Functions")
+		void DisplayWaitCallable(bool bShouldDisplayWait, UTextBlock* WaitTB);
+
+	UFUNCTION(BlueprintCallable, Category = "Callable Functions")
+		void DisplayProceedCallable(bool bShouldDisplayProceed, UTextBlock* ProceedTB);
+
 
 private:
 
 	void FlashUpAreaStartTimer(UTextBlock* AreaStart);
-
-	void FlashUpWaitStartTimer(UTextBlock* WaitTB);
-
-	
 	
 };

@@ -43,3 +43,14 @@ void AAnnouncer::PlayReload()
 	//UGameplayStatics::PlaySound2D(this, SFXReload);
 }
 
+void AAnnouncer::PlayAction() 
+{
+	if (!SFXAction) return;
+
+	if (!AudioComponent->IsPlaying()) 
+	{
+		AudioComponent->SetSound(SFXAction);
+		AudioComponent->Play();
+	}
+}
+

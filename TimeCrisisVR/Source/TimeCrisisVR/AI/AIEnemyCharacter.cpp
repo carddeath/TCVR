@@ -332,3 +332,8 @@ void AAIEnemyCharacter::SetupReloadTime()
 		break;
 	}
 }
+
+bool AAIEnemyCharacter::GetDeathState() 
+{
+	return bIsDead;
+}

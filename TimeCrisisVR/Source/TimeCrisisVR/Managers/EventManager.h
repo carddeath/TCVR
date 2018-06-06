@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "EventManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShowReload, bool, ShouldShowReload);
+
 UCLASS()
 class TIMECRISISVR_API AEventManager : public AActor
 {
@@ -20,7 +22,7 @@ public:
 	//Used to enable door code check for a limited amount of time
 	bool bCheckForCorrectCode = true;
 
-
+	FShowReload ReloadDisplayDelegate;
 
 protected:
 
@@ -47,6 +49,8 @@ private:
 	//The manager of navigation for communications
 	class ANavigationManager* NavManager;
 
+	class AAnnouncer* Announcer = nullptr;
+
 	//Methods
 	
 public:	
@@ -61,6 +65,10 @@ public:
 
 	UFUNCTION()
 	void ShowEndOfGameUIViaUIManager(int junk);
+
+	void AnnouncerCallThroughAction();
+
+	void AnnouncerReloadCallThroughAndUIBroadcast();
 
 protected:
 	virtual void BeginPlay() override;

@@ -73,6 +73,9 @@ bool AEnemySpawner::CheckNoFieldsAreEmpty()
 
 void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 {
+	//For end of game data
+	TotalEnemiesDeadAcrossTheGame++;
+
 	CurrentEnemiesAliveInSection--;
 	TotalEnemiesShot++;
 	UE_LOG(LogTemp, Warning, TEXT("Amount of soldiers left = %d"), CurrentEnemiesAliveInSection);
@@ -82,6 +85,7 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 	//Check if all enemies are dead for the section. We are currently 1 section ahead of the array
 	if (TotalEnemiesShot >= TotalEnemiesPerStage1Area1[CurrentSection - 1])
 	{
+
 		//Tell the nav manager to activate
 		if (RevealNextPointToNavMang.IsBound())
 		{
@@ -89,11 +93,13 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 			CurrentWaveInSection = 1;
 			bDoesSectorContainWaves = false; //Reset state incase a sector does not have waves
 			RevealNextPointToNavMang.Broadcast(0);
+			return;
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Next point not bound in %s"), *this->GetName());
 		}
+
 
 	}
 	//If we have waves then we should also check the wave and if all enemies are dead
@@ -701,6 +707,12 @@ void AEnemySpawner::DEBUGDeleteAllEnemiesAndAdvanceStage()
 		CurrentEnemiesAliveInSection = 0;
 		DecreaseEnemyCount(nullptr);
 	}
+}
+
+//Getters
+int32 AEnemySpawner::GetTotalEnemiesKilled() 
+{
+	return TotalEnemiesDeadAcrossTheGame;
 }
 
 //Delegate Method

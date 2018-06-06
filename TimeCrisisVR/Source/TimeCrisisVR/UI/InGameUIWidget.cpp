@@ -33,25 +33,27 @@ void UInGameUIWidget::FlashUpAreaStartTimer(UTextBlock* AreaStart)
 	}
 }
 
-void UInGameUIWidget::FlashUpWait(UTextBlock* WaitTB) 
+void UInGameUIWidget::DisplayWaitCallable(bool bShouldDisplayWait, UTextBlock* WaitTB) 
 {
-	FTimerDelegate ShowWaitDele = FTimerDelegate::CreateUObject(this, &UInGameUIWidget::FlashUpWaitStartTimer, WaitTB);
-	GetWorld()->GetTimerManager().SetTimer(FlashWaitHandle, ShowWaitDele, 0.5f, true);
-}
-
-//TODO: We need the function to hide wait when we arrive at the right point and then to display action
-void UInGameUIWidget::FlashUpWaitStartTimer(UTextBlock* WaitTB) 
-{
-	if (WaitTB->GetVisibility() == ESlateVisibility::Hidden)
+	if (bShouldDisplayWait) 
 	{
 		WaitTB->SetVisibility(ESlateVisibility::Visible);
-		AmtOfFlashesOfWait++;
 	}
-	else
+	else 
 	{
-		WaitTB->SetVisibility(ESlateVisibility::Hidden);
+		WaitTB->SetVisibility(ESlateVisibility::Collapsed);
 	}
-
 }
 
+void UInGameUIWidget::DisplayProceedCallable(bool bShouldDisplayProceed, UTextBlock* ProceedTB) 
+{
+	if (bShouldDisplayProceed) 
+	{
+		ProceedTB->SetVisibility(ESlateVisibility::Visible);
+	}
+	else 
+	{
+		ProceedTB->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
 

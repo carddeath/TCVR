@@ -63,5 +63,19 @@ void ATImeManager::AddTimeToTimersForSectionBasedOnArea(int32 StageNumber, int32
 void ATImeManager::PauseOrResumeTimer(bool bShouldPause)
 {
 	TimerWatchWidget->TogglePauseOnTimer(bShouldPause);
+
+	//Update the total time taken
+	if (bShouldPause) 
+	{
+		TotalTimeTakenInTheGame = TimerWatchWidget->GetTotalTimeTaken();
+	}
+}
+
+float ATImeManager::GetTotalTimeAtAreaEnd() 
+{
+	//Get the total time taken, reset the counter and return the actual value
+	float HolderOfTime = TotalTimeTakenInTheGame;
+	TotalTimeTakenInTheGame = 0;
+	return HolderOfTime;
 }
 

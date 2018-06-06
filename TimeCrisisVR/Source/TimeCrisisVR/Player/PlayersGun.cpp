@@ -8,7 +8,7 @@
 #include "Sound/SoundBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AmmoClip.h"
-#include "Gameplay/Announcer.h"
+#include "Managers/EventManager.h"
 #include "Managers/NavigationManager.h"
 #include "Gameplay/NavigationArrow.h"
 #include "AI/AIEnemyCharacter.h"
@@ -54,26 +54,26 @@ void APlayersGun::BeginPlay()
 	//Assign the reload delegate to know what to do when a clip collides with it.
 	ReloadCollider->OnComponentBeginOverlap.AddDynamic(this, &APlayersGun::OnComponentBeginOverlap);
 
-	//Get the announcer object in the scene
-	for (TActorIterator<AAnnouncer> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	//Get the Event manager object in the scene
+	for (TActorIterator<AEventManager> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-		Announcer = *ActorItr;
-	}
+		EventManager = *ActorItr;
 
-	if (!Announcer) 
-	{
-		UE_LOG(LogTemp, Error, TEXT("MISSING ANNOUNCER OBJECT IN %s"), *this->GetName());
+		if (!EventManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("MISSING Event Manager OBJECT IN %s"), *this->GetName());
+		}
 	}
 
 	//Get the Navigation Manager object in the scene
 	for (TActorIterator<ANavigationManager> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		NavManager = *ActorItr;
-	}
 
-	if (!NavManager)
-	{
-		UE_LOG(LogTemp, Error, TEXT("MISSING NAV MANAGER OBJECT IN %s"), *this->GetName());
+		if (!NavManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("MISSING NAV MANAGER OBJECT IN %s"), *this->GetName());
+		}
 	}
 
 	AmmoClipUILeft = Cast<UUIAmmoClip>(LeftGunAmmoWidget2->GetUserWidgetObject());
@@ -91,12 +91,14 @@ void APlayersGun::Fire()
 	//Gun Audio
 	PlayFireSound();
 
-	//TODO: Fire an actual projectile - Alternative fire method
 	//TODO: Add a muzzle flash
 
 	//Remove a bullet and shoot as he have a bullet.
 	if (CurrentAmmo > 0) 
 	{
+		//Increments all the shots that are fired
+		TotalShotsFired++;
+
 		//Fire the raytace
 		FVector ShotStartPos = FireStartPointComp->GetComponentLocation();
 		FVector ShotEndLocation = FireStartPointComp->GetComponentLocation() + GunStaticMeshComp->GetForwardVector() * -GunRange;
@@ -157,8 +159,13 @@ void APlayersGun::Fire()
 						//Kills all enemies in the scene
 						for (TActorIterator<AAIEnemyCharacter> EnemyIta(GetWorld()); EnemyIta; ++EnemyIta) 
 						{
+							//If the character isn't already dead then kill it
 							AAIEnemyCharacter* TempChar = *EnemyIta;
-							TempChar->KillEnemy(HitArea::RANDOM);
+							if (!TempChar->GetDeathState()) 
+							{
+								TempChar->KillEnemy(HitArea::RANDOM);
+							}
+
 						}
 					}
 					break;
@@ -197,9 +204,9 @@ void APlayersGun::PlayFireSound()
 	{
 		//Play empty clip and the announcer audio
 		UGameplayStatics::SpawnSoundAttached(SFXEmptyClip, this->GetRootComponent());
-		if (Announcer) 
+		if (EventManager) 
 		{
-			Announcer->PlayReload();
+			EventManager->AnnouncerReloadCallThroughAndUIBroadcast();
 		}
 	}
 	else 
@@ -264,5 +271,12 @@ void APlayersGun::DisableGripUI(bool bLeftHandHolding)
 		AmmoClipUILeft->SetVisibility(ESlateVisibility::Visible);
 		AmmoClipUIRight->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+//Getters
+
+int32 APlayersGun::GetTotalShotsFired()
+{
+	return TotalShotsFired;
 }
 

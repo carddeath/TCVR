@@ -39,7 +39,7 @@ protected:
 	USoundBase* SFXEmptyClip = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
-		USoundBase* SFXReloaded = nullptr;
+	USoundBase* SFXReloaded = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
 	class UBoxComponent* ReloadCollider = nullptr;
@@ -63,13 +63,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
 	float GunRange = 2000.0f;
 
-	class AAnnouncer* Announcer = nullptr;
+	class AEventManager* EventManager = nullptr;
 
 	class ANavigationManager* NavManager = nullptr;
 
 	class UUIAmmoClip* AmmoClipUILeft = nullptr;
 
 	class UUIAmmoClip* AmmoClipUIRight = nullptr;
+
+	//Tracks the total shots for DataTracker
+	int32 TotalShotsFired = 0;
 
 		//Methods
 	
@@ -80,6 +83,9 @@ public:
 	//Called from VRPawn
 	void Fire();
 	void DisableGripUI(bool bLeftHandHolding);
+
+	//Getters
+	int32 GetTotalShotsFired();
 
 protected:
 	virtual void BeginPlay() override;

@@ -503,7 +503,21 @@ void AVRPawn::TogglePointingHandMeshRight(float AxisValue)
 	}
 }
 
+//Health Related Classes
+void AVRPawn::TookDamage() 
+{
+	//TODO: Remove life total 
+	//TODO: SHow the UI change
+	TotalTimesHit++;
+}
+
+//Getters
 UUserWidget* AVRPawn::GetWatchClass() 
 {
 	return SMLeftWatchTimeWidget->GetUserWidgetObject();
+}
+
+int32 AVRPawn::GetTotalTimesHit() 
+{
+	return TotalTimesHit;
 }

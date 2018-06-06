@@ -22,6 +22,9 @@ protected:
 private:
 
 	class UTimer* TimerWatchWidget = nullptr;
+
+	float TotalTimeTakenInTheGame = 0.0f;
+
 	//Methods
 public:	
 	ATImeManager();
@@ -31,6 +34,8 @@ public:
 	void AddTimeToTimersForSectionBasedOnArea(int32 StageNumber, int32 Area);
 
 	void PauseOrResumeTimer(bool bShouldPause);
+
+	float GetTotalTimeAtAreaEnd();
 
 protected:
 	virtual void BeginPlay() override;

@@ -12,6 +12,10 @@ Should also tell the enemy spawner to update it's enemy set based on the, level,
 #include "NavigationManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFlashUpAreaAndWait, int32, StageNum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisplayProceedOnAreaClear, bool, bShouldShowProceed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisplayWait, bool, bShouldShowWait);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReachedEndOfArea, bool, bShouldShowEndOfAreaWidget);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReachedEndOfAreaDataTransfer, int32, junk);
 
 UCLASS()
 class TIMECRISISVR_API ANavigationManager : public AActor
@@ -21,7 +25,20 @@ class TIMECRISISVR_API ANavigationManager : public AActor
 	//Variables
 public:
 
+	//For the start of each stage
 	FFlashUpAreaAndWait FlashUpDelegateAreaStart;
+	
+	//For once an area is clear we should display to the player that they're read to proceed
+	FDisplayProceedOnAreaClear ToggleProceedDisplayDelegate;
+
+	//Used to turn off or on the wait ui and say action!
+	FDisplayWait ToggleWaitOffDelegate;
+
+	//Used for show the end of area widget and turn off the other
+	FReachedEndOfArea ShowEndOfAreaWidgetDelegate;
+
+	//Allows the DataTracker to seek out all data required for the end of area stats
+	FReachedEndOfAreaDataTransfer AllowDataCollectionFromClassesDelegate;
 
 protected:
 
@@ -47,6 +64,9 @@ private:
 	int32 CurrentSection = 1;
 
 	class AMainPlayerController* CustomPlayerController = nullptr;
+
+	//USed to check in "tick" if the player has reached the next locomotion point. If so then we remove the wait UI and display action
+	bool bHasPlayerSetOffToNextPoint = false;
 
 	//Methods
 	
