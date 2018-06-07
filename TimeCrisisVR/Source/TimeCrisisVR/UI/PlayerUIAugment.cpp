@@ -98,6 +98,15 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 void APlayerUIAugment::SendEndOfAreaDataToWidget(FGameData GameData) 
 {
 	//CAREFUL: HOPEFULLY NOT A RACE CONDITION WITH THE INFOMATION ABOVE
-	EndOfAreaWidget->GenerateAllDataToDisplay(GameData);
+	SwapWidgetsInGame(true);
+	if (EndOfAreaWidget) 
+	{
+		EndOfAreaWidget->GenerateAllDataToDisplay(GameData);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing End of area widget when sending data"));
+	}
+
 }
 

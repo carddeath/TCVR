@@ -44,6 +44,9 @@ public:
 
 	bool bIsReloading = false;
 
+	//Used for tracking data of total enemies killed against shots
+	bool bWasKilledByExplosion = false;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 		TArray<class USoundBase*> DeathNoises;

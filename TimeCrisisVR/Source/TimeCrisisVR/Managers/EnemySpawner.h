@@ -128,8 +128,6 @@ private:
 	int32 CurrentArea = 1; //The current area within an stage 1 -3
 	int32 CurrentWaveInSection = 1; //Used to keep track of which "wave of enemies" are in play in a certain area
 
-	int32 TotalEnemiesDeadAcrossTheGame = 0; //The accumulative amount of enemies who were killed
-
 	TArray<AAIEnemyCharacter*> CurrentEnemiesAlive;
 
 	//Used to toggle in a 
@@ -147,10 +145,6 @@ public:
 
 	UFUNCTION()
 	void DecreaseEnemyCount(AAIEnemyCharacter* Char);
-
-	//Getters
-
-	int32 GetTotalEnemiesKilled();
 
 	//Debug function
 	UFUNCTION(BlueprintCallable, Category = "Debug")

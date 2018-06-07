@@ -6,8 +6,6 @@
 #include "Player/PlayersGun.h"
 #include "Player/VRPawn.h"
 #include "Managers/TImeManager.h"
-#include "Managers/EnemySpawner.h"
-
 
 // Sets default values
 ADataTracker::ADataTracker()
@@ -25,11 +23,6 @@ void ADataTracker::BeginPlay()
 	for (TActorIterator<ANavigationManager> ita(GetWorld()); ita; ++ita) 
 	{
 		NavManager = *ita;
-	}
-
-	for (TActorIterator<AEnemySpawner> ita(GetWorld()); ita; ++ita)
-	{
-		EnemySpawner = *ita;
 	}
 
 	for (TActorIterator<ATImeManager> ita(GetWorld()); ita; ++ita)
@@ -56,16 +49,11 @@ void ADataTracker::FindAllData(int junk)
 	//Get total times hit
 	GameData.TotalTimesHitByEnemies = Cast<AVRPawn>(GetWorld()->GetFirstPlayerController()->GetPawn())->GetTotalTimesHit();
 
-	//Get total shots fired
+	//Get total shots fired and total enemies killed
 	if (PlayersGun) 
 	{
 		GameData.AmountOfBulletsFired = PlayersGun->GetTotalShotsFired();
-	}
-
-	//Get total enemies killed
-	if (EnemySpawner) 
-	{
-		GameData.AmountOfBulletsHit = EnemySpawner->GetTotalEnemiesKilled();
+		GameData.AmountOfBulletsHit = PlayersGun->GetTotalShotsHit();
 	}
 
 	//Get total time
@@ -79,6 +67,9 @@ void ADataTracker::FindAllData(int junk)
 	{
 		GameData.CurrentArea = NavManager->GetCurrentGameArea();
 	}
+
+	//Debug: Just temporary measure to compare to the players time
+	GameData.TopTime = 85.0f;
 
 	UE_LOG(LogTemp, Warning, TEXT("TotalTimesHitByEnemy %d"), GameData.TotalTimesHitByEnemies);
 	UE_LOG(LogTemp, Warning, TEXT("AMount of shots fired %d"), GameData.AmountOfBulletsFired);

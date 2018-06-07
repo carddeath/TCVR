@@ -73,9 +73,6 @@ bool AEnemySpawner::CheckNoFieldsAreEmpty()
 
 void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 {
-	//For end of game data
-	TotalEnemiesDeadAcrossTheGame++;
-
 	CurrentEnemiesAliveInSection--;
 	TotalEnemiesShot++;
 	UE_LOG(LogTemp, Warning, TEXT("Amount of soldiers left = %d"), CurrentEnemiesAliveInSection);
@@ -707,12 +704,6 @@ void AEnemySpawner::DEBUGDeleteAllEnemiesAndAdvanceStage()
 		CurrentEnemiesAliveInSection = 0;
 		DecreaseEnemyCount(nullptr);
 	}
-}
-
-//Getters
-int32 AEnemySpawner::GetTotalEnemiesKilled() 
-{
-	return TotalEnemiesDeadAcrossTheGame;
 }
 
 //Delegate Method

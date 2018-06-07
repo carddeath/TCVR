@@ -125,6 +125,7 @@ void APlayersGun::Fire()
 					{
 						//Change false to true if we want "Teleport" behaviour
 						NavManager->UpdateCurrentSection(bTeleportOnLocoHit);
+						TotalShotsHit++;
 						break;
 					}
 				}
@@ -148,11 +149,13 @@ void APlayersGun::Fire()
 						{
 							Cast<AAIEnemyCharacter>(actor.GetActor())->KillEnemy(HitArea::HEAD);
 						}
+						TotalShotsHit++;
 					}
 					break;
 				}
 				else if (Cast<AExplosiveBox>(actor.GetActor()))
 				{
+					TotalShotsHit++;
 					//If the box blew up
 					if (Cast<AExplosiveBox>(actor.GetActor())->TookDamageFromPlayer()) 
 					{
@@ -163,6 +166,7 @@ void APlayersGun::Fire()
 							AAIEnemyCharacter* TempChar = *EnemyIta;
 							if (!TempChar->GetDeathState()) 
 							{
+								TempChar->bWasKilledByExplosion = true;
 								TempChar->KillEnemy(HitArea::RANDOM);
 							}
 
@@ -278,5 +282,10 @@ void APlayersGun::DisableGripUI(bool bLeftHandHolding)
 int32 APlayersGun::GetTotalShotsFired()
 {
 	return TotalShotsFired;
+}
+
+int32 APlayersGun::GetTotalShotsHit() 
+{
+	return TotalShotsHit;
 }
 

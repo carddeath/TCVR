@@ -74,6 +74,9 @@ private:
 	//Tracks the total shots for DataTracker
 	int32 TotalShotsFired = 0;
 
+	//The total shots hitting enemies
+	int32 TotalShotsHit = 0;
+
 		//Methods
 	
 public:	
@@ -86,6 +89,8 @@ public:
 
 	//Getters
 	int32 GetTotalShotsFired();
+
+	int32 GetTotalShotsHit();
 
 protected:
 	virtual void BeginPlay() override;

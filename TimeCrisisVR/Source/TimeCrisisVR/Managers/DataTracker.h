@@ -30,8 +30,6 @@ private:
 
 	class ANavigationManager* NavManager = nullptr;
 
-	class AEnemySpawner* EnemySpawner = nullptr;
-
 	class ATImeManager* TimeManager = nullptr;
 
 	FGameData GameData;

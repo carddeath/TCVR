@@ -159,10 +159,10 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		}
 
 		//Show the end of game widget
-		if (ShowEndOfAreaWidgetDelegate.IsBound()) 
-		{
-			ShowEndOfAreaWidgetDelegate.Broadcast(true);
-		}
+		//if (ShowEndOfAreaWidgetDelegate.IsBound()) 
+		//{
+		//	ShowEndOfAreaWidgetDelegate.Broadcast(true);
+		//}
 		return;
 	}
 		LocomotionPoints[CurrentSection]->ShowArrow(true);

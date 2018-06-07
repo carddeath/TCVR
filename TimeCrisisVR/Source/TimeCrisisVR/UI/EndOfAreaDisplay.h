@@ -26,8 +26,6 @@ protected:
 
 private:
 
-
-
 	//Methods
 public:
 
@@ -39,8 +37,11 @@ public:
 
 protected:
 
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void PopulateData(class UTextBlock* AreaNum, UTextBlock* MainTimer, UTextBlock* VsTopMain, UTextBlock* AccuracyPer, UTextBlock* ShotRatio);
+
 private:
 	
-	
+	void TimeStringConstruction(UTextBlock* TimeToChange, bool bIsVsTime);
 	
 };
