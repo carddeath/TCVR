@@ -86,8 +86,16 @@ void ANavigationManager::Tick(float DeltaTime)
 			if (ToggleWaitOffDelegate.IsBound()) 
 			{
 				ToggleWaitOffDelegate.Broadcast(false);
-				EventManager->AnnouncerCallThroughAction();
+				//EventManager->AnnouncerCallThroughAction();
 			}
+
+			if (TurnGunToEnabled.IsBound()) 
+			{
+				TurnGunToEnabled.Broadcast(0);
+			}
+
+			//TODO: Add a delay based on when the player is in the correct position
+			EnemySpawner->UpdateSection(CurrentSection);
 		}
 	}
 }
@@ -123,8 +131,8 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 	//Increment the current stage
 	CurrentSection++;
 
-	//TODO: Add a delay based on when the player is in the correct position
-	EnemySpawner->UpdateSection(CurrentSection);
+	//Delay added, now found in the tick component
+	//EnemySpawner->UpdateSection(CurrentSection);
 
 	//Check to see if there are events that should happen
 	EventChecker();
@@ -157,12 +165,6 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		{
 			AllowDataCollectionFromClassesDelegate.Broadcast(0);
 		}
-
-		//Show the end of game widget
-		//if (ShowEndOfAreaWidgetDelegate.IsBound()) 
-		//{
-		//	ShowEndOfAreaWidgetDelegate.Broadcast(true);
-		//}
 		return;
 	}
 		LocomotionPoints[CurrentSection]->ShowArrow(true);

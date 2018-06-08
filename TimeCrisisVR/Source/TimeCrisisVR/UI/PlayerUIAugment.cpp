@@ -63,8 +63,10 @@ void APlayerUIAugment::BeginPlay()
 		//We want to display reload and it comes from the event manager via the players gun
 		EventManager->ReloadDisplayDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayReload);
 
+		//Shows the end of the game data screen
 		NavManager->ShowEndOfAreaWidgetDelegate.AddDynamic(this, &APlayerUIAugment::SwapWidgetsInGame);
 
+		//Is used to retrieve the end of screen data
 		DataTracker->DataSendingDelegate.AddDynamic(this, &APlayerUIAugment::SendEndOfAreaDataToWidget);
 	}
 	else 

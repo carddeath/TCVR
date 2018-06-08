@@ -50,15 +50,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	UWidgetComponent* RightGunAmmoWidget = nullptr;
 
-private:
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+		class UParticleSystemComponent* ParticleComponent = nullptr;
 
+private:
 	UPROPERTY(VisibleAnywhere, Category = "Gun Specifics")
 	int32 CurrentAmmo;
 	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
 	int32 FullClipAmmo = 6;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
-	bool bTeleportOnLocoHit = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
 	float GunRange = 2000.0f;
@@ -76,6 +75,12 @@ private:
 
 	//The total shots hitting enemies
 	int32 TotalShotsHit = 0;
+
+	//This gets turned to false when hitting a nav arrow and enabled when arriving at the next point
+	bool bIsAllowedToFire = true;
+
+	//CHANGE: Change to false if required if we want the teleporting basis
+	bool bIsNodeBasedMovement = true;
 
 		//Methods
 	
@@ -104,4 +109,6 @@ private:
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	UFUNCTION()
+	void AllowGunTobeFired(int junk);
 };

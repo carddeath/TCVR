@@ -46,6 +46,9 @@ protected:
 	UFUNCTION()
 		void FindAllData(int junk);
 
+	UFUNCTION()
+		void GetGunFromPawn(APlayersGun* PGun);
+
 private:	
 
 

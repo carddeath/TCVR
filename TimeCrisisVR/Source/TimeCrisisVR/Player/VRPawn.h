@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "VRPawn.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGunWasCreated, class APlayersGun*, PGun);
+
 UENUM()
 enum class EHand : uint8 
 {
@@ -28,6 +30,9 @@ public:
 		class USceneComponent* VRCameraRoot = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "VR")
 		class UCameraComponent* VRCamera = nullptr;
+
+	//Used so the data manager can get the gun
+	FGunWasCreated GunWasCreatedDelegate;
 
 protected:
 
@@ -61,6 +66,9 @@ protected:
 	UStaticMesh* FingerPointHandModel = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "VR")
+	UStaticMesh* AmmoClipHandModel = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "VR")
 	TSubclassOf<class AAmmoPouch> AmmoPouchTemplate = nullptr;
 
 	AAmmoPouch* SpawnedAmmoPouch = nullptr;
@@ -79,6 +87,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	class UChildActorComponent* UIDisplay = nullptr;
+
+	//The gun added by default instead of picking it up
+	UPROPERTY(EditDefaultsOnly, Category = "Object")
+	TSubclassOf<class APlayersGun> PlayersGunTemplate = nullptr;
+
+	APlayersGun* PlayersGun = nullptr;
 
 
 private:
@@ -99,12 +113,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "VR")
 	float HandSwapRange = 20.0f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "VR")
-	float PickupRotOffsetYaw = 180.0f; //Ideal value is 180
-
-	UPROPERTY(EditDefaultsOnly, Category = "VR")
-	float PickupRotOffsetPitch = 90.0f; //Ideal value is 90
 
 	EHand CurrentHandPressed;
 
@@ -167,6 +175,9 @@ private:
 	void FirePistolLeft();
 
 	void FirePistolRight();
+
+	UFUNCTION()
+		void SpawnPistolAndPlaceInRightHand();
 
 
 };

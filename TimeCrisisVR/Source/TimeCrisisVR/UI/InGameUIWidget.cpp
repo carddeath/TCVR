@@ -27,9 +27,11 @@ void UInGameUIWidget::FlashUpAreaStartTimer(UTextBlock* AreaStart)
 	}
 	else 
 	{
-		AreaStart->SetVisibility(ESlateVisibility::Hidden);
+		AreaStart->SetVisibility(ESlateVisibility::Collapsed);
 		GetWorld()->GetTimerManager().ClearTimer(FlashAreaStartHandle);
 		AmtOfFlashesOnStart = 0;
+		HideWait();
+		DisplayAction();
 	}
 }
 
@@ -56,4 +58,3 @@ void UInGameUIWidget::DisplayProceedCallable(bool bShouldDisplayProceed, UTextBl
 		ProceedTB->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
-

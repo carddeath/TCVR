@@ -16,6 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisplayProceedOnAreaClear, bool, bS
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisplayWait, bool, bShouldShowWait);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReachedEndOfArea, bool, bShouldShowEndOfAreaWidget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReachedEndOfAreaDataTransfer, int32, junk);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReactiveGun, int32, junk);
 
 UCLASS()
 class TIMECRISISVR_API ANavigationManager : public AActor
@@ -33,6 +34,9 @@ public:
 
 	//Used to turn off or on the wait ui and say action!
 	FDisplayWait ToggleWaitOffDelegate;
+
+	//A delegate that is called when "action delegate" is called as well
+	FReactiveGun TurnGunToEnabled;
 
 	//Used for show the end of area widget and turn off the other
 	FReachedEndOfArea ShowEndOfAreaWidgetDelegate;

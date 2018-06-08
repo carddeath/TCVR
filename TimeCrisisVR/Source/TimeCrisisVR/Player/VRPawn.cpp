@@ -75,6 +75,9 @@ void AVRPawn::BeginPlay()
 
 	FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
 	SpawnedAmmoPouch->AttachToActor(this, AttachRules);
+
+	//Create the gun and place it in the hand at the start of the game
+	SpawnPistolAndPlaceInRightHand();
 }
 
 // Called every frame
@@ -101,6 +104,7 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AVRPawn::PickUpObjectLeft() 
 {
+	//UE_LOG(LogTemp, Warning, TEXT(" INLEFTPICK UP HIT LeftHitComponent is %s and RightHitComponent is %s"), *LeftHitComponent->GetName(), *RightHitComponent->GetName());
 	if (GEngine) 
 	{
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, TEXT("Pickup left called"), true, FVector2D(3.0f, 3.0f));
@@ -113,7 +117,7 @@ void AVRPawn::PickUpObjectLeft()
 	}
 	//If we are inside the ammo pouch then we should pick up an ammo clip and ignore shooting
 	//TODO: UPDATE THIS WHEN NEEDED
-	else if(SpawnedAmmoPouch->GetLeftHandInPouchState())
+	else if(SpawnedAmmoPouch->GetLeftHandInPouchState() && LeftPickedUpActor == nullptr)
 	{
 		AttemptToPickUpAmmoClip(EHand::LEFT);
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
@@ -174,6 +178,7 @@ void AVRPawn::PickUpObjectLeft()
 			FVector HandSwapVector = MCLeft->GetForwardVector() * HandSwapRange;
 			if (LeftHitComponent == RightHitComponent && GetWorld()->LineTraceSingleByObjectType(Hit, LeftMCLoc, LeftMCLoc + HandSwapVector, Params))
 			{
+
 				FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
 				RightPickedUpActor->DetachFromActor(DetachRules);
 
@@ -228,7 +233,7 @@ void AVRPawn::PickUpObjectRight()
 	}
 	//If we are inside the ammo pouch then we should pick up an ammo clip and ignore shooting
 	//TODO: UPDATE THIS WHEN NEEDED by playing clip in right position
-	else if (SpawnedAmmoPouch->GetRightHandInPouchState())
+	else if (SpawnedAmmoPouch->GetRightHandInPouchState() && RightPickedUpActor == nullptr )
 	{
 		AttemptToPickUpAmmoClip(EHand::RIGHT);
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
@@ -285,6 +290,7 @@ void AVRPawn::PickUpObjectRight()
 		else
 		{	//If we hit the component in the opposite hand
 			//Should be constrained based on distance
+
 			FVector HandSwapVector = MCRight->GetForwardVector() * HandSwapRange;
 			if (RightHitComponent == LeftHitComponent && GetWorld()->LineTraceSingleByObjectType(Hit, RightMCLoc, RightMCLoc + HandSwapVector, Params))
 			{
@@ -343,7 +349,7 @@ void AVRPawn::AttemptToPickUpAmmoClip(EHand HandType)
 		if (HandType == EHand::LEFT)
 		{
 			//Set the hand to be the grab gun hand atm
-			SMLeft->SetStaticMesh(GunHoldingModel);
+			SMLeft->SetStaticMesh(AmmoClipHandModel);
 
 			//Spawning the ammo clip
 			LeftPickedUpActor = GetWorld()->SpawnActor<AAmmoClip>(AmmoClip);
@@ -359,10 +365,17 @@ void AVRPawn::AttemptToPickUpAmmoClip(EHand HandType)
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 			LeftPickedUpActor->AttachToComponent(SCHeldObjectLeft, AttachRules);
 
+			FVector Locat = SMLeft->GetSocketLocation(FName("Ammo_Clip_Left"));
+
+			LeftPickedUpActor->SetActorLocation(Locat);
+
+			//	LeftPickedUpActor->AttachToComponent(SMLeft, AttachRules, FName("Gun_Position"));
+			LeftPickedUpActor->SetActorRotation(SMLeft->GetSocketRotation(FName("Ammo_Clip_Left")));
+
 		}
 		else if (HandType == EHand::RIGHT) 
 		{
-			SMRight->SetStaticMesh(GunHoldingModel);
+			SMRight->SetStaticMesh(AmmoClipHandModel);
 
 			//Spawning the ammo clip
 			RightPickedUpActor = GetWorld()->SpawnActor<AAmmoClip>(AmmoClip);
@@ -379,8 +392,12 @@ void AVRPawn::AttemptToPickUpAmmoClip(EHand HandType)
 			FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 			RightPickedUpActor->AttachToComponent(SCHeldObjectRight, AttachRules);
 
-			//TODO: Not perfect but will do for now
-			RightPickedUpActor->SetActorRotation(FRotator(PickupRotOffsetPitch, PickupRotOffsetYaw, 0.0f));
+			FVector Locat = SMRight->GetSocketLocation(FName("Ammo_Clip_Right"));
+
+			RightPickedUpActor->SetActorLocation(Locat);
+
+			//	LeftPickedUpActor->AttachToComponent(SMLeft, AttachRules, FName("Gun_Position"));
+			RightPickedUpActor->SetActorRotation(SMRight->GetSocketRotation(FName("Ammo_Clip_Right")));
 		}
 	}
 }
@@ -500,6 +517,43 @@ void AVRPawn::TogglePointingHandMeshRight(float AxisValue)
 	else if (!bIsHoldingObjectRight && AxisValue >= 1.0f)
 	{
 		SMRight->SetStaticMesh(EmptyHandModel);
+	}
+}
+
+void AVRPawn::SpawnPistolAndPlaceInRightHand() 
+{
+	PlayersGun = GetWorld()->SpawnActor<APlayersGun>(PlayersGunTemplate);
+	//PlayersGun->FindComponentByClass<UStaticMeshComponent>()->SetRelativeScale3D(FVector(2.0f));
+	//PlayersGun->FindComponentByClass<UStaticMeshComponent>()->SetSimulatePhysics(false);
+
+	RightHitComponent = PlayersGun->FindComponentByClass<UStaticMeshComponent>();
+	RightHitComponent->SetRelativeScale3D(FVector(2.0f));
+	RightHitComponent->SetSimulatePhysics(false);
+	RightPickedUpActor = PlayersGun;
+	bIsHoldingObjectRight = true;
+
+	RightPickedUpActor->SetActorRotation(FRotator::ZeroRotator);
+
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
+	RightPickedUpActor->AttachToComponent(SCHeldObjectRight, AttachRules);
+
+	SMRight->SetStaticMesh(GunHoldingModel);
+
+	FVector Locat = SMRight->GetSocketLocation(FName("Gun_Position_Right"));
+
+	RightPickedUpActor->SetActorLocation(Locat);
+	RightPickedUpActor->SetActorRotation(SMRight->GetSocketRotation(FName("Gun_Position_Right")));
+
+	//If it's the gun hide the right ammo ui
+	if (Cast<APlayersGun>(RightPickedUpActor))
+	{
+		Cast<APlayersGun>(RightPickedUpActor)->DisableGripUI(false);
+	}
+
+	//Lets send this gun to the data tracker
+	if (GunWasCreatedDelegate.IsBound()) 
+	{
+		GunWasCreatedDelegate.Broadcast(PlayersGun);
 	}
 }
 

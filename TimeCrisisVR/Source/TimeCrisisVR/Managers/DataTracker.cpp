@@ -20,11 +20,6 @@ void ADataTracker::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TActorIterator<APlayersGun> ita(GetWorld()); ita; ++ita)
-	{
-		PlayersGun = *ita;
-	}
-
 	for (TActorIterator<ANavigationManager> ita(GetWorld()); ita; ++ita) 
 	{
 		NavManager = *ita;
@@ -40,6 +35,8 @@ void ADataTracker::BeginPlay()
 	{
 		NavManager->AllowDataCollectionFromClassesDelegate.AddDynamic(this, &ADataTracker::FindAllData);
 	}
+
+	Cast<AVRPawn>(GetWorld()->GetFirstPlayerController()->GetPawn())->GunWasCreatedDelegate.AddDynamic(this, &ADataTracker::GetGunFromPawn);
 }
 
 // Called every frame
@@ -84,6 +81,15 @@ void ADataTracker::FindAllData(int junk)
 	if (DataSendingDelegate.IsBound()) 
 	{
 		DataSendingDelegate.Broadcast(GameData);
+	}
+}
+
+void ADataTracker::GetGunFromPawn(APlayersGun* PGun) 
+{
+	PlayersGun = PGun;
+	if (!PlayersGun) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Still no gun"));
 	}
 }
 

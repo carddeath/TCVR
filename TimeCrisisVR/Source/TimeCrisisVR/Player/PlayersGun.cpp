@@ -39,6 +39,9 @@ APlayersGun::APlayersGun()
 
 	RightGunAmmoWidget = CreateDefaultSubobject<UWidgetComponent>(FName("Right Ammo Widget"));
 	RightGunAmmoWidget->SetupAttachment(GunStaticMeshComp);
+
+	ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(FName("Particle System"));
+	ParticleComponent->SetAutoAttachmentParameters(GunStaticMeshComp, FName("FlashSocket"), EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative);
 }
 
 // Called when the game starts or when spawned
@@ -78,6 +81,9 @@ void APlayersGun::BeginPlay()
 
 	AmmoClipUILeft = Cast<UUIAmmoClip>(LeftGunAmmoWidget2->GetUserWidgetObject());
 	AmmoClipUIRight = Cast<UUIAmmoClip>(RightGunAmmoWidget->GetUserWidgetObject());
+
+	//A delegate to allow the gun to be fired once we reach our destination
+	NavManager->TurnGunToEnabled.AddDynamic(this, &APlayersGun::AllowGunTobeFired);
 }
 
 // Called every frame
@@ -88,14 +94,21 @@ void APlayersGun::Tick(float DeltaTime)
 
 void APlayersGun::Fire() 
 {
+	//We are moving currently and are not allowed to fire
+	if (!bIsAllowedToFire) 
+	{
+		return;
+	}
+
 	//Gun Audio
 	PlayFireSound();
-
-	//TODO: Add a muzzle flash
 
 	//Remove a bullet and shoot as he have a bullet.
 	if (CurrentAmmo > 0) 
 	{
+		//Show muzzle flash
+		ParticleComponent->Activate(true);
+
 		//Increments all the shots that are fired
 		TotalShotsFired++;
 
@@ -123,8 +136,10 @@ void APlayersGun::Fire()
 				{
 					if (NavManager)
 					{
+						//We cannot fire until we reach the next point
+						bIsAllowedToFire = false;
 						//Change false to true if we want "Teleport" behaviour
-						NavManager->UpdateCurrentSection(bTeleportOnLocoHit);
+						NavManager->UpdateCurrentSection(bIsNodeBasedMovement);
 						TotalShotsHit++;
 						break;
 					}
@@ -153,7 +168,8 @@ void APlayersGun::Fire()
 					}
 					break;
 				}
-				else if (Cast<AExplosiveBox>(actor.GetActor()))
+				//DO multiple checks here for areas that contain explosive boxes
+				else if (Cast<AExplosiveBox>(actor.GetActor()) && NavManager->GetCurrentGameSection() == 5)
 				{
 					TotalShotsHit++;
 					//If the box blew up
@@ -275,6 +291,11 @@ void APlayersGun::DisableGripUI(bool bLeftHandHolding)
 		AmmoClipUILeft->SetVisibility(ESlateVisibility::Visible);
 		AmmoClipUIRight->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void APlayersGun::AllowGunTobeFired(int junk) 
+{
+	bIsAllowedToFire = true;
 }
 
 //Getters

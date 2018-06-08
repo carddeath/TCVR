@@ -23,6 +23,7 @@ private:
 	
 	//A counter before we stop the loop of the timer
 	int32 AmtOfFlashesOnStart = 0;
+	int32 AmtOfFlashesOnWait = 0;
 
 	FTimerHandle FlashAreaStartHandle;
 	FTimerHandle FlashWaitHandle;
@@ -33,6 +34,7 @@ public:
 	//Is part of a delegate set to do this in CPP. We call this event to set the text, callable then does the time start and StartTimer does the flashing
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void FlashUpAreaStart(int32 AreaNum);
+
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void DisplayProceed(bool bShouldDisplayProceed);
@@ -57,6 +59,9 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Callable Functions")
 		void DisplayProceedCallable(bool bShouldDisplayProceed, UTextBlock* ProceedTB);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Callable Functions")
+		void HideWait();
 
 
 private:
