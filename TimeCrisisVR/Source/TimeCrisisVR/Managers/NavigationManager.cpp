@@ -115,7 +115,7 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 	if (CustomPlayerController) 
 	{
 		//Used to decide on which method of teleportation should be used.
-		if (!bTeleportPlayer) 
+		if (true) 
 		{
 			CustomPlayerController->MovePlayerViaNavManagerNodeBased(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
 		}

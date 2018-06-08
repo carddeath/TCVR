@@ -11,7 +11,7 @@ void AMainPlayerController::MovePlayerViaNavManagerTeleport(FVector LocationToMo
 	FRotator PawnsRot = this->GetPawn()->GetActorRotation();
 
 	this->GetPawn()->SetActorLocation(FVector(LocationToMove.X, LocationToMove.Y, 0.0f));
-	this->GetPawn()->SetActorRelativeRotation(FRotator(PawnsRot.Pitch, RotationToFace.Yaw, PawnsRot.Roll));
+	//this->GetPawn()->SetActorRelativeRotation(FRotator(PawnsRot.Pitch, RotationToFace.Yaw, PawnsRot.Roll));
 	
 }
 
