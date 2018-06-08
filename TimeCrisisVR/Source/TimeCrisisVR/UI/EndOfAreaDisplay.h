@@ -32,7 +32,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void GenerateAllDataToDisplay(FGameData GD);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Events")
 	void DisplayEndOfGameScreenInOrder();
 
 protected:

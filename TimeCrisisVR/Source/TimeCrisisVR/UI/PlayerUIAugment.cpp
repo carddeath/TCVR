@@ -83,9 +83,9 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 {
 	if (bShowEndOfAreaWidget) 
 	{
-		WidgetDisplay->SetWidget(EndOfAreaWidget);
 		if (EndOfAreaWidget) 
 		{
+			WidgetDisplay->SetWidget(EndOfAreaWidget);
 			EndOfAreaWidget->DisplayEndOfGameScreenInOrder();
 		}
 	}
@@ -97,10 +97,12 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 
 void APlayerUIAugment::SendEndOfAreaDataToWidget(FGameData GameData) 
 {
+	//Creates the end of game widget to be assigned later
+	EndOfAreaWidget = CreateWidget<UEndOfAreaDisplay>(GetWorld(), EndOfAreaTemplate);
 	//CAREFUL: HOPEFULLY NOT A RACE CONDITION WITH THE INFOMATION ABOVE
-	SwapWidgetsInGame(true);
 	if (EndOfAreaWidget) 
 	{
+		WidgetDisplay->SetWidget(EndOfAreaWidget);
 		EndOfAreaWidget->GenerateAllDataToDisplay(GameData);
 	}
 	else 

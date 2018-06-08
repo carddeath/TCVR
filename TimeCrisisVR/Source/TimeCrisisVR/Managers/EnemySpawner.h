@@ -130,7 +130,7 @@ private:
 
 	TArray<AAIEnemyCharacter*> CurrentEnemiesAlive;
 
-	//Used to toggle in a 
+	//Used to toggle in a wave based section
 	bool bDoesSectorContainWaves = false;
 
 	//Methods

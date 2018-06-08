@@ -25,7 +25,6 @@ protected:
 
 private:
 
-	UPROPERTY(EditInstanceOnly, Category = "Assets To Pull Data From")
 	class APlayersGun* PlayersGun = nullptr;
 
 	class ANavigationManager* NavManager = nullptr;

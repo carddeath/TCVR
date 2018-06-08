@@ -20,6 +20,11 @@ void ADataTracker::BeginPlay()
 {
 	Super::BeginPlay();
 
+	for (TActorIterator<APlayersGun> ita(GetWorld()); ita; ++ita)
+	{
+		PlayersGun = *ita;
+	}
+
 	for (TActorIterator<ANavigationManager> ita(GetWorld()); ita; ++ita) 
 	{
 		NavManager = *ita;

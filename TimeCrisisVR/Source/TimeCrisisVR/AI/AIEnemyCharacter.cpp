@@ -180,19 +180,6 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 {
 	//TODO: - Make sure to disable all colliders on the hitboxes of the mesh
 
-
-	//Make sure we've actually bound the delegate
-	if (DeathCallback.IsBound()) 
-	{
-		DeathCallback.Broadcast(this);
-	}
-	else 
-	{
-		UE_LOG(LogTemp, Error, TEXT("Delegate wasn't bound on %s"), *this->GetName());
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Delegate wasn't bound on AIEnemy Character"));
-	}
-
-
 	if (DeathNoises.Num() >= 3 && !bIsDead)
 	{
 		bIsDead = true;
@@ -224,9 +211,6 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->HitAreaSection = HitBoxTarget;
 		Cast<UAIAnimInstance>(FindComponentByClass<USkeletalMeshComponent>()->GetAnimInstance())->bIsDead = true;
 
-
-
-
 		TArray<USceneComponent*> Children;
 		GetMesh()->GetChildrenComponents(false, Children);
 
@@ -237,16 +221,21 @@ void AAIEnemyCharacter::KillEnemy(HitArea HitBoxTarget)
 
 		GetCapsuleComponent()->DestroyComponent();
 
-		GetWorldTimerManager().SetTimer(DeathVanishHandle, this, &AAIEnemyCharacter::DeleteEnemy, 3.0f, false);
+		GetWorldTimerManager().SetTimer(DeathVanishHandle, this, &AAIEnemyCharacter::DeleteEnemy, 0.5f, false);
 
 	}
-
-	//DEBUG: Incase we need to destroy the enemy
-	//Destroy();
 }
 
+//We want to delete the enemy but with no death sounds
 void AAIEnemyCharacter::EraseEnemy() 
 {
+	DeleteEnemy();
+}
+
+void AAIEnemyCharacter::DeleteEnemy() 
+{
+
+	//Make sure we've actually bound the delegate
 	if (DeathCallback.IsBound())
 	{
 		DeathCallback.Broadcast(this);
@@ -256,11 +245,6 @@ void AAIEnemyCharacter::EraseEnemy()
 		UE_LOG(LogTemp, Error, TEXT("Delegate wasn't bound on %s"), *this->GetName());
 		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("Delegate wasn't bound on AIEnemy Character"));
 	}
-	Destroy();
-}
-
-void AAIEnemyCharacter::DeleteEnemy() 
-{
 	Destroy();
 }
 
