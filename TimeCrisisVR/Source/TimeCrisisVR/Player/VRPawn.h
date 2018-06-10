@@ -7,6 +7,7 @@
 #include "VRPawn.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGunWasCreated, class APlayersGun*, PGun);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTutorialProceed, int32, junk);
 
 UENUM()
 enum class EHand : uint8 
@@ -33,6 +34,9 @@ public:
 
 	//Used so the data manager can get the gun
 	FGunWasCreated GunWasCreatedDelegate;
+
+	//Tutorial delegate to broadcast when the button is pressed, if it's bound
+	FTutorialProceed TutorialProceedDelegate;
 
 protected:
 
@@ -179,5 +183,8 @@ private:
 	UFUNCTION()
 		void SpawnPistolAndPlaceInRightHand();
 
+	//Tutorial Logic
+	//Proceeds the tutorial UI to the next one via a delegate
+	void ProceedTutorialScreen();
 
 };

@@ -83,7 +83,10 @@ void APlayersGun::BeginPlay()
 	AmmoClipUIRight = Cast<UUIAmmoClip>(RightGunAmmoWidget->GetUserWidgetObject());
 
 	//A delegate to allow the gun to be fired once we reach our destination
-	NavManager->TurnGunToEnabled.AddDynamic(this, &APlayersGun::AllowGunTobeFired);
+	if (NavManager) 
+	{
+		NavManager->TurnGunToEnabled.AddDynamic(this, &APlayersGun::AllowGunTobeFired);
+	}
 }
 
 // Called every frame
@@ -142,6 +145,12 @@ void APlayersGun::Fire()
 						NavManager->UpdateCurrentSection(bIsNodeBasedMovement);
 						TotalShotsHit++;
 						break;
+					}
+					//Tutorial logic, we have no navigation manager
+					else 
+					{
+						//Load the main level from the tutorial level when shot
+						EventManager->LoadMainLevelFromTutorial();
 					}
 				}
 				else if (Cast<UShapeComponent>(actor.GetComponent()))

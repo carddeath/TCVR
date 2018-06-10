@@ -11,6 +11,7 @@
 #include "Events/HangerDoors.h"
 #include "Interactables/Keypad.h"
 #include "Gameplay/Announcer.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEventManager::AEventManager()
@@ -62,15 +63,19 @@ void AEventManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//THIS IS DIRTY WAY OF DOING IT. THINK OF SOMETHING BETTER. We will open the door if they entered the correct code
-	if (NavManager->GetCurrentGameStage() == 1 && NavManager->GetCurrentGameArea() == 1 && NavManager->GetCurrentGameSection() == 4 && bCheckForCorrectCode)
+	if (NavManager) 
 	{
-
-		if (KeyPad->GetCurrentIndexOfEnteredNum() >= 4 && KeyPad->CheckIfCodeIsCorrect())
+		if (NavManager->GetCurrentGameStage() == 1 && NavManager->GetCurrentGameArea() == 1 && NavManager->GetCurrentGameSection() == 4 && bCheckForCorrectCode)
 		{
-			bCheckForCorrectCode = false;
-			StopTimerOnHangerDoor();
+
+			if (KeyPad->GetCurrentIndexOfEnteredNum() >= 4 && KeyPad->CheckIfCodeIsCorrect())
+			{
+				bCheckForCorrectCode = false;
+				StopTimerOnHangerDoor();
+			}
 		}
 	}
+
 }
 
 void AEventManager::MoveCraneStage1Area1Section1() 
@@ -153,5 +158,12 @@ void AEventManager::AnnouncerReloadCallThroughAndUIBroadcast()
 	{
 		ReloadDisplayDelegate.Broadcast(true);
 	}
+}
+
+//Tutorial Logic
+void AEventManager::LoadMainLevelFromTutorial() 
+{
+	FName LevelToLoadName = "Main_Scene";
+	UGameplayStatics::OpenLevel(this, LevelToLoadName, false);
 }
 

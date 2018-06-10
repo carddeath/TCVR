@@ -21,18 +21,26 @@ public:
 
 protected:
 
+
+
 private:
 
 	//If the object is visible
 	bool bIsVisible = false;
+
+	//Almost all arrows will not be a tutorial arrow but we need this check
+	UPROPERTY(EditInstanceOnly, Category = "Tutorial")
+	bool bIsTutorialArrow = false;
 
 	//Methods
 
 public:
 
 	void ShowArrow(bool bShouldShow);
+	bool GetTutorialArrowState();
 
 protected:
+	virtual void BeginPlay() override;
 
 private:
 	

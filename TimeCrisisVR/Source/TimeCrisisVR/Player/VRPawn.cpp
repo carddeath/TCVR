@@ -97,6 +97,7 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("PickupRight", IE_Released, this, &AVRPawn::DropObjectRight);
 	PlayerInputComponent->BindAction("FirePistolLeft", IE_Pressed, this, &AVRPawn::FirePistolLeft);
 	PlayerInputComponent->BindAction("FirePistolRight", IE_Pressed, this, &AVRPawn::FirePistolRight);
+	PlayerInputComponent->BindAction("TutorialContinue", IE_Pressed, this, &AVRPawn::ProceedTutorialScreen);
 
 	PlayerInputComponent->BindAxis("PlayerPointingHandLeft", this, &AVRPawn::TogglePointingHandMeshLeft);
 	PlayerInputComponent->BindAxis("PlayerPointingHandRight", this, &AVRPawn::TogglePointingHandMeshRight);
@@ -554,6 +555,16 @@ void AVRPawn::SpawnPistolAndPlaceInRightHand()
 	if (GunWasCreatedDelegate.IsBound()) 
 	{
 		GunWasCreatedDelegate.Broadcast(PlayersGun);
+	}
+}
+
+//Tutorial Logic
+void AVRPawn::ProceedTutorialScreen() 
+{
+	//Will not be bound in the main game
+	if (TutorialProceedDelegate.IsBound()) 
+	{
+		TutorialProceedDelegate.Broadcast(0);
 	}
 }
 

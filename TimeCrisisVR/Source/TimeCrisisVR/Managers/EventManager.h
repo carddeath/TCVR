@@ -70,6 +70,9 @@ public:
 
 	void AnnouncerReloadCallThroughAndUIBroadcast();
 
+	//Tutorial Functions
+	void LoadMainLevelFromTutorial();
+
 protected:
 	virtual void BeginPlay() override;
 
