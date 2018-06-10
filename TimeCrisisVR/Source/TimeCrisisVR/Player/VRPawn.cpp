@@ -85,6 +85,16 @@ void AVRPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//TESTING - MIGHT NEED THIS IF IT'S A TUTORIAL drawing a linetrace from the head
+	FHitResult Hit;
+	
+	DrawDebugLine(GetWorld(), VRCamera->GetComponentLocation(), VRCamera->GetForwardVector() * 1000, FColor::Purple, false, 0.2f, 0, 1.0f);
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, VRCamera->GetComponentLocation(), VRCamera->GetForwardVector() * 1000, ECollisionChannel::ECC_WorldDynamic))
+	{
+		
+	}
+
 }
 
 // Called to bind functionality to input

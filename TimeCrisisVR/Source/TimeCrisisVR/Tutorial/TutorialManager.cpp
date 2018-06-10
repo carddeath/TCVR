@@ -7,6 +7,8 @@
 
 //Game Classes
 #include "Player/VRPawn.h"
+#include "Tutorial/TutorialWidget.h"
+#include "Engine/Texture2D.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -28,7 +30,11 @@ void ATutorialManager::BeginPlay()
 		PlayerCharacter = *ita;
 	}
 
+	GenerateTutorialMessageScreens();
 	AssignDelegates();
+
+	//Call this once to get the first step to show
+	ProceedTutorialStep(0);
 }
 
 // Called every frame
@@ -36,6 +42,16 @@ void ATutorialManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ATutorialManager::GenerateTutorialMessageScreens() 
+{
+	TutorialMessages.Insert("Welcome to the experiment. This level aims to get you familiar with the environment and controls that you'll be using for around 10 minutes. Rotate your head and look up and down to get a feel for the movement.To proceed press A or X."
+		, 0);
+	TutorialMessages.Insert("Notice the boxes to your left and right. In the experiment you'll aim to avoid being hit as much as possible by enemies. Learn to peek out of cover to shoot and to hide when bullets are coming towards you. To proceed press A or X."
+		, 1);
+	TutorialMessages.Insert("Please tell us, are you left or right handed? Just stare at the box stated 'Left' or 'Right' depending on your preference!"
+		, 2);
 }
 
 void ATutorialManager::AssignDelegates() 
@@ -48,5 +64,15 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 {
 	//TODO: Proceed over the tutorial step to the next page loading the correct text and image thats required
 	UE_LOG(LogTemp, Warning, TEXT("Proceed Tutorial"));
+
+
+
+	//Replace nullptr with the array, make sure it's the right size = to the max amount of steps
+	if (TutorialStepCounter <= 2) 
+	{
+		Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], nullptr);
+	}
+
+	TutorialStepCounter++;
 }
 

@@ -19,8 +19,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	class UWidgetComponent* TutorialWidget = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	TArray<class UTexture2D*> TutorialImages;
+
 private:
 	class AVRPawn* PlayerCharacter = nullptr;
+
+	//The current step of the tutorial
+	int32 TutorialStepCounter = 0;
+
+	TArray<FString> TutorialMessages;
+
 
 	//Methods
 public:	
@@ -31,6 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:	
+	void GenerateTutorialMessageScreens();
 
 	void AssignDelegates();
 
