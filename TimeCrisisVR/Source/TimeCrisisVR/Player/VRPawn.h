@@ -47,14 +47,14 @@ public:
 	//FStopBoxStare StopBoxStareAnim;
 
 	bool bIsTutorial = false;
-	bool bIsSearchingForHands = false;
-	bool bStartedAnimationPlaying = false;
+	bool bTutorialIsSearchingForHands = false;
+	bool bTutoialStartedAnimHandBox = false;
 
 //The actor that was hovered over last
-	AActor* HoveredActor = nullptr;
+	AActor* TutorialHoveredHandChoiceBox = nullptr;
 
-	//Which hand is the gun
-	FText WhichHanded;
+	//TODO: Assign this and pass it to the function that creates a gun and send the component and actor we want to assign the gun to so we only need one function.
+	EHand TutorialChosenHand;
 
 protected:
 
@@ -210,5 +210,8 @@ private:
 
 	//Call this from tick if we are at the right stage of the tutorial
 	void TutorialGunHandSearch(float DeltaTime);
+
+	//Used to pick which hand to put the gun into when chosen
+	void TutorialGunSpawn(EHand HandType);
 
 };

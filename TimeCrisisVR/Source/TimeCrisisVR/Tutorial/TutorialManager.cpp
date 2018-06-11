@@ -92,19 +92,14 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 	//TODO: Proceed over the tutorial step to the next page loading the correct text and image thats required
 	UE_LOG(LogTemp, Warning, TEXT("Proceed Tutorial"));
 
-
-
 	//Replace nullptr with the array, make sure it's the right size = to the max amount of steps
-	if (TutorialStepCounter <= 2) 
-	{
-		Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], nullptr);
-	}
+	Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], nullptr);
 
 	//TODO: We need a way to stop the player from incrementing the step everytime
 	if (TutorialStepCounter == 2) 
 	{
 		//We need to start looking with the line trace for where we are focusing
-		PlayerCharacter->bIsSearchingForHands = true;
+		PlayerCharacter->bTutorialIsSearchingForHands = true;
 
 		for (auto& Box : HandSelectionBoxes)
 		{

@@ -77,8 +77,12 @@ void AVRPawn::BeginPlay()
 	FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
 	SpawnedAmmoPouch->AttachToActor(this, AttachRules);
 
-	//Create the gun and place it in the hand at the start of the game
-	SpawnPistolAndPlaceInRightHand();
+	//TODO: REMOVE THIS LATER. WE WILL PICK THE HAND WITH DATA INSTANCE VIA TUTORIAL TO MAIN LEVEL
+	if (!bIsTutorial) 
+	{
+		//Create the gun and place it in the hand at the start of the game
+		SpawnPistolAndPlaceInRightHand();
+	}
 }
 
 // Called every frame
@@ -87,7 +91,7 @@ void AVRPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//If we're on the searching for hands stage and it's the tutorial then lets do this raycast
-	if (bIsSearchingForHands && bIsTutorial) 
+	if (bTutorialIsSearchingForHands && bIsTutorial)
 	{
 		TutorialGunHandSearch(DeltaTime);
 	}
@@ -588,7 +592,7 @@ int32 AVRPawn::GetTotalTimesHit()
 void AVRPawn::ProceedTutorialScreen()
 {
 	//Only make this a control if we are in the tutorial and we're not searching for the players hands
-	if (bIsTutorial && !bIsSearchingForHands)
+	if (bIsTutorial && !bTutorialIsSearchingForHands)
 	{
 		//Will not be bound in the main game
 		if (TutorialProceedDelegate.IsBound())
@@ -617,35 +621,35 @@ void AVRPawn::TutorialGunHandSearch(float DeltaTime)
 		if (TimeSpendHoveredOverOption >= 2.0f)
 		{
 			//Get the text to know which box was hovered over
-			UTextRenderComponent* RenderComp = HoveredActor->FindComponentByClass<UTextRenderComponent>();
-			WhichHanded = RenderComp->Text;
+			UTextRenderComponent* RenderComp = TutorialHoveredHandChoiceBox->FindComponentByClass<UTextRenderComponent>();
+			FText WhichHanded = RenderComp->Text;
 
-			if (WhichHanded.CompareTo(FText::FromString("RIGHT"), ETextComparisonLevel::Default))
+			if (WhichHanded.ToString() == "RIGHT")
 			{
-				//TODO: Place gun in the right hand
+				TutorialGunSpawn(EHand::RIGHT);
 			}
-			else if (WhichHanded.CompareTo(FText::FromString("LEFT"), ETextComparisonLevel::Default))
+			else if (WhichHanded.ToString() == "LEFT")
 			{
-				//TODO: Place the gun in the left hand
+				TutorialGunSpawn(EHand::LEFT);
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("The hand chosen was %s"), *WhichHanded.ToString());
 			//Will force us to stop calling this function
-			bIsSearchingForHands = false;
+			bTutorialIsSearchingForHands = false;
 
 			//GO to the next step of the tutorial
 			ProceedTutorialScreen();
 		}
 
-		HoveredActor = Hit.Actor.Get();
+		TutorialHoveredHandChoiceBox = Hit.Actor.Get();
 
-		if (!bStartedAnimationPlaying)
+		if (!bTutoialStartedAnimHandBox)
 		{
 			if (BeginBoxStareAnimation.IsBound())
 			{
 				//We only want to broadcast once so set it to true
-				BeginBoxStareAnimation.Broadcast(HoveredActor, true);
-				bStartedAnimationPlaying = true;
+				BeginBoxStareAnimation.Broadcast(TutorialHoveredHandChoiceBox, true);
+				bTutoialStartedAnimHandBox = true;
 			}
 		}
 	}
@@ -653,15 +657,67 @@ void AVRPawn::TutorialGunHandSearch(float DeltaTime)
 	else
 	{
 		//We only want to call the delegate once so we check if the animation is being played
-		if (bStartedAnimationPlaying)
+		if (bTutoialStartedAnimHandBox)
 		{
 			if (BeginBoxStareAnimation.IsBound())
 			{
-				BeginBoxStareAnimation.Broadcast(HoveredActor, false);
+				BeginBoxStareAnimation.Broadcast(TutorialHoveredHandChoiceBox, false);
 			}
-			HoveredActor = nullptr;
-			bStartedAnimationPlaying = false;
+			TutorialHoveredHandChoiceBox = nullptr;
+			bTutoialStartedAnimHandBox = false;
 			TimeSpendHoveredOverOption = 0.0f;
 		}
+	}
+}
+
+void AVRPawn::TutorialGunSpawn(EHand HandType)
+{
+	PlayersGun = GetWorld()->SpawnActor<APlayersGun>(PlayersGunTemplate);
+
+	if (HandType == EHand::RIGHT) 
+	{
+		RightHitComponent = PlayersGun->FindComponentByClass<UStaticMeshComponent>();
+		RightHitComponent->SetRelativeScale3D(FVector(2.0f));
+		RightHitComponent->SetSimulatePhysics(false);
+		RightPickedUpActor = PlayersGun;
+
+		RightPickedUpActor->SetActorRotation(FRotator::ZeroRotator);
+
+		FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
+		RightPickedUpActor->AttachToComponent(SCHeldObjectRight, AttachRules);
+
+		SMRight->SetStaticMesh(GunHoldingModel);
+
+		FVector Locat = SMRight->GetSocketLocation(FName("Gun_Position_Right"));
+		RightPickedUpActor->SetActorLocation(Locat);
+		RightPickedUpActor->SetActorRotation(SMRight->GetSocketRotation(FName("Gun_Position_Right")));
+		bIsHoldingObjectRight = true;
+		Cast<APlayersGun>(RightPickedUpActor)->DisableGripUI(false);
+	}
+	else if(HandType == EHand::LEFT)
+	{
+		LeftHitComponent = PlayersGun->FindComponentByClass<UStaticMeshComponent>();
+		LeftHitComponent->SetRelativeScale3D(FVector(2.0f));
+		LeftHitComponent->SetSimulatePhysics(false);
+		LeftPickedUpActor = PlayersGun;
+
+		LeftPickedUpActor->SetActorRotation(FRotator::ZeroRotator);
+
+		FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
+		LeftPickedUpActor->AttachToComponent(SCHeldObjectLeft, AttachRules);
+
+		SMLeft->SetStaticMesh(GunHoldingModel);
+
+		FVector Locat = SMLeft->GetSocketLocation(FName("Gun_Position_Left"));
+		LeftPickedUpActor->SetActorLocation(Locat);
+		LeftPickedUpActor->SetActorRotation(SMLeft->GetSocketRotation(FName("Gun_Position_Left")));
+		bIsHoldingObjectLeft = true;
+		Cast<APlayersGun>(LeftPickedUpActor)->DisableGripUI(true);
+	}
+
+	//Lets send this gun to the data tracker
+	if (GunWasCreatedDelegate.IsBound())
+	{
+		GunWasCreatedDelegate.Broadcast(PlayersGun);
 	}
 }
