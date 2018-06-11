@@ -4,11 +4,12 @@
 
 #include "Components/WidgetComponent.h"
 #include "EngineUtils.h"
+#include "Engine/Texture2D.h"
 
 //Game Classes
 #include "Player/VRPawn.h"
 #include "Tutorial/TutorialWidget.h"
-#include "Engine/Texture2D.h"
+#include "Tutorial/HandSelectionBox.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -30,8 +31,11 @@ void ATutorialManager::BeginPlay()
 		PlayerCharacter = *ita;
 	}
 
+	PlayerCharacter->bIsTutorial = true;
+
 	GenerateTutorialMessageScreens();
 	AssignDelegates();
+	HideAllObjects();
 
 	//Call this once to get the first step to show
 	ProceedTutorialStep(0);
@@ -52,12 +56,35 @@ void ATutorialManager::GenerateTutorialMessageScreens()
 		, 1);
 	TutorialMessages.Insert("Please tell us, are you left or right handed? Just stare at the box stated 'Left' or 'Right' depending on your preference!"
 		, 2);
+	TutorialMessages.Insert("You can swap hands at anytime as long as the other hand is empty! Just point your empty hand towards the hand holding the gun. Press the 'Grip' button to take the gun. If you're having trouble move your hands closer together!"
+		, 3);
 }
 
 void ATutorialManager::AssignDelegates() 
 {
 	//Allows the tutorial to be ticked over by the VR pawn
 	PlayerCharacter->TutorialProceedDelegate.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
+	PlayerCharacter->BeginBoxStareAnimation.AddDynamic(this, &ATutorialManager::GetHandSelectionActor);
+}
+
+void ATutorialManager::HideAllObjects() 
+{
+	for(auto& Box : HandSelectionBoxes)
+	{
+		Box->ShowBox(false);
+	}
+}
+
+void ATutorialManager::GetHandSelectionActor(AActor* BoxToHighlight, bool bStartAnim) 
+{
+	if (bStartAnim) 
+	{
+		Cast<AHandSelectionBox>(BoxToHighlight)->ShowTheBoxFilling();
+	}
+	else 
+	{
+		Cast<AHandSelectionBox>(BoxToHighlight)->ResetBoxPosition();
+	}
 }
 
 void ATutorialManager::ProceedTutorialStep(int junk) 
@@ -73,6 +100,28 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 		Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], nullptr);
 	}
 
+	//TODO: We need a way to stop the player from incrementing the step everytime
+	if (TutorialStepCounter == 2) 
+	{
+		//We need to start looking with the line trace for where we are focusing
+		PlayerCharacter->bIsSearchingForHands = true;
+
+		for (auto& Box : HandSelectionBoxes)
+		{
+			Box->ShowBox(true);
+		}
+	}
+
+	if (TutorialStepCounter == 3) 
+	{
+		//Hide the boxes now, we are done with them
+		for (auto& Box : HandSelectionBoxes)
+		{
+			Box->ShowBox(false);
+		}
+	}
+
 	TutorialStepCounter++;
+
 }
 

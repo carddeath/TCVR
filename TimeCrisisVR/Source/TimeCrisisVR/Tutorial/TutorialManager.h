@@ -22,6 +22,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	TArray<class UTexture2D*> TutorialImages;
 
+	//The hand selection boxes will be hidden on launch and shown when required
+	UPROPERTY(EditInstanceOnly, Category = "Objects")
+		TArray<class AHandSelectionBox*> HandSelectionBoxes;
+
 private:
 	class AVRPawn* PlayerCharacter = nullptr;
 
@@ -44,7 +48,12 @@ private:
 
 	void AssignDelegates();
 
+	void HideAllObjects();
+
 	//Proceeds the tutorial step
 	UFUNCTION()
 	void ProceedTutorialStep(int junk);
+
+	UFUNCTION()
+		void GetHandSelectionActor(AActor* BoxToHighlight, bool bStartAnim);
 };

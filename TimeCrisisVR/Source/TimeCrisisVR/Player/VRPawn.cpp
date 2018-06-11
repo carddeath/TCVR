@@ -16,6 +16,7 @@
 #include "Player/AmmoClip.h"
 #include "Blueprint/UserWidget.h"
 #include "UI/PlayerUIAugment.h"
+//#include "Components/TextRenderComponent.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -85,16 +86,11 @@ void AVRPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//TESTING - MIGHT NEED THIS IF IT'S A TUTORIAL drawing a linetrace from the head
-	FHitResult Hit;
-	
-	DrawDebugLine(GetWorld(), VRCamera->GetComponentLocation(), VRCamera->GetForwardVector() * 1000, FColor::Purple, false, 0.2f, 0, 1.0f);
-
-	if (GetWorld()->LineTraceSingleByChannel(Hit, VRCamera->GetComponentLocation(), VRCamera->GetForwardVector() * 1000, ECollisionChannel::ECC_WorldDynamic))
+	//If we're on the searching for hands stage and it's the tutorial then lets do this raycast
+	if (bIsSearchingForHands && bIsTutorial) 
 	{
-		
+		TutorialGunHandSearch(DeltaTime);
 	}
-
 }
 
 // Called to bind functionality to input
@@ -568,16 +564,6 @@ void AVRPawn::SpawnPistolAndPlaceInRightHand()
 	}
 }
 
-//Tutorial Logic
-void AVRPawn::ProceedTutorialScreen() 
-{
-	//Will not be bound in the main game
-	if (TutorialProceedDelegate.IsBound()) 
-	{
-		TutorialProceedDelegate.Broadcast(0);
-	}
-}
-
 //Health Related Classes
 void AVRPawn::TookDamage() 
 {
@@ -595,4 +581,87 @@ UUserWidget* AVRPawn::GetWatchClass()
 int32 AVRPawn::GetTotalTimesHit() 
 {
 	return TotalTimesHit;
+}
+
+//Tutorial Logic
+
+void AVRPawn::ProceedTutorialScreen()
+{
+	//Only make this a control if we are in the tutorial and we're not searching for the players hands
+	if (bIsTutorial && !bIsSearchingForHands)
+	{
+		//Will not be bound in the main game
+		if (TutorialProceedDelegate.IsBound())
+		{
+			TutorialProceedDelegate.Broadcast(0);
+		}
+	}
+
+}
+
+//USed for step 2 of the tutorial
+void AVRPawn::TutorialGunHandSearch(float DeltaTime) 
+{
+	FHitResult Hit;
+	DrawDebugLine(GetWorld(), VRCamera->GetComponentLocation(), VRCamera->GetComponentLocation() + VRCamera->GetForwardVector() * 1000, FColor::Purple, false, 0.2f, 0, 1.0f);
+	//We only want to hit our custom objects that are "hoverables"
+	FCollisionObjectQueryParams Params;
+	Params.AddObjectTypesToQuery(ECC_GameTraceChannel1);
+
+	if (GetWorld()->LineTraceSingleByObjectType(Hit, VRCamera->GetComponentLocation(), VRCamera->GetComponentLocation() + VRCamera->GetForwardVector() * 1000, Params))
+	{
+		//We are currently hovering over the correct object, check to see if it takes 2 seconds. This time is related to the HandSelectionBoxTimeline
+		TimeSpendHoveredOverOption += DeltaTime;
+
+		//We have completed this step now, find out which hand and put the gun in it
+		if (TimeSpendHoveredOverOption >= 2.0f)
+		{
+			//Get the text to know which box was hovered over
+			UTextRenderComponent* RenderComp = HoveredActor->FindComponentByClass<UTextRenderComponent>();
+			WhichHanded = RenderComp->Text;
+
+			if (WhichHanded.CompareTo(FText::FromString("RIGHT"), ETextComparisonLevel::Default))
+			{
+				//TODO: Place gun in the right hand
+			}
+			else if (WhichHanded.CompareTo(FText::FromString("LEFT"), ETextComparisonLevel::Default))
+			{
+				//TODO: Place the gun in the left hand
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("The hand chosen was %s"), *WhichHanded.ToString());
+			//Will force us to stop calling this function
+			bIsSearchingForHands = false;
+
+			//GO to the next step of the tutorial
+			ProceedTutorialScreen();
+		}
+
+		HoveredActor = Hit.Actor.Get();
+
+		if (!bStartedAnimationPlaying)
+		{
+			if (BeginBoxStareAnimation.IsBound())
+			{
+				//We only want to broadcast once so set it to true
+				BeginBoxStareAnimation.Broadcast(HoveredActor, true);
+				bStartedAnimationPlaying = true;
+			}
+		}
+	}
+	//We are not picking anything up on the track so reset the state
+	else
+	{
+		//We only want to call the delegate once so we check if the animation is being played
+		if (bStartedAnimationPlaying)
+		{
+			if (BeginBoxStareAnimation.IsBound())
+			{
+				BeginBoxStareAnimation.Broadcast(HoveredActor, false);
+			}
+			HoveredActor = nullptr;
+			bStartedAnimationPlaying = false;
+			TimeSpendHoveredOverOption = 0.0f;
+		}
+	}
 }

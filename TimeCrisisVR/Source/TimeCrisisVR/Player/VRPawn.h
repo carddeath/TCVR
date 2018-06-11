@@ -8,6 +8,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGunWasCreated, class APlayersGun*, PGun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTutorialProceed, int32, junk);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBeginBoxStare, AActor*, SelectedBox, bool, bStartAnimation);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStopBoxStare, int32, junk);
 
 UENUM()
 enum class EHand : uint8 
@@ -35,8 +37,24 @@ public:
 	//Used so the data manager can get the gun
 	FGunWasCreated GunWasCreatedDelegate;
 
+
+	//TUTORIAL LOGIC VARIABLES
 	//Tutorial delegate to broadcast when the button is pressed, if it's bound
 	FTutorialProceed TutorialProceedDelegate;
+
+	//Both being used to select which hand should be used for the gun
+	FBeginBoxStare BeginBoxStareAnimation;
+	//FStopBoxStare StopBoxStareAnim;
+
+	bool bIsTutorial = false;
+	bool bIsSearchingForHands = false;
+	bool bStartedAnimationPlaying = false;
+
+//The actor that was hovered over last
+	AActor* HoveredActor = nullptr;
+
+	//Which hand is the gun
+	FText WhichHanded;
 
 protected:
 
@@ -131,6 +149,9 @@ private:
 
 	int32 TotalTimesHit = 0;
 
+	//The time spent hovering over a certain object
+	float TimeSpendHoveredOverOption = 0.0f;
+
 	//Methods
 
 public:
@@ -186,5 +207,8 @@ private:
 	//Tutorial Logic
 	//Proceeds the tutorial UI to the next one via a delegate
 	void ProceedTutorialScreen();
+
+	//Call this from tick if we are at the right stage of the tutorial
+	void TutorialGunHandSearch(float DeltaTime);
 
 };
