@@ -10,6 +10,7 @@
 #include "Player/VRPawn.h"
 #include "Tutorial/TutorialWidget.h"
 #include "Tutorial/HandSelectionBox.h"
+#include "Player/PlayersGun.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -58,6 +59,8 @@ void ATutorialManager::GenerateTutorialMessageScreens()
 		, 2);
 	TutorialMessages.Insert("You can swap hands at anytime as long as the other hand is empty! Just point your empty hand towards the hand holding the gun. Press the 'Grip' button to take the gun. If you're having trouble move your hands closer together!"
 		, 3);
+	TutorialMessages.Insert("Now that you know how to change hands let's look at firing your weapon. Point the gun at the target and press the trigger on the hand holding the gun to fire a shot. Notice how you only have 6 bullets."
+		, 4);
 }
 
 void ATutorialManager::AssignDelegates() 
@@ -95,7 +98,7 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 	//Replace nullptr with the array, make sure it's the right size = to the max amount of steps
 	Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], nullptr);
 
-	//TODO: We need a way to stop the player from incrementing the step everytime
+	//Picking if you're left or right handed with a pistol
 	if (TutorialStepCounter == 2) 
 	{
 		//We need to start looking with the line trace for where we are focusing
@@ -107,12 +110,29 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 		}
 	}
 
+
+	//Letting the player know how to swap hands with the gun
 	if (TutorialStepCounter == 3) 
 	{
-		//Hide the boxes now, we are done with them
 		for (auto& Box : HandSelectionBoxes)
 		{
 			Box->ShowBox(false);
+		}
+
+		//Attempt to get the gun and set the value to true that we're in a tutorial
+		PlayersGun = PlayerCharacter->GetPlayersGun();
+		if (PlayersGun) 
+		{
+			PlayersGun->bTutorialHandSwap = true;
+		}
+	}
+
+	//Shooting the gun stage of the tutorial
+	if (TutorialStepCounter == 4) 
+	{
+		if (PlayersGun) 
+		{
+			PlayersGun->bTutorialHandSwap = false;
 		}
 	}
 

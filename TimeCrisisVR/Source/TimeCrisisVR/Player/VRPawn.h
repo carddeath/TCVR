@@ -9,7 +9,6 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGunWasCreated, class APlayersGun*, PGun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTutorialProceed, int32, junk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBeginBoxStare, AActor*, SelectedBox, bool, bStartAnimation);
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStopBoxStare, int32, junk);
 
 UENUM()
 enum class EHand : uint8 
@@ -44,7 +43,6 @@ public:
 
 	//Both being used to select which hand should be used for the gun
 	FBeginBoxStare BeginBoxStareAnimation;
-	//FStopBoxStare StopBoxStareAnim;
 
 	bool bIsTutorial = false;
 	bool bTutorialIsSearchingForHands = false;
@@ -55,6 +53,9 @@ public:
 
 	//TODO: Assign this and pass it to the function that creates a gun and send the component and actor we want to assign the gun to so we only need one function.
 	EHand TutorialChosenHand;
+
+	//Step 3 of the tutorial
+	bool bTutorialDidSwapHands = false;
 
 protected:
 
@@ -171,6 +172,8 @@ public:
 
 	int32 GetTotalTimesHit();
 
+	APlayersGun* GetPlayersGun();
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -202,7 +205,9 @@ private:
 	void FirePistolRight();
 
 	UFUNCTION()
-		void SpawnPistolAndPlaceInRightHand();
+	void SpawnPistolAndPlaceInRightHand();
+
+	void CreateAmmoPouch();
 
 	//Tutorial Logic
 	//Proceeds the tutorial UI to the next one via a delegate

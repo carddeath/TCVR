@@ -24,6 +24,9 @@ class TIMECRISISVR_API APlayersGun : public AActor
 		//Variables
 public:
 
+	//Used to check if the gun is in tutorial mode or not
+	bool bTutorialHandSwap = false;
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")

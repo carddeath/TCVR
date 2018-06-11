@@ -68,20 +68,18 @@ void AVRPawn::BeginPlay()
 	SCHeldObjectLeft->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 	SCHeldObjectRight->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 
-	//Spawns the ammo pouch objects
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnedAmmoPouch = GetWorld()->SpawnActor<AAmmoPouch>(AmmoPouchTemplate, GetActorTransform(), SpawnParams);
-
-	FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
-	SpawnedAmmoPouch->AttachToActor(this, AttachRules);
+	
 
 	//TODO: REMOVE THIS LATER. WE WILL PICK THE HAND WITH DATA INSTANCE VIA TUTORIAL TO MAIN LEVEL
 	if (!bIsTutorial) 
 	{
 		//Create the gun and place it in the hand at the start of the game
 		SpawnPistolAndPlaceInRightHand();
+		CreateAmmoPouch();
+	}
+	else 
+	{
+	
 	}
 }
 
@@ -128,11 +126,14 @@ void AVRPawn::PickUpObjectLeft()
 	}
 	//If we are inside the ammo pouch then we should pick up an ammo clip and ignore shooting
 	//TODO: UPDATE THIS WHEN NEEDED
-	else if(SpawnedAmmoPouch->GetLeftHandInPouchState() && LeftPickedUpActor == nullptr)
+	else if(SpawnedAmmoPouch)
 	{
-		AttemptToPickUpAmmoClip(EHand::LEFT);
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
-		return;
+		if (SpawnedAmmoPouch->GetLeftHandInPouchState() && LeftPickedUpActor == nullptr)
+		{
+			AttemptToPickUpAmmoClip(EHand::LEFT);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
+			return;
+		}
 	}
 
 	//Logic for shooting if their is no object in the hand or the hand is not in the ammo pouch
@@ -189,6 +190,12 @@ void AVRPawn::PickUpObjectLeft()
 			FVector HandSwapVector = MCLeft->GetForwardVector() * HandSwapRange;
 			if (LeftHitComponent == RightHitComponent && GetWorld()->LineTraceSingleByObjectType(Hit, LeftMCLoc, LeftMCLoc + HandSwapVector, Params))
 			{
+				//For the swapping hands with gripping the gun for the tutorial
+				if (!bTutorialDidSwapHands && bIsTutorial)
+				{
+					bTutorialDidSwapHands = true;
+					ProceedTutorialScreen();
+				}
 
 				FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
 				RightPickedUpActor->DetachFromActor(DetachRules);
@@ -244,11 +251,14 @@ void AVRPawn::PickUpObjectRight()
 	}
 	//If we are inside the ammo pouch then we should pick up an ammo clip and ignore shooting
 	//TODO: UPDATE THIS WHEN NEEDED by playing clip in right position
-	else if (SpawnedAmmoPouch->GetRightHandInPouchState() && RightPickedUpActor == nullptr )
+	else if (SpawnedAmmoPouch)
 	{
-		AttemptToPickUpAmmoClip(EHand::RIGHT);
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
-		return;
+		if (SpawnedAmmoPouch->GetRightHandInPouchState() && RightPickedUpActor == nullptr) 
+		{
+			AttemptToPickUpAmmoClip(EHand::RIGHT);
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::White, TEXT("Spawned Clip"), true, FVector2D(3.0f, 3.0f));
+			return;
+		}
 	}
 
 	//Logic for shooting if their is no object in the hand or the hand is not in the ammo pouch
@@ -305,6 +315,13 @@ void AVRPawn::PickUpObjectRight()
 			FVector HandSwapVector = MCRight->GetForwardVector() * HandSwapRange;
 			if (RightHitComponent == LeftHitComponent && GetWorld()->LineTraceSingleByObjectType(Hit, RightMCLoc, RightMCLoc + HandSwapVector, Params))
 			{
+				//For the swapping hands with gripping the gun for the tutorial
+				if (!bTutorialDidSwapHands && bIsTutorial) 
+				{
+					bTutorialDidSwapHands = true;
+					ProceedTutorialScreen();
+				}
+
 				FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
 				LeftPickedUpActor->DetachFromActor(DetachRules);
 
@@ -568,6 +585,18 @@ void AVRPawn::SpawnPistolAndPlaceInRightHand()
 	}
 }
 
+void AVRPawn::CreateAmmoPouch() 
+{
+	//Spawns the ammo pouch objects
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnedAmmoPouch = GetWorld()->SpawnActor<AAmmoPouch>(AmmoPouchTemplate, GetActorTransform(), SpawnParams);
+
+	FAttachmentTransformRules AttachRules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
+	SpawnedAmmoPouch->AttachToActor(this, AttachRules);
+}
+
 //Health Related Classes
 void AVRPawn::TookDamage() 
 {
@@ -585,6 +614,11 @@ UUserWidget* AVRPawn::GetWatchClass()
 int32 AVRPawn::GetTotalTimesHit() 
 {
 	return TotalTimesHit;
+}
+
+APlayersGun* AVRPawn::GetPlayersGun() 
+{
+	return PlayersGun;
 }
 
 //Tutorial Logic

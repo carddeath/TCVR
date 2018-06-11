@@ -97,8 +97,8 @@ void APlayersGun::Tick(float DeltaTime)
 
 void APlayersGun::Fire() 
 {
-	//We are moving currently and are not allowed to fire
-	if (!bIsAllowedToFire) 
+	//We are moving currently and are not allowed to fire. Or we are in the hand swapping phase of the tutorial
+	if (!bIsAllowedToFire || bTutorialHandSwap)
 	{
 		return;
 	}

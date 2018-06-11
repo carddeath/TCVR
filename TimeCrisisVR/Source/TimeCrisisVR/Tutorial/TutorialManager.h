@@ -29,6 +29,8 @@ protected:
 private:
 	class AVRPawn* PlayerCharacter = nullptr;
 
+	class APlayersGun* PlayersGun = nullptr;
+
 	//The current step of the tutorial
 	int32 TutorialStepCounter = 0;
 
