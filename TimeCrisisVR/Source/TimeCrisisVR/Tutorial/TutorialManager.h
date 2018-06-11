@@ -26,6 +26,12 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Objects")
 		TArray<class AHandSelectionBox*> HandSelectionBoxes;
 
+	//Should be a target object for step 4
+	UPROPERTY(EditDefaultsOnly, Category = "Tutorial Step 4")
+		TSubclassOf<class ATutorialShootingTarget> TargetTemplate = nullptr;
+
+	ATutorialShootingTarget* CurrentTarget = nullptr;
+
 private:
 	class AVRPawn* PlayerCharacter = nullptr;
 

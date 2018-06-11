@@ -16,6 +16,7 @@
 #include "Components/WidgetComponent.h"
 #include "Events/ExplosiveBox.h"
 #include "GameFramework/DamageType.h"
+#include "Tutorial/TutorialShootingTarget.h"
 
 
 // Sets default values
@@ -177,7 +178,7 @@ void APlayersGun::Fire()
 					}
 					break;
 				}
-				//DO multiple checks here for areas that contain explosive boxes
+				//TODO multiple checks here for areas that contain explosive boxes
 				else if (Cast<AExplosiveBox>(actor.GetActor()) && NavManager->GetCurrentGameSection() == 5)
 				{
 					TotalShotsHit++;
@@ -196,6 +197,17 @@ void APlayersGun::Fire()
 							}
 
 						}
+					}
+					break;
+				}
+				//For Tutorial
+				else if (Cast<ATutorialShootingTarget>(actor.GetActor())) 
+				{
+					if (TutorialTargetShotDelegate.IsBound()) 
+					{
+						TutorialTargetShotDelegate.Broadcast(0);
+						//Clear the delegate
+						TutorialTargetShotDelegate.Clear();
 					}
 					break;
 				}
@@ -221,6 +233,16 @@ void APlayersGun::Fire()
 		{
 			AmmoClipUILeft->UpdateDisplayRemoteCall(false, CurrentAmmo);
 			AmmoClipUIRight->UpdateDisplayRemoteCall(false, CurrentAmmo);
+		}
+	}
+	//If we are out of ammo in the tutorial and it's bound let's move on the tutorial
+	else if(bTutorialEnabled)
+	{
+		if (TutorialTargetShotDelegate.IsBound()) 
+		{
+			TutorialTargetShotDelegate.Broadcast(0);
+			//Clear the delegate
+			TutorialTargetShotDelegate.Clear();
 		}
 	}
 }

@@ -11,6 +11,7 @@
 #include "Tutorial/TutorialWidget.h"
 #include "Tutorial/HandSelectionBox.h"
 #include "Player/PlayersGun.h"
+#include "Tutorial/TutorialShootingTarget.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -61,6 +62,8 @@ void ATutorialManager::GenerateTutorialMessageScreens()
 		, 3);
 	TutorialMessages.Insert("Now that you know how to change hands let's look at firing your weapon. Point the gun at the target and press the trigger on the hand holding the gun to fire a shot. Notice how you only have 6 bullets."
 		, 4);
+	TutorialMessages.Insert("Good job if you hit the target, if not you'll just keep trying in the experiment. If you look down now you'll notice some ammo pouches where you can ammo. Place your empty hand into the pouch and hold the grab button. Raise the ammo clip towards your gun to reload!"
+		, 5);
 }
 
 void ATutorialManager::AssignDelegates() 
@@ -101,6 +104,8 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 	//Picking if you're left or right handed with a pistol
 	if (TutorialStepCounter == 2) 
 	{
+		PlayerCharacter->bTutorialBtnEnabled = false;
+
 		//We need to start looking with the line trace for where we are focusing
 		PlayerCharacter->bTutorialIsSearchingForHands = true;
 
@@ -114,6 +119,8 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 	//Letting the player know how to swap hands with the gun
 	if (TutorialStepCounter == 3) 
 	{
+		PlayerCharacter->bTutorialBtnEnabled = false;
+
 		for (auto& Box : HandSelectionBoxes)
 		{
 			Box->ShowBox(false);
@@ -130,10 +137,32 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 	//Shooting the gun stage of the tutorial
 	if (TutorialStepCounter == 4) 
 	{
+		PlayerCharacter->bTutorialBtnEnabled = false;
+
 		if (PlayersGun) 
 		{
 			PlayersGun->bTutorialHandSwap = false;
+			//Assign the delegate so that when we shoot the target we call this function and increment the number
+			PlayersGun->TutorialTargetShotDelegate.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
 		}
+
+		//Create the target to be shot
+		if (TargetTemplate) 
+		{
+			//Spawns a target in the middle of the room
+			CurrentTarget = GetWorld()->SpawnActor<ATutorialShootingTarget>(TargetTemplate);
+			CurrentTarget->SetActorLocation(FVector(310.0f, -670.0f, 100.0f));
+			CurrentTarget->SetActorRotation(FRotator(90.0f, 0.0f, 0.0f));
+		}
+	}
+
+	if (TutorialStepCounter == 5) 
+	{
+		PlayerCharacter->bTutorialBtnEnabled = false;
+		CurrentTarget->Destroy();
+
+		//Make the ammo pouch
+		PlayerCharacter->CreateAmmoPouch();
 	}
 
 	TutorialStepCounter++;

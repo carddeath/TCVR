@@ -57,6 +57,9 @@ public:
 	//Step 3 of the tutorial
 	bool bTutorialDidSwapHands = false;
 
+	//Overall Tutorial variables
+	bool bTutorialBtnEnabled = true;
+
 protected:
 
 
@@ -164,6 +167,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Section 1 Alarm Effect")
 	void TurnAlarmOnOrOff(bool bTurnAlarmOn);
 
+	void CreateAmmoPouch();
+
 	//TODO: Implement this later!
 	void TookDamage();
 
@@ -206,8 +211,6 @@ private:
 
 	UFUNCTION()
 	void SpawnPistolAndPlaceInRightHand();
-
-	void CreateAmmoPouch();
 
 	//Tutorial Logic
 	//Proceeds the tutorial UI to the next one via a delegate

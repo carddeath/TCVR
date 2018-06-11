@@ -194,7 +194,11 @@ void AVRPawn::PickUpObjectLeft()
 				if (!bTutorialDidSwapHands && bIsTutorial)
 				{
 					bTutorialDidSwapHands = true;
-					ProceedTutorialScreen();
+					//Will not be bound in the main game
+					if (TutorialProceedDelegate.IsBound())
+					{
+						TutorialProceedDelegate.Broadcast(0);
+					}
 				}
 
 				FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
@@ -319,7 +323,11 @@ void AVRPawn::PickUpObjectRight()
 				if (!bTutorialDidSwapHands && bIsTutorial) 
 				{
 					bTutorialDidSwapHands = true;
-					ProceedTutorialScreen();
+					//Will not be bound in the main game
+					if (TutorialProceedDelegate.IsBound())
+					{
+						TutorialProceedDelegate.Broadcast(0);
+					}
 				}
 
 				FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, false);
@@ -626,7 +634,7 @@ APlayersGun* AVRPawn::GetPlayersGun()
 void AVRPawn::ProceedTutorialScreen()
 {
 	//Only make this a control if we are in the tutorial and we're not searching for the players hands
-	if (bIsTutorial && !bTutorialIsSearchingForHands)
+	if (bIsTutorial && bTutorialBtnEnabled)
 	{
 		//Will not be bound in the main game
 		if (TutorialProceedDelegate.IsBound())
@@ -672,7 +680,11 @@ void AVRPawn::TutorialGunHandSearch(float DeltaTime)
 			bTutorialIsSearchingForHands = false;
 
 			//GO to the next step of the tutorial
-			ProceedTutorialScreen();
+			//Will not be bound in the main game
+			if (TutorialProceedDelegate.IsBound())
+			{
+				TutorialProceedDelegate.Broadcast(0);
+			}
 		}
 
 		TutorialHoveredHandChoiceBox = Hit.Actor.Get();

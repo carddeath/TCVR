@@ -9,10 +9,7 @@
 #include "GameFramework/Actor.h"
 #include "PlayersGun.generated.h"
 
-
-
-//Things for this class
-//Sound effects and audio components
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShotTargetInTutorial, int32, junk);
 
 
 UCLASS()
@@ -26,6 +23,11 @@ public:
 
 	//Used to check if the gun is in tutorial mode or not
 	bool bTutorialHandSwap = false;
+
+	//Tutorial Variables
+	FShotTargetInTutorial TutorialTargetShotDelegate;
+
+	bool bTutorialEnabled = false;
 
 protected:
 
