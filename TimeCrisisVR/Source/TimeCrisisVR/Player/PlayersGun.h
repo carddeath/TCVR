@@ -10,6 +10,7 @@
 #include "PlayersGun.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShotTargetInTutorial, int32, junk);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReloadedInTutorial, int32, junk);
 
 
 UCLASS()
@@ -28,6 +29,8 @@ public:
 	FShotTargetInTutorial TutorialTargetShotDelegate;
 
 	bool bTutorialEnabled = false;
+
+	FReloadedInTutorial TutorialReloadedGun;
 
 protected:
 

@@ -12,6 +12,8 @@
 #include "Tutorial/HandSelectionBox.h"
 #include "Player/PlayersGun.h"
 #include "Tutorial/TutorialShootingTarget.h"
+#include "Managers/EnemySpawner.h"
+#include "Gameplay/NavigationArrow.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -34,6 +36,19 @@ void ATutorialManager::BeginPlay()
 	}
 
 	PlayerCharacter->bIsTutorial = true;
+
+	//Get the enemy spawner so we can assign the delegate when all enemies are dead
+	for (TActorIterator<AEnemySpawner> ita(GetWorld()); ita; ++ita)
+	{
+		EnemySpawner = *ita;
+	}
+
+	//Move the tutorial on when the enemies are all dead
+	if (EnemySpawner) 
+	{
+		EnemySpawner->TutorialKilledEnemiesDele.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
+		EnemySpawner->bIsTutorial = true;
+	}
 
 	GenerateTutorialMessageScreens();
 	AssignDelegates();
@@ -64,6 +79,10 @@ void ATutorialManager::GenerateTutorialMessageScreens()
 		, 4);
 	TutorialMessages.Insert("Good job if you hit the target, if not you'll just keep trying in the experiment. If you look down now you'll notice some ammo pouches where you can ammo. Place your empty hand into the pouch and hold the grab button. Raise the ammo clip towards your gun to reload!"
 		, 5);
+	TutorialMessages.Insert("You now know how to reload your gun. See those enemy soldiers? They are your real targets. Once all enemies in an area are dead you'll see an arrow. Shoot it to proceed through the level! Kill all of the soldiers to proceed!"
+		, 6);
+	TutorialMessages.Insert("Well done. Now shoot the arrow to proceed to the experiment. If you need to take a break, remove the headset and speak to the experiment lead. Good luck!"
+		, 7);
 }
 
 void ATutorialManager::AssignDelegates() 
@@ -123,7 +142,7 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 
 		for (auto& Box : HandSelectionBoxes)
 		{
-			Box->ShowBox(false);
+			Box->Destroy();
 		}
 
 		//Attempt to get the gun and set the value to true that we're in a tutorial
@@ -131,6 +150,7 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 		if (PlayersGun) 
 		{
 			PlayersGun->bTutorialHandSwap = true;
+			PlayersGun->bTutorialEnabled = true;
 		}
 	}
 
@@ -163,6 +183,23 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 
 		//Make the ammo pouch
 		PlayerCharacter->CreateAmmoPouch();
+
+		//We need the player to reload the gun and to proceed when it's done
+		PlayersGun->TutorialReloadedGun.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
+	}
+
+	if (TutorialStepCounter == 6) 
+	{
+		//TODO: Create an enemy model in the scene and allow it to be shot, the player must kill it to proceed
+		EnemySpawner->SpawnTutorialEnemies();
+	}
+
+	if (TutorialStepCounter == 7) 
+	{
+		if (EndLevelArrow) 
+		{
+			EndLevelArrow->ShowArrow(true);
+		}
 	}
 
 	TutorialStepCounter++;

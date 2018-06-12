@@ -51,6 +51,10 @@ private:
 
 	class AAnnouncer* Announcer = nullptr;
 
+	class ATutorialManager* TutorialManager = nullptr;
+
+	class AEnemySpawner* EnemySpawner = nullptr;
+
 	//Methods
 	
 public:	

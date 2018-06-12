@@ -649,7 +649,7 @@ void AVRPawn::ProceedTutorialScreen()
 void AVRPawn::TutorialGunHandSearch(float DeltaTime) 
 {
 	FHitResult Hit;
-	DrawDebugLine(GetWorld(), VRCamera->GetComponentLocation(), VRCamera->GetComponentLocation() + VRCamera->GetForwardVector() * 1000, FColor::Purple, false, 0.2f, 0, 1.0f);
+	//DrawDebugLine(GetWorld(), VRCamera->GetComponentLocation(), VRCamera->GetComponentLocation() + VRCamera->GetForwardVector() * 1000, FColor::Purple, false, 0.2f, 0, 1.0f);
 	//We only want to hit our custom objects that are "hoverables"
 	FCollisionObjectQueryParams Params;
 	Params.AddObjectTypesToQuery(ECC_GameTraceChannel1);

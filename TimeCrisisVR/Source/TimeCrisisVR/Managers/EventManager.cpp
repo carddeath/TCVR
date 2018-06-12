@@ -12,6 +12,8 @@
 #include "Interactables/Keypad.h"
 #include "Gameplay/Announcer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Tutorial/TutorialManager.h"
+#include "Managers/EnemySpawner.h"
 
 // Sets default values
 AEventManager::AEventManager()
@@ -45,6 +47,37 @@ void AEventManager::BeginPlay()
 		{
 			UE_LOG(LogTemp, Error, TEXT("Missing Announcer on %s"), *this->GetName());
 		}
+	}
+
+	for (TActorIterator<AEnemySpawner> it(GetWorld()); it; ++it)
+	{
+		EnemySpawner = *it;
+
+		if (!EnemySpawner)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing EnemySpawner on %s"), *this->GetName());
+		}
+	}
+
+	for (TActorIterator<ATutorialManager> it(GetWorld()); it; ++it)
+	{
+		TutorialManager = *it;
+
+		if (!TutorialManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing TutorialManager on %s"), *this->GetName());
+		}
+	}
+
+	//If were in the tutorial then say to spawn tutorial enemies otherwise spawn the regular enemies
+	if (TutorialManager && EnemySpawner) 
+	{
+		EnemySpawner->TutorialOrRegularGame(false);
+	}
+	//Otherwise do regular enemies
+	else if (EnemySpawner) 
+	{
+		EnemySpawner->TutorialOrRegularGame(true);
 	}
 
 	//If we are at the start of the game

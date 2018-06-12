@@ -30,17 +30,22 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tutorial Step 4")
 		TSubclassOf<class ATutorialShootingTarget> TargetTemplate = nullptr;
 
-	ATutorialShootingTarget* CurrentTarget = nullptr;
-
+	UPROPERTY(EditInstanceOnly, Category = "Objects")
+		class ANavigationArrow* EndLevelArrow = nullptr;
+	
 private:
 	class AVRPawn* PlayerCharacter = nullptr;
 
 	class APlayersGun* PlayersGun = nullptr;
 
+	class AEnemySpawner* EnemySpawner = nullptr;
+
 	//The current step of the tutorial
 	int32 TutorialStepCounter = 0;
 
 	TArray<FString> TutorialMessages;
+
+	ATutorialShootingTarget* CurrentTarget = nullptr;
 
 
 	//Methods

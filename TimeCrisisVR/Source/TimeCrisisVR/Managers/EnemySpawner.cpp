@@ -36,8 +36,21 @@ void AEnemySpawner::BeginPlay()
 
 	CurrentEnemiesAlive.SetNum(10);
 
-	//Start the game off with the first section being called directly
-	UpdateSection(CurrentSection);
+	//if (!bIsTutorial) 
+	//{
+	//	//Start the game off with the first section being called directly
+	//	UpdateSection(CurrentSection);
+	//}
+}
+
+//Called from the event manager to make sure that we can do the correct behaviour when spawning enemies
+void AEnemySpawner::TutorialOrRegularGame(bool bIsRegularGame) 
+{
+	if (bIsRegularGame) 
+	{
+		CurrentEnemiesAlive.SetNum(10);
+		UpdateSection(CurrentSection);
+	}
 }
 
 // Called every frame
@@ -73,10 +86,21 @@ bool AEnemySpawner::CheckNoFieldsAreEmpty()
 
 void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 {
+
 	CurrentEnemiesAliveInSection--;
 	TotalEnemiesShot++;
 	UE_LOG(LogTemp, Warning, TEXT("Amount of soldiers left = %d"), CurrentEnemiesAliveInSection);
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("Enemy Count is now: %d"), CurrentEnemiesAliveInSection));
+
+	//If we are in the tutorial and have killed all enemies
+	if (bIsTutorial && TotalEnemiesShot >= 3)
+	{
+		if (TutorialKilledEnemiesDele.IsBound()) 
+		{
+			TutorialKilledEnemiesDele.Broadcast(0);
+			TutorialKilledEnemiesDele.Clear();
+		}
+	}
 
 	//If we have wiped out all of the enemies in the substage
 	//Check if all enemies are dead for the section. We are currently 1 section ahead of the array
@@ -703,6 +727,41 @@ void AEnemySpawner::DEBUGDeleteAllEnemiesAndAdvanceStage()
 		TotalEnemiesShot += EnemyQuantityTotalStage1Area1Section2Waves[CurrentWaveInSection - 1];
 		CurrentEnemiesAliveInSection = 0;
 		DecreaseEnemyCount(nullptr);
+	}
+}
+
+void AEnemySpawner::SpawnTutorialEnemies() 
+{
+	//3 because we want to spawn 3 enemies
+	for (int32 i = 0; i < 3; i++)
+	{
+		//Increment how many enemies are alive
+		CurrentEnemiesAliveInSection++;
+
+		CurrentEnemiesAlive[i] = GetWorld()->SpawnActor<AAIEnemyCharacter>(CharacterToSpawn);
+
+		if (CurrentEnemiesAlive[i])
+		{
+			//Make a brown uniform for the middle soldier
+			if (i == 1)
+			{
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BROWN, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT,
+					TutorialSpawnPoints[i], nullptr, nullptr, nullptr);
+			}
+			else
+			{
+				CurrentEnemiesAlive[i]->SetupEnemy(EnemyType::BLUE, EnemyWeapon::PISTOL, EAIBehaviour::SPAWN_SHOOT,
+					TutorialSpawnPoints[i], nullptr, nullptr, nullptr);
+			}
+
+			//Add the delegate to say when an enemy is dead
+			CurrentEnemiesAlive[i]->DeathCallback.AddDynamic(this, &AEnemySpawner::DecreaseEnemyCount);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Problem with spawning on %s"), *this->GetName());
+		}
+
 	}
 }
 

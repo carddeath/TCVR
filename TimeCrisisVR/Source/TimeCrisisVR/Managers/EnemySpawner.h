@@ -13,6 +13,7 @@ The navigation manager should then show the next movement point, when the moveme
 #include "EnemySpawner.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRevealNextPoint, int, junk);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FKilledTutorialEnemies, int, junk);
 
 UCLASS()
 class TIMECRISISVR_API AEnemySpawner : public AActor
@@ -28,7 +29,20 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Debug")
 		int32 CurrentSection = 1; //The current area of shooting
 
+
+	//TUtorial
+	FKilledTutorialEnemies TutorialKilledEnemiesDele;
+
+	//If the game is a tutorial follow a different path
+	bool bIsTutorial = false;
+
 protected:
+
+	//Tutorial Spawns
+	UPROPERTY(EditInstanceOnly, Category = "Tutorial_Spawn_Points")
+		TArray<class ATargetPoint*> TutorialSpawnPoints;
+
+	////////////////////////////////
 
 	//The event manager that needs to be communicated with when certain enemies in the game die
 	class AEventManager* EventMang = nullptr;
@@ -139,6 +153,12 @@ public:
 	AEnemySpawner();
 	virtual void Tick(float DeltaTime) override;
 
+	//Launching logic mixed with tutorial logic
+	void TutorialOrRegularGame(bool bIsRegularGame);
+
+	//Tutorial
+	void SpawnTutorialEnemies();
+
 	//void UpdateStage(int32 NewStage);
 	//void UpdateArea(int32 NewArea);
 	void UpdateSection(int32 NewSection);
@@ -159,6 +179,8 @@ private:
 	void LaunchRocketSoldierDead(AAIEnemyCharacter* junk);
 
 	void PlaceEnemies();
+
+
 
 	//Stage 1 | Area 1 |
 	void PlaceEnemiesStage1Area1();

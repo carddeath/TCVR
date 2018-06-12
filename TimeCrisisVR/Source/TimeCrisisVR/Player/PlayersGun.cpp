@@ -305,6 +305,16 @@ void APlayersGun::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedCompone
 			AmmoClipUILeft->UpdateDisplayRemoteCall(true, CurrentAmmo);
 			AmmoClipUIRight->UpdateDisplayRemoteCall(true, CurrentAmmo);
 		}
+
+		//We want to move the tutorial step further with a reload action taking place.
+		if (bTutorialEnabled) 
+		{
+			if (TutorialReloadedGun.IsBound()) 
+			{
+				TutorialReloadedGun.Broadcast(0);
+				TutorialReloadedGun.Clear();
+			}
+		}
 	}
 }
 
