@@ -32,6 +32,9 @@ protected:
 
 	UPROPERTY(EditInstanceOnly, Category = "Objects")
 		class ANavigationArrow* EndLevelArrow = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+		class USoundBase* PhaseMoveSFX = nullptr;
 	
 private:
 	class AVRPawn* PlayerCharacter = nullptr;
@@ -46,6 +49,8 @@ private:
 	TArray<FString> TutorialMessages;
 
 	ATutorialShootingTarget* CurrentTarget = nullptr;
+
+	class UTutorialToGameSaveInstance* DataInstance = nullptr;
 
 
 	//Methods

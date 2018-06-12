@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "DataStructures/Hand.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "VRPawn.generated.h"
@@ -9,14 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGunWasCreated, class APlayersGun*, PGun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTutorialProceed, int32, junk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBeginBoxStare, AActor*, SelectedBox, bool, bStartAnimation);
-
-UENUM()
-enum class EHand : uint8 
-{
-	LEFT,
-	RIGHT,
-	NONE
-};
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHandPreference, EHand, hand);
 
 UCLASS()
 class TIMECRISISVR_API AVRPawn : public APawn
@@ -59,6 +54,8 @@ public:
 
 	//Overall Tutorial variables
 	bool bTutorialBtnEnabled = true;
+
+	FHandPreference HandPrefDele;
 
 protected:
 

@@ -17,6 +17,7 @@
 #include "Events/ExplosiveBox.h"
 #include "GameFramework/DamageType.h"
 #include "Tutorial/TutorialShootingTarget.h"
+#include "Components/AudioComponent.h"
 
 
 // Sets default values
@@ -43,6 +44,9 @@ APlayersGun::APlayersGun()
 
 	ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(FName("Particle System"));
 	ParticleComponent->SetAutoAttachmentParameters(GunStaticMeshComp, FName("FlashSocket"), EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative);
+
+	BulletDropAudioComp = CreateDefaultSubobject<UAudioComponent>(FName("Bullet Drop Audio Comp"));
+	BulletDropAudioComp->SetupAttachment(GunStaticMeshComp);
 }
 
 // Called when the game starts or when spawned
@@ -110,6 +114,8 @@ void APlayersGun::Fire()
 	//Remove a bullet and shoot as he have a bullet.
 	if (CurrentAmmo > 0) 
 	{
+		//Play the bullet drop sound
+		PlayBulletDropSoundAfterDelay();
 		//Show muzzle flash
 		ParticleComponent->Activate(true);
 

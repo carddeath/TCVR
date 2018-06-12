@@ -5,6 +5,7 @@
 #include "Components/WidgetComponent.h"
 #include "EngineUtils.h"
 #include "Engine/Texture2D.h"
+#include "Kismet/GameplayStatics.h"
 
 //Game Classes
 #include "Player/VRPawn.h"
@@ -14,6 +15,8 @@
 #include "Tutorial/TutorialShootingTarget.h"
 #include "Managers/EnemySpawner.h"
 #include "Gameplay/NavigationArrow.h"
+#include "Data/TutorialToGameSaveInstance.h"
+#include "DataStructures/Hand.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -48,6 +51,13 @@ void ATutorialManager::BeginPlay()
 	{
 		EnemySpawner->TutorialKilledEnemiesDele.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
 		EnemySpawner->bIsTutorial = true;
+	}
+
+	//For keeping the correct hand
+	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
+	if (DataInstance) 
+	{
+		PlayerCharacter->HandPrefDele.AddDynamic(DataInstance, &UTutorialToGameSaveInstance::SetHandTypeViaDelegation);
 	}
 
 	GenerateTutorialMessageScreens();
@@ -114,95 +124,75 @@ void ATutorialManager::GetHandSelectionActor(AActor* BoxToHighlight, bool bStart
 
 void ATutorialManager::ProceedTutorialStep(int junk) 
 {
+	UGameplayStatics::PlaySound2D(GetWorld(), PhaseMoveSFX);
+
 	//TODO: Proceed over the tutorial step to the next page loading the correct text and image thats required
 	UE_LOG(LogTemp, Warning, TEXT("Proceed Tutorial"));
 
 	//Replace nullptr with the array, make sure it's the right size = to the max amount of steps
-	Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], nullptr);
+	Cast<UTutorialWidget>(TutorialWidget->GetUserWidgetObject())->UpdateVisualsInTutorial(TutorialMessages[TutorialStepCounter], TutorialImages[TutorialStepCounter]);
 
-	//Picking if you're left or right handed with a pistol
-	if (TutorialStepCounter == 2) 
+	//Decides what to do depending on the tutorial step
+	switch (TutorialStepCounter) 
 	{
+	//Choosing a hand to shoot with. Allow the player to fire a line trace and show up selection boxes
+	case 2:
+		//From this stage on the tutorial button is disabled
 		PlayerCharacter->bTutorialBtnEnabled = false;
-
-		//We need to start looking with the line trace for where we are focusing
 		PlayerCharacter->bTutorialIsSearchingForHands = true;
-
 		for (auto& Box : HandSelectionBoxes)
 		{
 			Box->ShowBox(true);
 		}
-	}
-
-
-	//Letting the player know how to swap hands with the gun
-	if (TutorialStepCounter == 3) 
-	{
-		PlayerCharacter->bTutorialBtnEnabled = false;
-
-		for (auto& Box : HandSelectionBoxes)
-		{
-			Box->Destroy();
-		}
-
-		//Attempt to get the gun and set the value to true that we're in a tutorial
+		break;
+		//Will spawn the gun in the players hand and allows them to be swapped to trigger the delegate once and destroy the boxes
+	case 3:
 		PlayersGun = PlayerCharacter->GetPlayersGun();
-		if (PlayersGun) 
+		if (PlayersGun)
 		{
 			PlayersGun->bTutorialHandSwap = true;
 			PlayersGun->bTutorialEnabled = true;
 		}
-	}
-
-	//Shooting the gun stage of the tutorial
-	if (TutorialStepCounter == 4) 
-	{
-		PlayerCharacter->bTutorialBtnEnabled = false;
-
-		if (PlayersGun) 
+		for (auto& Box : HandSelectionBoxes)
+		{
+			Box->Destroy();
+		}
+		break;
+		//Allows the player to shoot and will spawn a target for them to shoot, if they run out of ammo it ends anyway
+	case 4:
+		if (PlayersGun)
 		{
 			PlayersGun->bTutorialHandSwap = false;
 			//Assign the delegate so that when we shoot the target we call this function and increment the number
 			PlayersGun->TutorialTargetShotDelegate.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
 		}
-
-		//Create the target to be shot
-		if (TargetTemplate) 
+		if (TargetTemplate)
 		{
-			//Spawns a target in the middle of the room
 			CurrentTarget = GetWorld()->SpawnActor<ATutorialShootingTarget>(TargetTemplate);
 			CurrentTarget->SetActorLocation(FVector(310.0f, -670.0f, 100.0f));
 			CurrentTarget->SetActorRotation(FRotator(90.0f, 0.0f, 0.0f));
 		}
-	}
-
-	if (TutorialStepCounter == 5) 
-	{
-		PlayerCharacter->bTutorialBtnEnabled = false;
+		break;
+		//Spawns ammo pouches on the player and removes the target from the scene and adds a delegate to the players gun
+	case 5:
 		CurrentTarget->Destroy();
-
 		//Make the ammo pouch
 		PlayerCharacter->CreateAmmoPouch();
-
 		//We need the player to reload the gun and to proceed when it's done
 		PlayersGun->TutorialReloadedGun.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
-	}
-
-	if (TutorialStepCounter == 6) 
-	{
-		//TODO: Create an enemy model in the scene and allow it to be shot, the player must kill it to proceed
+		break;
+		//Just spawns enemies via the Enemy Spawner
+	case 6:
 		EnemySpawner->SpawnTutorialEnemies();
-	}
-
-	if (TutorialStepCounter == 7) 
-	{
-		if (EndLevelArrow) 
+		break;
+		//Reveal the end of level arrow and allow it to be shot to go to main game
+	case 7:
+		if (EndLevelArrow)
 		{
 			EndLevelArrow->ShowArrow(true);
 		}
+		break;
 	}
-
 	TutorialStepCounter++;
-
 }
 

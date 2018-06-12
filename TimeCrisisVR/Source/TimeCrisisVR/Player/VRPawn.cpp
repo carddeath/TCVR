@@ -17,6 +17,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UI/PlayerUIAugment.h"
 //#include "Components/TextRenderComponent.h"
+#include "Data/TutorialToGameSaveInstance.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -74,13 +75,14 @@ void AVRPawn::BeginPlay()
 	if (!bIsTutorial) 
 	{
 		//Create the gun and place it in the hand at the start of the game
-		SpawnPistolAndPlaceInRightHand();
+		//SpawnPistolAndPlaceInRightHand();
+
+		EHand HandType = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance())->GetPreferedHand();
+		TutorialGunSpawn(HandType);
+
 		CreateAmmoPouch();
 	}
-	else 
-	{
-	
-	}
+
 }
 
 // Called every frame
@@ -669,10 +671,20 @@ void AVRPawn::TutorialGunHandSearch(float DeltaTime)
 			if (WhichHanded.ToString() == "RIGHT")
 			{
 				TutorialGunSpawn(EHand::RIGHT);
+
+				if (HandPrefDele.IsBound()) 
+				{
+					HandPrefDele.Broadcast(EHand::RIGHT);
+				}
 			}
 			else if (WhichHanded.ToString() == "LEFT")
 			{
 				TutorialGunSpawn(EHand::LEFT);
+
+				if (HandPrefDele.IsBound())
+				{
+					HandPrefDele.Broadcast(EHand::LEFT);
+				}
 			}
 
 			UE_LOG(LogTemp, Warning, TEXT("The hand chosen was %s"), *WhichHanded.ToString());

@@ -40,13 +40,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	class USceneComponent* FireStartPointComp = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	class USoundBase* SFXGunShot = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	USoundBase* SFXEmptyClip = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
 	USoundBase* SFXReloaded = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gun Specifics")
@@ -59,7 +59,10 @@ protected:
 	UWidgetComponent* RightGunAmmoWidget = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-		class UParticleSystemComponent* ParticleComponent = nullptr;
+	class UParticleSystemComponent* ParticleComponent = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+		class UAudioComponent* BulletDropAudioComp = nullptr;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Gun Specifics")
@@ -108,6 +111,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "SoundEvents")
+		void PlayBulletDropSoundAfterDelay();
+
 private:	
 
 	void PlayFireSound();
@@ -119,4 +126,5 @@ private:
 
 	UFUNCTION()
 	void AllowGunTobeFired(int junk);
+
 };
