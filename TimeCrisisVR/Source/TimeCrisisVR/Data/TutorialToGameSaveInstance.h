@@ -23,10 +23,13 @@ protected:
 
 private:
 
-	EHand PlayerHandPreference = EHand::RIGHT;
+	EHand PlayerHandPreference;
 
 	//Methods
 public:
+
+	virtual void Init();
+
 	EHand GetPreferedHand();
 
 	UFUNCTION()
