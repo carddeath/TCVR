@@ -8,6 +8,7 @@
 #include "UI/InGameUIWidget.h"
 #include "UI/EndOfAreaDisplay.h"
 #include "Managers/DataTracker.h"
+#include "UI/EndOfTrialTimer.h"
 
 // Sets default values
 APlayerUIAugment::APlayerUIAugment()
@@ -43,11 +44,13 @@ void APlayerUIAugment::BeginPlay()
 	WidgetDisplay->SetWidget(InGameUiWidget);
 
 	//Creates the end of game widget to be assigned later
-	EndOfAreaWidget = CreateWidget<UEndOfAreaDisplay>(GetWorld(), EndOfAreaTemplate);
+	//EndOfAreaWidget = CreateWidget<UEndOfAreaDisplay>(GetWorld(), EndOfAreaTemplate);
+
+	//Creates the trial end widget
+	//EndOfTrialWidget = CreateWidget<UEndOfTrialTimer>(GetWorld(), EndOfTrialTimerTemplate);
 
 	//Assign all delegates
-	if (InGameUiWidget && NavManager && EventManager && EndOfAreaWidget && DataTracker && InGameUITemplate && EndOfAreaTemplate)
-	{
+
 		//A delegate that will show the area start if the section = 1 in the navigation manager
 		NavManager->FlashUpDelegateAreaStart.AddDynamic(InGameUiWidget, &UInGameUIWidget::FlashUpAreaStart);
 		//Need to call it myself here so that we have assigned the delegate
@@ -61,18 +64,13 @@ void APlayerUIAugment::BeginPlay()
 		NavManager->ToggleWaitOffDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayWait);
 
 		//We want to display reload and it comes from the event manager via the players gun
-		EventManager->ReloadDisplayDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayReload);
+		EventManager->ReloadDisplayDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayReload);	
 
 		//Shows the end of the game data screen
 		NavManager->ShowEndOfAreaWidgetDelegate.AddDynamic(this, &APlayerUIAugment::SwapWidgetsInGame);
 
 		//Is used to retrieve the end of screen data
 		DataTracker->DataSendingDelegate.AddDynamic(this, &APlayerUIAugment::SendEndOfAreaDataToWidget);
-	}
-	else 
-	{
-		UE_LOG(LogTemp, Error, TEXT("Missing Something on %s"), *this->GetName());
-	}
 }
 
 // Called every frame
@@ -85,10 +83,17 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 {
 	if (bShowEndOfAreaWidget) 
 	{
-		if (EndOfAreaWidget) 
+		//FOR THE GAME, NOT THE EXPERIMENT
+		//if (EndOfAreaWidget) 
+		//{
+		//	WidgetDisplay->SetWidget(EndOfAreaWidget);
+		//	EndOfAreaWidget->DisplayEndOfGameScreenInOrder();
+		//}
+
+		if (EndOfTrialWidget) 
 		{
-			WidgetDisplay->SetWidget(EndOfAreaWidget);
-			EndOfAreaWidget->DisplayEndOfGameScreenInOrder();
+			WidgetDisplay->SetWidget(EndOfTrialWidget);
+			EndOfTrialWidget->SetCountTimerDown();
 		}
 	}
 	else 
@@ -99,10 +104,18 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 
 void APlayerUIAugment::SendEndOfAreaDataToWidget(FGameData GameData) 
 {
-	//Creates the end of game widget to be assigned later
-	EndOfAreaWidget = CreateWidget<UEndOfAreaDisplay>(GetWorld(), EndOfAreaTemplate);
-	//CAREFUL: HOPEFULLY NOT A RACE CONDITION WITH THE INFOMATION ABOVE
-	if (EndOfAreaWidget) 
+	//EXPERIMENT ONLY
+	EndOfTrialWidget = CreateWidget<UEndOfTrialTimer>(GetWorld(), EndOfTrialTimerTemplate);
+	if (EndOfTrialWidget)
+	{
+		InGameUiWidget->RemoveFromViewport();
+		WidgetDisplay->SetWidget(EndOfTrialWidget);
+		EndOfTrialWidget->SetCountTimerDown();
+	}
+
+	//GAME ONLY
+	//EndOfAreaWidget = CreateWidget<UEndOfAreaDisplay>(GetWorld(), EndOfAreaTemplate);
+	/*if (EndOfAreaWidget) 
 	{
 		WidgetDisplay->SetWidget(EndOfAreaWidget);
 		EndOfAreaWidget->GenerateAllDataToDisplay(GameData);
@@ -110,7 +123,7 @@ void APlayerUIAugment::SendEndOfAreaDataToWidget(FGameData GameData)
 	else 
 	{
 		UE_LOG(LogTemp, Error, TEXT("Missing End of area widget when sending data"));
-	}
+	}*/
 
 }
 

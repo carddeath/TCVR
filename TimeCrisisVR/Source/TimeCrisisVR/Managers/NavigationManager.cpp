@@ -164,6 +164,12 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		if (AllowDataCollectionFromClassesDelegate.IsBound())
 		{
 			AllowDataCollectionFromClassesDelegate.Broadcast(0);
+
+			//Plays the audio if it's bound
+			if (EndOfStageAudioToggle.IsBound()) 
+			{
+				EndOfStageAudioToggle.Broadcast(0);
+			}
 		}
 		return;
 	}

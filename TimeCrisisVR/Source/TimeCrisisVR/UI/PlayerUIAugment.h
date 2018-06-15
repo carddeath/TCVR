@@ -8,8 +8,6 @@
 #include "GameFramework/Actor.h"
 #include "PlayerUIAugment.generated.h"
 
-
-
 UCLASS()
 class TIMECRISISVR_API APlayerUIAugment : public AActor
 {
@@ -31,6 +29,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Widget Subclasses")
 		TSubclassOf<class UEndOfAreaDisplay> EndOfAreaTemplate;
 
+	//Experiment ONLY: Used to show the timer counting down at the end
+	UPROPERTY(EditDefaultsOnly, Category = "Widget Subclasses")
+		TSubclassOf<class UEndOfTrialTimer> EndOfTrialTimerTemplate;
+
 private:
 
 	class ANavigationManager* NavManager = nullptr;
@@ -40,6 +42,8 @@ private:
 	class UInGameUIWidget* InGameUiWidget = nullptr;
 
 	class UEndOfAreaDisplay* EndOfAreaWidget = nullptr;
+
+	UEndOfTrialTimer* EndOfTrialWidget = nullptr;
 
 	class ADataTracker* DataTracker = nullptr;
 

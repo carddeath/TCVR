@@ -31,7 +31,6 @@ public:
 	//Used so the data manager can get the gun
 	FGunWasCreated GunWasCreatedDelegate;
 
-
 	//TUTORIAL LOGIC VARIABLES
 	//Tutorial delegate to broadcast when the button is pressed, if it's bound
 	FTutorialProceed TutorialProceedDelegate;

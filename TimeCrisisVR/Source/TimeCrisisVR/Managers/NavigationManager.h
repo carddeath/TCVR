@@ -17,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisplayWait, bool, bShouldShowWait)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReachedEndOfArea, bool, bShouldShowEndOfAreaWidget);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReachedEndOfAreaDataTransfer, int32, junk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReactiveGun, int32, junk);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayEndOfStageAudio, int32, junk);
 
 UCLASS()
 class TIMECRISISVR_API ANavigationManager : public AActor
@@ -43,6 +44,9 @@ public:
 
 	//Allows the DataTracker to seek out all data required for the end of area stats
 	FReachedEndOfAreaDataTransfer AllowDataCollectionFromClassesDelegate;
+
+	//Used by music manager to change audio on game end
+	FPlayEndOfStageAudio EndOfStageAudioToggle;
 
 protected:
 

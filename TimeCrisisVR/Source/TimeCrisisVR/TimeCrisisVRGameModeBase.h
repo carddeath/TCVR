@@ -13,8 +13,10 @@ UCLASS()
 class TIMECRISISVR_API ATimeCrisisVRGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-	
+
+public:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Reset State")
+		void LoadNewLevel();
 	
 	
 };

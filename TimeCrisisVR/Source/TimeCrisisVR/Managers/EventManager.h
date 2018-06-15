@@ -55,6 +55,8 @@ private:
 
 	class AEnemySpawner* EnemySpawner = nullptr;
 
+	class ADataTracker* DataTracker = nullptr;
+
 	//Methods
 	
 public:	

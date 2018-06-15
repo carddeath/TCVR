@@ -31,6 +31,8 @@ ATutorialManager::ATutorialManager()
 void ATutorialManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 	
 	//Get the player character
 	for (TActorIterator<AVRPawn> ita(GetWorld()); ita; ++ita) 
@@ -58,6 +60,9 @@ void ATutorialManager::BeginPlay()
 	if (DataInstance) 
 	{
 		PlayerCharacter->HandPrefDele.AddDynamic(DataInstance, &UTutorialToGameSaveInstance::SetHandTypeViaDelegation);
+
+		//Reset the hand type
+		DataInstance->SetHandTypeViaDelegation(EHand::NONE);
 	}
 
 	GenerateTutorialMessageScreens();

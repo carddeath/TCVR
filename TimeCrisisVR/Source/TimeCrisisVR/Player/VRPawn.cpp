@@ -69,9 +69,6 @@ void AVRPawn::BeginPlay()
 	SCHeldObjectLeft->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 	SCHeldObjectRight->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 
-	
-
-	//TODO: REMOVE THIS LATER. WE WILL PICK THE HAND WITH DATA INSTANCE VIA TUTORIAL TO MAIN LEVEL
 	if (!bIsTutorial) 
 	{
 		//Create the gun and place it in the hand at the start of the game
@@ -82,7 +79,6 @@ void AVRPawn::BeginPlay()
 
 		CreateAmmoPouch();
 	}
-
 }
 
 // Called every frame
