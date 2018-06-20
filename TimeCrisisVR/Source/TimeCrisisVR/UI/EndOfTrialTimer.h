@@ -23,16 +23,23 @@ protected:
 
 private:
 
+	FString FileName;
+	class UTutorialToGameSaveInstance* DataInstance = nullptr;
+	float TotalTimeTakenInStage;
 
 	//Methods
 public:
-	void SetCountTimerDown();
+	void SetCountTimerDown(float TotalTimeTaken);
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "EndGame")
 		void GenerateNewLocomotionModifier();
 
 private:
+
+	void PickLocomotionTypeToWrite();
+
+	void PickModiferTypeToWrite();
 
 	
 	

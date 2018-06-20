@@ -30,6 +30,8 @@ void ATImeManager::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Missing time watch widget or event manager on %s"), *this->GetName());
 	}
+
+	TotalTimeTakenInTheGame = 0.0f;
 	
 }
 
@@ -75,7 +77,6 @@ float ATImeManager::GetTotalTimeAtAreaEnd()
 {
 	//Get the total time taken, reset the counter and return the actual value
 	float HolderOfTime = TotalTimeTakenInTheGame;
-	TotalTimeTakenInTheGame = 0;
 	return HolderOfTime;
 }
 

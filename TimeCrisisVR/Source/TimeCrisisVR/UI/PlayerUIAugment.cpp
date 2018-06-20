@@ -9,6 +9,7 @@
 #include "UI/EndOfAreaDisplay.h"
 #include "Managers/DataTracker.h"
 #include "UI/EndOfTrialTimer.h"
+#include "Player/VRPawn.h"
 
 // Sets default values
 APlayerUIAugment::APlayerUIAugment()
@@ -108,7 +109,7 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 		if (EndOfTrialWidget) 
 		{
 			WidgetDisplay->SetWidget(EndOfTrialWidget);
-			EndOfTrialWidget->SetCountTimerDown();
+			EndOfTrialWidget->SetCountTimerDown(0);
 		}
 	}
 	else 
@@ -119,13 +120,18 @@ void APlayerUIAugment::SwapWidgetsInGame(bool bShowEndOfAreaWidget)
 
 void APlayerUIAugment::SendEndOfAreaDataToWidget(FGameData GameData) 
 {
+
 	//EXPERIMENT ONLY
 	EndOfTrialWidget = CreateWidget<UEndOfTrialTimer>(GetWorld(), EndOfTrialTimerTemplate);
 	if (EndOfTrialWidget)
 	{
+
+
 		InGameUiWidget->RemoveFromViewport();
 		WidgetDisplay->SetWidget(EndOfTrialWidget);
-		EndOfTrialWidget->SetCountTimerDown();
+		
+		//Passes the total time taken in the game
+		EndOfTrialWidget->SetCountTimerDown(GameData.TotalTimeTaken);
 	}
 
 	//GAME ONLY

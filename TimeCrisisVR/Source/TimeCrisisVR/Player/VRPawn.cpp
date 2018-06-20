@@ -18,6 +18,7 @@
 #include "UI/PlayerUIAugment.h"
 //#include "Components/TextRenderComponent.h"
 #include "Data/TutorialToGameSaveInstance.h"
+#include "UI/Timer.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -98,6 +99,11 @@ void AVRPawn::BeginPlay()
 		TutorialGunSpawn(HandType);
 
 		CreateAmmoPouch();
+	}
+	else 
+	{
+		SMLeftWatchTimeWidget->SetVisibility(false, true);
+		SMLeftWatch->SetVisibility(false, true);
 	}
 }
 
@@ -642,7 +648,7 @@ int32 AVRPawn::GetTotalTimesHit()
 	return TotalTimesHit;
 }
 
-APlayersGun* AVRPawn::GetPlayersGun() 
+APlayersGun* AVRPawn::GetPlayersGun()  
 {
 	return PlayersGun;
 }

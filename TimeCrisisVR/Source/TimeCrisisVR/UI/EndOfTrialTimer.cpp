@@ -5,16 +5,20 @@
 #include "Data/TutorialToGameSaveInstance.h"
 #include "Engine.h"
 #include "TimeCrisisVRGameModeBase.h"
+#include <iostream>
+#include <fstream>
 
-void UEndOfTrialTimer::SetCountTimerDown() 
+
+void UEndOfTrialTimer::SetCountTimerDown(float TotalTimeTaken) 
 {
 	bCountTimerDown = true;
+	TotalTimeTakenInStage = TotalTimeTaken;
 }
 
 void UEndOfTrialTimer::GenerateNewLocomotionModifier() 
 {
 
-	UTutorialToGameSaveInstance* DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
+	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
 
 	if (!DataInstance)
 	{
@@ -24,6 +28,9 @@ void UEndOfTrialTimer::GenerateNewLocomotionModifier()
 
 	//Gets the current trail number to pick which trial to experiment with
 	int32 CurrentIndex = DataInstance->GetCurrentTrail();
+
+	FileName.Empty();
+	PickLocomotionTypeToWrite();
 
 	//Setting and saving the new modifier for the next trial
 	if (CurrentIndex == 3) 
@@ -51,4 +58,56 @@ void UEndOfTrialTimer::GenerateNewLocomotionModifier()
 	//TODO: Write all the times and the name of the technique to a file 
 
 	//TODO: DO a comparisson here of the number, if the trial number is 4. Do not load the level. Quit the game
+}
+
+void UEndOfTrialTimer::PickLocomotionTypeToWrite() 
+{
+	if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT) 
+	{
+		FileName.Append("PAT_");
+	}
+	else if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED)
+	{
+		FileName.Append("NB_");
+	}
+
+	PickModiferTypeToWrite();
+}
+
+void UEndOfTrialTimer::PickModiferTypeToWrite() 
+{
+	//ofstream FileWritter;
+
+	UE_LOG(LogTemp, Warning, TEXT("Total time taken is %f"), TotalTimeTakenInStage);
+
+	//Used for writing to file
+	switch (DataInstance->GetCurrentTrail())
+	{
+		//None
+	case 0:
+		UE_LOG(LogTemp, Error, TEXT("No modifer applied"));
+		FileName.Append("no_modifiers.txt");
+		//FileWritter.open(FileName, std::ios::app);
+
+		//if (FileWritter.is_open()) 
+		//{
+		//	
+		//}
+
+		break;
+		//Fade
+	case 1:
+		UE_LOG(LogTemp, Error, TEXT("Fade applied"));
+		break;
+		//Forced rotation
+	case 2:
+		UE_LOG(LogTemp, Error, TEXT("Forced Rotation applied"));
+		break;
+		//Annotated rotation
+	case 3:
+		UE_LOG(LogTemp, Error, TEXT("Annotated Rotation applied"));
+		break;
+	default:
+		break;
+	}
 }

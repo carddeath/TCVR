@@ -21,6 +21,7 @@ public:
 	//Sends the data to the ui when required
 	FSendDataToUIElement DataSendingDelegate;
 
+
 protected:
 
 private:
