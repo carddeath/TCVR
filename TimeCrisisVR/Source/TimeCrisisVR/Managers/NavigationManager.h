@@ -7,6 +7,8 @@ Should also tell the enemy spawner to update it's enemy set based on the, level,
 
 #pragma once
 
+#include "Data/TutorialToGameSaveInstance.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "NavigationManager.generated.h"
@@ -76,6 +78,13 @@ private:
 	//USed to check in "tick" if the player has reached the next locomotion point. If so then we remove the wait UI and display action
 	bool bHasPlayerSetOffToNextPoint = false;
 
+	//The tutorial instance for getting the locomotion type
+	UTutorialToGameSaveInstance* DataInstance = nullptr;
+
+	EModifierTypes ModType;
+
+	ELocomotionType LocoType;
+
 	//Methods
 	
 public:	
@@ -99,6 +108,8 @@ private:
 	void RevealNextLocomotionArrow(int junk);
 
 	void EventChecker();
+
+	void SetLocomotionModifer();
 
 
 	

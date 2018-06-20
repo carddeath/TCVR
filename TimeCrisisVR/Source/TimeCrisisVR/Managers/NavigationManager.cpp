@@ -9,6 +9,7 @@
 #include "Managers/EventManager.h"
 #include "Managers/TImeManager.h"
 
+
 // Sets default values
 ANavigationManager::ANavigationManager()
 {
@@ -65,6 +66,20 @@ void ANavigationManager::BeginPlay()
 
 	//Assign the current section to the enemy spawner so we have the right info for debugging
 	CurrentSection = EnemySpawner->CurrentSection;
+
+	if (GetWorld() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing The world"))
+			return;
+	}
+
+	//Get the data instance
+	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
+
+
+
+	//Sets the locomotionModiferToUse
+	SetLocomotionModifer();
 }
 
 // Called every frame
@@ -100,6 +115,38 @@ void ANavigationManager::Tick(float DeltaTime)
 	}
 }
 
+void ANavigationManager::SetLocomotionModifer() 
+{
+	//Generates the type of modifier to apply to the locomotion based on the index inside of the tutorial instance
+	if (!DataInstance) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing Data Instance on %s"), *this->GetName());
+		return;
+	}
+
+	switch (DataInstance->GetCurrentTrail())
+	{
+	case 0:
+		ModType = EModifierTypes::NONE;
+		UE_LOG(LogTemp, Error, TEXT("No modifer applied"));
+		break;
+	case 1:
+		ModType = EModifierTypes::FADE;
+		UE_LOG(LogTemp, Error, TEXT("Fade applied"));
+		break;
+	case 2:
+		ModType = EModifierTypes::FORCED_ROTATION;
+		UE_LOG(LogTemp, Error, TEXT("Forced Rotation applied"));
+		break;
+	case 3:
+		ModType = EModifierTypes::ANNOTATED_ROTATION;
+		UE_LOG(LogTemp, Error, TEXT("Annotated Rotation applied"));
+		break;
+	default:
+		break;
+	}
+}
+
 void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer) 
 {
 	//We dont increment at first as the current section is one value ahead of the 0 array of locomotion points
@@ -112,17 +159,29 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 	}
 
 	//Do the locomotion and send the location of the next point
+	//TODO: These values need to be set via the data instance once we set it up
 	if (CustomPlayerController) 
 	{
 		//Used to decide on which method of teleportation should be used.
-		if (true) 
-		{
-			CustomPlayerController->MovePlayerViaNavManagerNodeBased(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
-		}
-		else 
-		{
-			CustomPlayerController->MovePlayerViaNavManagerTeleport(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
-		}
+			CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
+
+			if (!DataInstance)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Missing Data Instance on %s"), *this->GetName());
+				return;
+			}
+
+			CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+			if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
+			{
+				UE_LOG(LogTemp, Error, TEXT("LocomotionType Was: NODE BASED"));
+			}
+			else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT)
+			{
+				UE_LOG(LogTemp, Error, TEXT("LocomotionType Was: TELEPORT BASED"));
+			}
+
+
 	}
 
 	//Hide the arrow that was just shot, is no longer needed

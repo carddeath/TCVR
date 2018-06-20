@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Data/TutorialToGameSaveInstance.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "MainPlayerController.generated.h"
@@ -14,15 +16,30 @@ class TIMECRISISVR_API AMainPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+		//Variables
+protected:
+
+	UPROPERTY(BlueprintReadOnly, Category = "Values")
+	EModifierTypes ModiferType;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Values")
+		FVector LocomotionToMoveTowards;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Values")
+		FRotator RotationToFaceTowards;
 		//Methods
 public:
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Locomotion")
-		void MovePlayerViaNavManagerNodeBased(FVector LocationToMoveTo, FRotator RotationToFace);
+	void SetModiferState(EModifierTypes ModiferType, ELocomotionType LocomotionType);
 
-		void MovePlayerViaNavManagerTeleport(FVector LocationToMove, FRotator RotationToFace);
-	
-	
-	
+	void SetLocationToMoveAndRotation(FVector LocationToMoveTo, FRotator RotationToFace);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Locomotion")
+		void MovePlayerViaNavManagerNodeBased();
+
+		void MovePlayerViaNavManagerTeleport();
+
+protected:
+
 	
 };

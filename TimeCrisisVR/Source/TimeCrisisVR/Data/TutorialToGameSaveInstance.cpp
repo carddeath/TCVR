@@ -11,12 +11,36 @@ void UTutorialToGameSaveInstance::Init()
 	}
 }
 
+//Setters
+
 void UTutorialToGameSaveInstance::SetHandTypeViaDelegation(EHand HandType) 
 {
 	PlayerHandPreference = HandType;
 }
 
+void UTutorialToGameSaveInstance::SetLocomotionType(ELocomotionType LocoType) 
+{
+	CurrentLocomotionType = LocoType;
+}
+
+void UTutorialToGameSaveInstance::SetCurrentTrial(int32 CurTrial) 
+{
+	CurrentTrail = CurTrial;
+}
+
+//Getters
+
 EHand UTutorialToGameSaveInstance::GetPreferedHand() 
 {
 	return PlayerHandPreference;
+}
+
+ELocomotionType UTutorialToGameSaveInstance::GetLocomotionType() 
+{
+	return CurrentLocomotionType;
+}
+
+int32 UTutorialToGameSaveInstance::GetCurrentTrail() 
+{
+	return CurrentTrail;
 }

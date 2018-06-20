@@ -21,6 +21,8 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "State")
 	bool bCountTimerDown = false;
 
+private:
+
 
 	//Methods
 public:
@@ -31,12 +33,6 @@ protected:
 		void GenerateNewLocomotionModifier();
 
 private:
-
-
-
-	//Loads the level again
-	void LoadLevelAgain();
-
 
 	
 	

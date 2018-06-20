@@ -57,12 +57,13 @@ void ATutorialManager::BeginPlay()
 
 	//For keeping the correct hand
 	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
+
 	if (DataInstance) 
 	{
 		PlayerCharacter->HandPrefDele.AddDynamic(DataInstance, &UTutorialToGameSaveInstance::SetHandTypeViaDelegation);
 
 		//Reset the hand type
-		DataInstance->SetHandTypeViaDelegation(EHand::NONE);
+		//DataInstance->SetHandTypeViaDelegation(EHand::NONE);
 	}
 
 	GenerateTutorialMessageScreens();

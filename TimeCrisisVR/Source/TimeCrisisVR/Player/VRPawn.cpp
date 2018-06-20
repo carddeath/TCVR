@@ -69,12 +69,32 @@ void AVRPawn::BeginPlay()
 	SCHeldObjectLeft->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 	SCHeldObjectRight->SetRelativeLocation(FVector(3.6, 0.0, 0.0));
 
-	if (!bIsTutorial) 
+	//If the world is in the main scene we will spawn the gun. Otherwise nope
+
+	FString LevelName = GetWorld()->GetMapName().Mid(GetWorld()->StreamingLevelsPrefix.Len());
+	UE_LOG(LogTemp, Error, TEXT("World name is: %s"), *LevelName);
+
+	//Only swap the gun in the main world if we are in the main scene
+	if (LevelName.Compare("Main_Scene") == 0) 
 	{
 		//Create the gun and place it in the hand at the start of the game
 		//SpawnPistolAndPlaceInRightHand();
 
-		EHand HandType = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance())->GetPreferedHand();
+		if(GetWorld() == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing The world"))
+				return;
+		}
+		UTutorialToGameSaveInstance* DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
+		EHand HandType = EHand::NONE;
+
+		if (DataInstance) 
+		{
+			HandType = DataInstance->GetPreferedHand();
+		}
+
+		UE_LOG(LogTemp, Error, TEXT("Spawn da gun"))
+
 		TutorialGunSpawn(HandType);
 
 		CreateAmmoPouch();

@@ -8,6 +8,22 @@
 #include "Engine/GameInstance.h"
 #include "TutorialToGameSaveInstance.generated.h"
 
+UENUM()
+enum class EModifierTypes : uint8 
+{
+	NONE,
+	FADE,
+	FORCED_ROTATION,
+	ANNOTATED_ROTATION
+};
+
+UENUM(Blueprintable)
+enum class ELocomotionType : uint8
+{
+	POINT_AND_TELEPORT,
+	NODE_BASED
+};
+
 /**
  * 
  */
@@ -19,11 +35,22 @@ class TIMECRISISVR_API UTutorialToGameSaveInstance : public UGameInstance
 	//Variables
 public:
 
+
+
 protected:
+
+
+	UPROPERTY(BlueprintReadWrite, Category = "Tutorial state")
+		bool bWasInitialTutorialDone = false;
+
 
 private:
 
 	EHand PlayerHandPreference;
+
+	ELocomotionType CurrentLocomotionType;
+
+	int32 CurrentTrail;
 
 	//Methods
 public:
@@ -32,8 +59,19 @@ public:
 
 	EHand GetPreferedHand();
 
+	ELocomotionType GetLocomotionType();
+
+	int32 GetCurrentTrail();
+
 	UFUNCTION()
 		void SetHandTypeViaDelegation(EHand HandType);
+
+
+	UFUNCTION(BlueprintCallable, Category = "Experiment")
+		void SetLocomotionType(ELocomotionType LocoType);
+
+		UFUNCTION(BlueprintCallable, Category = "Experiment")
+		void SetCurrentTrial(int32 CurTrial);
 
 protected:
 

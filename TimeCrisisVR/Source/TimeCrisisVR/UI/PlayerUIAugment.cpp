@@ -24,6 +24,12 @@ void APlayerUIAugment::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (GetWorld() == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Missing The world in Augment"))
+			return;
+	}
+
 	for (TActorIterator<AEventManager> ita(GetWorld()); ita; ++ita) 
 	{
 		EventManager = *ita;
@@ -51,6 +57,8 @@ void APlayerUIAugment::BeginPlay()
 
 	//Assign all delegates
 
+	if (NavManager) 
+	{
 		//A delegate that will show the area start if the section = 1 in the navigation manager
 		NavManager->FlashUpDelegateAreaStart.AddDynamic(InGameUiWidget, &UInGameUIWidget::FlashUpAreaStart);
 		//Need to call it myself here so that we have assigned the delegate
@@ -63,14 +71,21 @@ void APlayerUIAugment::BeginPlay()
 		//Remove Wait once the player arrives at a location and show ACTION
 		NavManager->ToggleWaitOffDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayWait);
 
-		//We want to display reload and it comes from the event manager via the players gun
-		EventManager->ReloadDisplayDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayReload);	
-
 		//Shows the end of the game data screen
 		NavManager->ShowEndOfAreaWidgetDelegate.AddDynamic(this, &APlayerUIAugment::SwapWidgetsInGame);
+	}
 
+	if (EventManager) 
+	{
+		//We want to display reload and it comes from the event manager via the players gun
+		EventManager->ReloadDisplayDelegate.AddDynamic(InGameUiWidget, &UInGameUIWidget::DisplayReload);
+	}
+		
+	if (DataTracker) 
+	{
 		//Is used to retrieve the end of screen data
 		DataTracker->DataSendingDelegate.AddDynamic(this, &APlayerUIAugment::SendEndOfAreaDataToWidget);
+	}
 }
 
 // Called every frame
