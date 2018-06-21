@@ -76,9 +76,12 @@ void UEndOfTrialTimer::PickLocomotionTypeToWrite()
 
 void UEndOfTrialTimer::PickModiferTypeToWrite() 
 {
-	//ofstream FileWritter;
-
+	FString TimerStringWithNewLine;
+	FString SaveDirectory = FString("F:/GSD2017Work/Masters/Trimester 3/Final Project/DATA");
+	FString FinalisedFilePath;
 	UE_LOG(LogTemp, Warning, TEXT("Total time taken is %f"), TotalTimeTakenInStage);
+
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
 
 	//Used for writing to file
 	switch (DataInstance->GetCurrentTrail())
@@ -87,27 +90,34 @@ void UEndOfTrialTimer::PickModiferTypeToWrite()
 	case 0:
 		UE_LOG(LogTemp, Error, TEXT("No modifer applied"));
 		FileName.Append("no_modifiers.txt");
-		//FileWritter.open(FileName, std::ios::app);
-
-		//if (FileWritter.is_open()) 
-		//{
-		//	
-		//}
-
 		break;
 		//Fade
 	case 1:
 		UE_LOG(LogTemp, Error, TEXT("Fade applied"));
+		FileName.Append("fade_applied.txt");
 		break;
 		//Forced rotation
 	case 2:
 		UE_LOG(LogTemp, Error, TEXT("Forced Rotation applied"));
+		FileName.Append("forced_rotation.txt");
 		break;
 		//Annotated rotation
 	case 3:
 		UE_LOG(LogTemp, Error, TEXT("Annotated Rotation applied"));
+		FileName.Append("annotated_rotation.txt");
 		break;
 	default:
-		break;
+		//We return because we don't want to write the file
+		return;
+	}
+
+	//If it was 0 - 3 we will write the file, otherwise we return
+	//If we don't have the directory
+	if (PlatformFile.CreateDirectoryTree(*SaveDirectory))
+	{
+		FinalisedFilePath = SaveDirectory + "/" + FileName;
+		TimerStringWithNewLine = FString::SanitizeFloat(TotalTimeTakenInStage);
+		TimerStringWithNewLine += LINE_TERMINATOR;
+		FFileHelper::SaveStringToFile(TimerStringWithNewLine, *FinalisedFilePath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), EFileWrite::FILEWRITE_Append);
 	}
 }

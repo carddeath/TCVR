@@ -159,7 +159,6 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 	}
 
 	//Do the locomotion and send the location of the next point
-	//TODO: These values need to be set via the data instance once we set it up
 	if (CustomPlayerController) 
 	{
 		//Used to decide on which method of teleportation should be used.
@@ -172,6 +171,7 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 			}
 
 			CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+
 			if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
 			{
 				UE_LOG(LogTemp, Error, TEXT("LocomotionType Was: NODE BASED"));
