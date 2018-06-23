@@ -32,6 +32,9 @@ public:
 
 	void ShowTeleportPad(bool bShouldShow);
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Visuals")
+		void ChangePanelColor(bool bWasHovered);
+
 protected:
 
 	virtual void BeginPlay() override;

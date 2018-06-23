@@ -89,6 +89,8 @@ private:
 
 	ELocomotionType LocoType;
 
+	float XResult;
+	float YResult;
 	//Methods
 	
 public:	

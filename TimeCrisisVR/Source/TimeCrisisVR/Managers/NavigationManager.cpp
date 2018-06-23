@@ -86,7 +86,19 @@ void ANavigationManager::BeginPlay()
 	//Get the data instance
 	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
 
+	//DEBUG Just to change the type to quickly test
+	//DataInstance->SetLocomotionType(ELocomotionType::NODE_BASED);
+	DataInstance->SetLocomotionType(ELocomotionType::POINT_AND_TELEPORT);
 
+	//Lets allow the arc to happen or not happen depending, will be checked in main player controller blueprint
+	if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
+	{
+		CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(false);
+	}
+	else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT) 
+	{
+		CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(true);
+	}
 
 	//Sets the locomotionModiferToUse
 	SetLocomotionModifer();
@@ -101,39 +113,32 @@ void ANavigationManager::Tick(float DeltaTime)
 	if (bHasPlayerSetOffToNextPoint) 
 	{
 		//Need to calculate the different depending on if its the arrow the actual teleportation pad. Might even need different ranges for the actual pad as it's a larger object
-		float XResult;
-		float YResult;
+
 		if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
 		{
 			XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - LocomotionPoints[CurrentSection - 1]->GetActorLocation().X);
 			YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - LocomotionPoints[CurrentSection - 1]->GetActorLocation().Y);
-		}
-		else 
-		{
-			XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - PointAndTPAreas[CurrentSection - 1]->GetActorLocation().X);
-			YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - PointAndTPAreas[CurrentSection - 1]->GetActorLocation().Y);
-		}
 
-
-		UE_LOG(LogTemp, Warning, TEXT("XResult is %f, and YResult is %f"), XResult, YResult);
-		if (XResult <= 2.0f || YResult <= 2.0f)
-		{
-			bHasPlayerSetOffToNextPoint = false;
-
-			// Remove wait and show action
-			if (ToggleWaitOffDelegate.IsBound()) 
+			//UE_LOG(LogTemp, Warning, TEXT("XResult is %f, and YResult is %f"), XResult, YResult);
+			if (XResult <= 2.0f && YResult <= 2.0f)
 			{
-				ToggleWaitOffDelegate.Broadcast(false);
-				//EventManager->AnnouncerCallThroughAction();
-			}
+				bHasPlayerSetOffToNextPoint = false;
 
-			if (TurnGunToEnabled.IsBound()) 
-			{
-				TurnGunToEnabled.Broadcast(0);
-			}
+				// Remove wait and show action
+				if (ToggleWaitOffDelegate.IsBound())
+				{
+					ToggleWaitOffDelegate.Broadcast(false);
+					//EventManager->AnnouncerCallThroughAction();
+				}
 
-			//TODO: Add a delay based on when the player is in the correct position
-			EnemySpawner->UpdateSection(CurrentSection);
+				if (TurnGunToEnabled.IsBound())
+				{
+					TurnGunToEnabled.Broadcast(0);
+				}
+
+				//TODO: Add a delay based on when the player is in the correct position
+				EnemySpawner->UpdateSection(CurrentSection);
+			}
 		}
 	}
 }
@@ -190,6 +195,7 @@ void ANavigationManager::UpdateCurrentSection()
 			//Used to decide on which method of teleportation should be used.
 			CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
 			CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+			bHasPlayerSetOffToNextPoint = true;
 		}
 
 		//Hide the arrow that was just shot, is no longer needed
@@ -207,9 +213,10 @@ void ANavigationManager::UpdateCurrentSection()
 		//Do the locomotion and send the location of the next point
 		if (CustomPlayerController)
 		{
-			//Used to decide on which method of teleportation should be used.
+			//Used to decide on which method of teleportation should be used. - We will use the locomotion point as the actual location you teleport to
 			CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
 			CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+			CustomPlayerController->MovePlayerViaNavManagerTeleport();
 		}
 
 		//Hide the pad that was just shot, is no longer needed
@@ -235,7 +242,29 @@ void ANavigationManager::UpdateCurrentSection()
 	if (ToggleProceedDisplayDelegate.IsBound())
 	{
 		ToggleProceedDisplayDelegate.Broadcast(false);
-		bHasPlayerSetOffToNextPoint = true;
+	}
+
+	//TELEPORT ONLY FOR LOCOMOTION MOVING ON
+	//We don't need to change this in the UI for updating as the player has officially teleported and arrived at the point. See "tick" for the same type of logic
+	if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT)
+	{
+		bHasPlayerSetOffToNextPoint = false;
+
+		// Remove wait and show action
+		if (ToggleWaitOffDelegate.IsBound())
+		{
+			ToggleWaitOffDelegate.Broadcast(false);
+			//EventManager->AnnouncerCallThroughAction();
+		}
+
+		if (TurnGunToEnabled.IsBound())
+		{
+			TurnGunToEnabled.Broadcast(0);
+		}
+
+		//UE_LOG(LogTemp, Error, TEXT("Should send index %d to enemy spawner"), CurrentSection);
+		//TODO: Add a delay based on when the player is in the correct position
+		EnemySpawner->UpdateSection(CurrentSection);
 	}
 }
 
@@ -300,6 +329,9 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		PointAndTPAreas[CurrentSection]->ShowTeleportPad(true);
 		UE_LOG(LogTemp, Warning, TEXT("Should have revealed %d"), CurrentSection);
 		TimeManager->PauseOrResumeTimer(true);
+
+		//Allows the point and teleportation to be used when all enemies are dead
+		CustomPlayerController->AllowTeleportationAfterAllEnemiesAreDead();
 	}
 
 	

@@ -37,6 +37,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Values")
 		FRotator RotationToFaceTowards;
 
+	//Set from the Navigation manager 
+	UPROPERTY(BlueprintReadOnly, Category = "Values")
+		bool bAllowToTeleportThisGame = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Values")
+		bool bCanTeleportAfterAllEnemiesDead = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Values")
+		bool bFadeModifierEnabled = false;
 
 
 		//Methods
@@ -45,6 +54,11 @@ public:
 	void SetModiferState(EModifierTypes ModiferType, ELocomotionType LocomotionType);
 
 	void SetLocationToMoveAndRotation(FVector LocationToMoveTo, FRotator RotationToFace);
+
+	void SetIfAllowedToTeleportViaArcForDuration(bool bCanTeleportViaArc);
+	
+	UFUNCTION()
+	void AllowTeleportationAfterAllEnemiesAreDead();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Locomotion")
 		void MovePlayerViaNavManagerNodeBased();

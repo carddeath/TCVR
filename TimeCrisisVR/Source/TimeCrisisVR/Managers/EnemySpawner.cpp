@@ -63,6 +63,7 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 void AEnemySpawner::UpdateSection(int32 NewSection) 
 {
+	//UE_LOG(LogTemp, Error, TEXT("Enemy Spawner Got %d"), NewSection);
 	CurrentSection = NewSection;
 	TotalEnemiesShot = 0;
 	if (CheckNoFieldsAreEmpty()) 
@@ -90,7 +91,7 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 
 	CurrentEnemiesAliveInSection--;
 	TotalEnemiesShot++;
-	UE_LOG(LogTemp, Warning, TEXT("Amount of soldiers left = %d"), CurrentEnemiesAliveInSection);
+	//UE_LOG(LogTemp, Warning, TEXT("Amount of soldiers left = %d"), CurrentEnemiesAliveInSection);
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("Enemy Count is now: %d"), CurrentEnemiesAliveInSection));
 
 	//If we are in the tutorial and have killed all enemies
@@ -110,7 +111,7 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 			if (RevealNextPointToNavMang.IsBound())
 			{
 				RevealNextPointToNavMang.Broadcast(0);
-				return;
+				//return;
 			}
 			else
 			{

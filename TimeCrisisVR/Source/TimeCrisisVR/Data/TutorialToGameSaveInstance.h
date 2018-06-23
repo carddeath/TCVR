@@ -8,7 +8,7 @@
 #include "Engine/GameInstance.h"
 #include "TutorialToGameSaveInstance.generated.h"
 
-UENUM()
+UENUM(Blueprintable)
 enum class EModifierTypes : uint8 
 {
 	NONE,
@@ -44,13 +44,16 @@ protected:
 		bool bWasInitialTutorialDone = false;
 
 
+	UPROPERTY(BlueprintReadOnly, Category = "Mods")
+		int32 CurrentTrail;
+
+		ELocomotionType CurrentLocomotionType;
+
 private:
 
 	EHand PlayerHandPreference;
 
-	ELocomotionType CurrentLocomotionType;
 
-	int32 CurrentTrail;
 
 	//Methods
 public:
