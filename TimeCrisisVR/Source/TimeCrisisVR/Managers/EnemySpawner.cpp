@@ -8,6 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #include "Managers/EventManager.h"
+#include "Data/TutorialToGameSaveInstance.h"
 
 
 // Sets default values
@@ -106,22 +107,19 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 	//Check if all enemies are dead for the section. We are currently 1 section ahead of the array
 	if (TotalEnemiesShot >= TotalEnemiesPerStage1Area1[CurrentSection - 1])
 	{
+			if (RevealNextPointToNavMang.IsBound())
+			{
+				RevealNextPointToNavMang.Broadcast(0);
+				return;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Next point not bound in %s"), *this->GetName());
+			}
 
-		//Tell the nav manager to activate
-		if (RevealNextPointToNavMang.IsBound())
-		{
 			//Reset the wave as we are moving on to a new section
 			CurrentWaveInSection = 1;
 			bDoesSectorContainWaves = false; //Reset state incase a sector does not have waves
-			RevealNextPointToNavMang.Broadcast(0);
-			return;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Next point not bound in %s"), *this->GetName());
-		}
-
-
 	}
 	//If we have waves then we should also check the wave and if all enemies are dead
 	else if (bDoesSectorContainWaves) 

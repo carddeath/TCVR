@@ -8,6 +8,7 @@
 #include "Gameplay/NavigationArrow.h"
 #include "Managers/EventManager.h"
 #include "Managers/TImeManager.h"
+#include "Gameplay/PlayerConstraintArea.h"
 
 
 // Sets default values
@@ -58,10 +59,19 @@ void ANavigationManager::BeginPlay()
 	//Save a reference to the player controller
 	CustomPlayerController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
 
+	//Wire up this delegate if the locomotion mode is teleporting
+	CustomPlayerController->TeleportLocomodeDataBaseUpdate.AddDynamic(this, &ANavigationManager::UpdateCurrentSection);
+
 	//Disable all arrows
 	for (auto& Arrow : LocomotionPoints) 
 	{
 		Arrow->ShowArrow(false);
+	}
+
+	//Disable all pads
+	for (auto& Pad : PointAndTPAreas)
+	{
+		Pad->ShowTeleportPad(false);
 	}
 
 	//Assign the current section to the enemy spawner so we have the right info for debugging
@@ -90,10 +100,23 @@ void ANavigationManager::Tick(float DeltaTime)
 	//When the player is moving we check to see if they've arrived at their destination. If so then we stop checking and change the UI and shout action!
 	if (bHasPlayerSetOffToNextPoint) 
 	{
-		float XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - LocomotionPoints[CurrentSection-1]->GetActorLocation().X);
-		float YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - LocomotionPoints[CurrentSection - 1]->GetActorLocation().Y);
+		//Need to calculate the different depending on if its the arrow the actual teleportation pad. Might even need different ranges for the actual pad as it's a larger object
+		float XResult;
+		float YResult;
+		if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
+		{
+			XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - LocomotionPoints[CurrentSection - 1]->GetActorLocation().X);
+			YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - LocomotionPoints[CurrentSection - 1]->GetActorLocation().Y);
+		}
+		else 
+		{
+			XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - PointAndTPAreas[CurrentSection - 1]->GetActorLocation().X);
+			YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - PointAndTPAreas[CurrentSection - 1]->GetActorLocation().Y);
+		}
 
-		if (XResult <= 0.5f && YResult <= 0.5f)
+
+		UE_LOG(LogTemp, Warning, TEXT("XResult is %f, and YResult is %f"), XResult, YResult);
+		if (XResult <= 2.0f || YResult <= 2.0f)
 		{
 			bHasPlayerSetOffToNextPoint = false;
 
@@ -147,45 +170,53 @@ void ANavigationManager::SetLocomotionModifer()
 	}
 }
 
-void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer) 
+void ANavigationManager::UpdateCurrentSection() 
 {
 	//We dont increment at first as the current section is one value ahead of the 0 array of locomotion points
 
-	if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num())
+	//Doing all checks required for node based locomotion
+	if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
 	{
-		UE_LOG(LogTemp, Error, TEXT("Missing Locomotion points on %s"), *this->GetName());
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing locomotion points on Navigation Manager or too few sub stage locomotion points"));
-		return;
-	}
+		if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing Locomotion points on %s"), *this->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing locomotion points on Navigation Manager or too few sub stage locomotion points"));
+			return;
+		}
 
-	//Do the locomotion and send the location of the next point
-	if (CustomPlayerController) 
-	{
-		//Used to decide on which method of teleportation should be used.
+		//Do the locomotion and send the location of the next point
+		if (CustomPlayerController)
+		{
+			//Used to decide on which method of teleportation should be used.
 			CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
-
-			if (!DataInstance)
-			{
-				UE_LOG(LogTemp, Error, TEXT("Missing Data Instance on %s"), *this->GetName());
-				return;
-			}
-
 			CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+		}
 
-			if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
-			{
-				UE_LOG(LogTemp, Error, TEXT("LocomotionType Was: NODE BASED"));
-			}
-			else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT)
-			{
-				UE_LOG(LogTemp, Error, TEXT("LocomotionType Was: TELEPORT BASED"));
-			}
-
-
+		//Hide the arrow that was just shot, is no longer needed
+		LocomotionPoints[CurrentSection]->ShowArrow(false);
 	}
+	else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT) 
+	{
+		if (PointAndTPAreas.Num() <= 0 || CurrentSection >= PointAndTPAreas.Num())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Missing PointAndTPAreas on %s"), *this->GetName());
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing PointAndTPAreas on Navigation Manager or too few sub stage PointAndTPAreas points"));
+			return;
+		}
 
-	//Hide the arrow that was just shot, is no longer needed
-	LocomotionPoints[CurrentSection]->ShowArrow(false);
+		//Do the locomotion and send the location of the next point
+		if (CustomPlayerController)
+		{
+			//Used to decide on which method of teleportation should be used.
+			CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
+			CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+		}
+
+		//Hide the pad that was just shot, is no longer needed
+		PointAndTPAreas[CurrentSection]->ShowTeleportPad(false);
+	}
+	
+	//Anything related to teleport will be done here too
 
 	//Increment the current stage
 	CurrentSection++;
@@ -211,29 +242,67 @@ void ANavigationManager::UpdateCurrentSection(bool bTeleportPlayer)
 void ANavigationManager::RevealNextLocomotionArrow(int junk) 
 {
 	//We check + 1 as we have no currently updated the current sub stage so we need to check if there is another point beyond this one
-	if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num()) 
+
+	//DataInstance->SetLocomotionType(ELocomotionType::NODE_BASED);
+
+	if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
 	{
-		//We have ran out of points, TODO: Launch a delegate to show the end of game data
-		UE_LOG(LogTemp, Error, TEXT("End of locomotion points on %s"), *this->GetName());
-
-		//Lets get the time after pausing at the end of an area/game
-		TimeManager->PauseOrResumeTimer(true);
-
-		//Let's allow it to collect all data for the display
-		if (AllowDataCollectionFromClassesDelegate.IsBound())
+		if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num())
 		{
-			AllowDataCollectionFromClassesDelegate.Broadcast(0);
+			//We have ran out of points, TODO: Launch a delegate to show the end of game data
+			UE_LOG(LogTemp, Error, TEXT("End of locomotion points on %s"), *this->GetName());
 
-			//Plays the audio if it's bound
-			if (EndOfStageAudioToggle.IsBound()) 
+			//Lets get the time after pausing at the end of an area/game
+			TimeManager->PauseOrResumeTimer(true);
+
+			//Let's allow it to collect all data for the display
+			if (AllowDataCollectionFromClassesDelegate.IsBound())
 			{
-				EndOfStageAudioToggle.Broadcast(0);
+				AllowDataCollectionFromClassesDelegate.Broadcast(0);
+
+				//Plays the audio if it's bound
+				if (EndOfStageAudioToggle.IsBound())
+				{
+					EndOfStageAudioToggle.Broadcast(0);
+				}
 			}
+			return;
 		}
-		return;
-	}
+		//Show the locomotion arrow as we are in node based 
 		LocomotionPoints[CurrentSection]->ShowArrow(true);
 		TimeManager->PauseOrResumeTimer(true);
+	}
+	else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT)
+	{
+		//TODO: DO THE SAME AS ABOVE BUT ABOUT THE TELEPORT PLATFORMS
+		if (PointAndTPAreas.Num() <= 0 || CurrentSection >= PointAndTPAreas.Num())
+		{
+			//We have ran out of points, TODO: Launch a delegate to show the end of game data
+			UE_LOG(LogTemp, Error, TEXT("End of PontAndTP Areas on %s"), *this->GetName());
+
+			//Lets get the time after pausing at the end of an area/game
+			TimeManager->PauseOrResumeTimer(true);
+
+			//Let's allow it to collect all data for the display
+			if (AllowDataCollectionFromClassesDelegate.IsBound())
+			{
+				AllowDataCollectionFromClassesDelegate.Broadcast(0);
+
+				//Plays the audio if it's bound
+				if (EndOfStageAudioToggle.IsBound())
+				{
+					EndOfStageAudioToggle.Broadcast(0);
+				}
+			}
+			return;
+		}
+		//Show the teleport pad as we are in point and teleport
+		PointAndTPAreas[CurrentSection]->ShowTeleportPad(true);
+		UE_LOG(LogTemp, Warning, TEXT("Should have revealed %d"), CurrentSection);
+		TimeManager->PauseOrResumeTimer(true);
+	}
+
+	
 
 		//We want to display the text of Proceed so the player knows to shoot the next arrow as all enemies have been killed. Send true as we want to display
 		if (ToggleProceedDisplayDelegate.IsBound())

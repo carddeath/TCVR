@@ -15,6 +15,7 @@ APlayerConstraintArea::APlayerConstraintArea()
 void APlayerConstraintArea::BeginPlay()
 {
 	Super::BeginPlay();
+	ShowTeleportPad(false);
 	
 }
 
@@ -23,5 +24,13 @@ void APlayerConstraintArea::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APlayerConstraintArea::ShowTeleportPad(bool bShouldShow)
+{
+	//Enables the arrow to be toggled/along with collision and tick
+	this->SetActorHiddenInGame(!bShouldShow);
+	this->SetActorEnableCollision(bShouldShow);
+	this->SetActorTickEnabled(bShouldShow);
 }
 

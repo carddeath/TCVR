@@ -56,6 +56,10 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Locomotion Points")
 	TArray<class ANavigationArrow*> LocomotionPoints;
 
+	//Used for the point and teleport areas instead
+	UPROPERTY(EditInstanceOnly, Category = "Locomotion Points")
+		TArray<class APlayerConstraintArea*> PointAndTPAreas;
+
 private:
 
 	class AEnemySpawner* EnemySpawner = nullptr;
@@ -91,7 +95,8 @@ public:
 	ANavigationManager();
 	virtual void Tick(float DeltaTime) override;
 
-	void UpdateCurrentSection(bool bTeleportPlayer);
+	UFUNCTION()
+	void UpdateCurrentSection();
 
 	int32 GetCurrentGameStage();
 	int32 GetCurrentGameArea();

@@ -8,6 +8,8 @@
 #include "GameFramework/PlayerController.h"
 #include "MainPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUpdateViaTeleportLocoMode);
+
 /**
  * 
  */
@@ -17,6 +19,13 @@ class TIMECRISISVR_API AMainPlayerController : public APlayerController
 	GENERATED_BODY()
 
 		//Variables
+public:
+
+	FUpdateViaTeleportLocoMode TeleportLocomodeDataBaseUpdate;
+
+	UPROPERTY(BlueprintReadWrite, Category = "State")
+		bool bCanFireTeleportArc = false;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Values")
@@ -27,6 +36,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Values")
 		FRotator RotationToFaceTowards;
+
+
+
 		//Methods
 public:
 
@@ -37,7 +49,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Locomotion")
 		void MovePlayerViaNavManagerNodeBased();
 
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Locomotion")
+		void DrawTeleportArc();
+
 		void MovePlayerViaNavManagerTeleport();
+
+		UFUNCTION(BlueprintCallable, Category = "TeleportLocomotion")
+			void UpdateSectionViaNavManager();
 
 protected:
 

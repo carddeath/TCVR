@@ -56,14 +56,16 @@ public:
 
 	FHandPreference HandPrefDele;
 
+	//Motion Controllers
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VR")
+		class UMotionControllerComponent* MCLeft = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VR")
+		UMotionControllerComponent* MCRight = nullptr;
+
 protected:
 
 
-	//Motion Controllers
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VR")
-	class UMotionControllerComponent* MCLeft = nullptr;
-	UPROPERTY(EditDefaultsOnly, Category = "VR")
-	UMotionControllerComponent* MCRight = nullptr;
+
 
 	//The static mesh components attached to both hands for visual representation
 	UPROPERTY(EditDefaultsOnly, Category = "VR")
@@ -207,6 +209,10 @@ private:
 
 	UFUNCTION()
 	void SpawnPistolAndPlaceInRightHand();
+
+	UFUNCTION(BlueprintCallable, Category = "Teleport Loco")
+		EHand CheckWhichHandIsEmpty();
+
 
 	//Tutorial Logic
 	//Proceeds the tutorial UI to the next one via a delegate

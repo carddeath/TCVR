@@ -149,7 +149,7 @@ void APlayersGun::Fire()
 						//We cannot fire until we reach the next point
 						bIsAllowedToFire = false;
 						//Change false to true if we want "Teleport" behaviour
-						NavManager->UpdateCurrentSection(bIsNodeBasedMovement);
+						NavManager->UpdateCurrentSection();
 						TotalShotsHit++;
 						break;
 					}

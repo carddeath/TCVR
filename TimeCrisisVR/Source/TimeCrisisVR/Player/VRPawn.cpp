@@ -18,6 +18,7 @@
 #include "UI/PlayerUIAugment.h"
 //#include "Components/TextRenderComponent.h"
 #include "Data/TutorialToGameSaveInstance.h"
+#include "Player/MainPlayerController.h"
 #include "UI/Timer.h"
 
 // Sets default values
@@ -123,6 +124,9 @@ void AVRPawn::Tick(float DeltaTime)
 void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	AMainPlayerController* MainPlayerController = Cast<AMainPlayerController>(this->GetController());
+
 	PlayerInputComponent->BindAction("PickupLeft", IE_Pressed, this, &AVRPawn::PickUpObjectLeft);
 	PlayerInputComponent->BindAction("PickupLeft", IE_Released, this, &AVRPawn::DropObjectLeft);
 	PlayerInputComponent->BindAction("PickupRight", IE_Pressed, this, &AVRPawn::PickUpObjectRight);
@@ -130,6 +134,7 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("FirePistolLeft", IE_Pressed, this, &AVRPawn::FirePistolLeft);
 	PlayerInputComponent->BindAction("FirePistolRight", IE_Pressed, this, &AVRPawn::FirePistolRight);
 	PlayerInputComponent->BindAction("TutorialContinue", IE_Pressed, this, &AVRPawn::ProceedTutorialScreen);
+	PlayerInputComponent->BindAction("DrawTeleportArc", IE_Pressed, MainPlayerController, &AMainPlayerController::DrawTeleportArc);
 
 	PlayerInputComponent->BindAxis("PlayerPointingHandLeft", this, &AVRPawn::TogglePointingHandMeshLeft);
 	PlayerInputComponent->BindAxis("PlayerPointingHandRight", this, &AVRPawn::TogglePointingHandMeshRight);
@@ -800,4 +805,17 @@ void AVRPawn::TutorialGunSpawn(EHand HandType)
 	{
 		GunWasCreatedDelegate.Broadcast(PlayersGun);
 	}
+}
+
+EHand AVRPawn::CheckWhichHandIsEmpty() 
+{
+	if (Cast<APlayersGun>(LeftPickedUpActor)) 
+	{
+		return EHand::RIGHT;
+	}
+	else if (Cast<APlayersGun>(RightPickedUpActor))
+	{
+		return EHand::LEFT;
+	}
+	return EHand::NONE;
 }

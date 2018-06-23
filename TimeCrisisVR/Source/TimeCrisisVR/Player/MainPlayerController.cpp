@@ -23,13 +23,23 @@ void AMainPlayerController::SetLocationToMoveAndRotation(FVector LocationToMoveT
 
 void AMainPlayerController::SetModiferState(EModifierTypes ModiferType, ELocomotionType LocomotionType) 
 {
+	//TODO: Currently no modifiers being applied
 	if (LocomotionType == ELocomotionType::POINT_AND_TELEPORT) 
 	{
-		this->MovePlayerViaNavManagerTeleport();
+		//Is now being done in the VR pawn via the blueprint for now
+		//this->MovePlayerViaNavManagerTeleport();
 	}
 	else if (LocomotionType == ELocomotionType::NODE_BASED)
 	{
 		this->MovePlayerViaNavManagerNodeBased();
+	}
+}
+
+void AMainPlayerController::UpdateSectionViaNavManager() 
+{
+	if (TeleportLocomodeDataBaseUpdate.IsBound()) 
+	{
+		TeleportLocomodeDataBaseUpdate.Broadcast();
 	}
 }
 

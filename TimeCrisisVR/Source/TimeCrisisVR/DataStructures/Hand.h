@@ -2,7 +2,7 @@
 
 #include "Hand.generated.h"
 
-UENUM()
+UENUM(Blueprintable)
 enum class EHand : uint8
 {
 	LEFT,

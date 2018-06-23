@@ -11,17 +11,34 @@ class TIMECRISISVR_API APlayerConstraintArea : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	APlayerConstraintArea();
+		//Variables
+public:
 
 protected:
-	// Called when the game starts or when spawned
+
+private:
+	//If the object is visible
+	bool bIsVisible = false;
+
+	//Almost all arrows will not be a tutorial arrow but we need this check
+	UPROPERTY(EditInstanceOnly, Category = "Tutorial")
+		bool bIsTutorialTeleportPad = false;
+
+		//Methods
+public:	
+
+	APlayerConstraintArea();
+	virtual void Tick(float DeltaTime) override;
+
+	void ShowTeleportPad(bool bShouldShow);
+
+protected:
+
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private:	
+
+
 
 	
 	
