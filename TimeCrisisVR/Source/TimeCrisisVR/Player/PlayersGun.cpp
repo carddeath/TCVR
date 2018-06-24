@@ -18,6 +18,7 @@
 #include "GameFramework/DamageType.h"
 #include "Tutorial/TutorialShootingTarget.h"
 #include "Components/AudioComponent.h"
+#include "Particles/ParticleSystem.h"
 
 
 // Sets default values
@@ -138,7 +139,7 @@ void APlayersGun::Fire()
 		//if (GetWorld()->LineTraceSingleByObjectType(Hit, ShotStartPos, ShotEndLocation, Params))
 		if(GetWorld()->LineTraceMultiByObjectType(Hits, ShotStartPos, ShotEndLocation, Params))
 		{
-			DrawDebugLine(GetWorld(), ShotStartPos, ShotEndLocation, FColor::Green, false, 2.0f, 0, 2.0f);
+			DrawDebugLine(GetWorld(), ShotStartPos, ShotEndLocation, FColor::Green, false, 0.25f, 0, 0.5f);
 
 			for (auto& actor : Hits)
 			{
@@ -151,6 +152,9 @@ void APlayersGun::Fire()
 						//Change false to true if we want "Teleport" behaviour
 						NavManager->UpdateCurrentSection();
 						TotalShotsHit++;
+
+						//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleSystem, actor.GetActor()->GetActorTransform());
+
 						break;
 					}
 					//Tutorial logic, we have no navigation manager
@@ -221,6 +225,8 @@ void APlayersGun::Fire()
 				if (actor.GetActor()->Tags.Num() > 0)
 				{
 					PlayImpactSound(actor.GetActor()->Tags[0], actor.GetActor()->GetRootComponent());
+
+					//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticleSystem, actor.GetActor()->GetTransform());
 					break;
 				}
 
@@ -230,7 +236,7 @@ void APlayersGun::Fire()
 		}
 		else
 		{
-			DrawDebugLine(GetWorld(), ShotStartPos, ShotEndLocation, FColor::Red, false, 2.0f, 0, 2.0f);
+			DrawDebugLine(GetWorld(), ShotStartPos, ShotEndLocation, FColor::Red, false, 0.25f, 0, 0.5f);
 		}
 		
 		CurrentAmmo--;

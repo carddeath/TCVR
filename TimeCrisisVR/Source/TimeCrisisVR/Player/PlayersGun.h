@@ -64,6 +64,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 		class UAudioComponent* BulletDropAudioComp = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+		class UParticleSystem* HitParticleSystem = nullptr;
+
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Gun Specifics")
 	int32 CurrentAmmo;
