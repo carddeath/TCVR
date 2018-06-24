@@ -134,6 +134,28 @@ void ANavigationManager::Tick(float DeltaTime)
 			XResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().X - LocomotionPoints[CurrentSection - 1]->GetActorLocation().X);
 			YResult = FMath::Abs(CustomPlayerController->GetPawn()->GetActorLocation().Y - LocomotionPoints[CurrentSection - 1]->GetActorLocation().Y);
 
+			//normalise the position for fade check
+
+			if (ModType == EModifierTypes::FADE) 
+			{
+				float PlayPos = CustomPlayerController->GetPawn()->GetActorLocation().X;
+				float EndPoint = LocomotionPoints[CurrentSection - 1]->GetActorLocation().X;
+				float StartPoint = LocomotionPoints[CurrentSection - 2]->GetActorLocation().X;
+				float NoramlizeDifference = (PlayPos - StartPoint) / (EndPoint - StartPoint);
+
+				if (NoramlizeDifference <= 0.1f && !bBeganFadeOnNode)
+				{
+					bBeganFadeOnNode = true;
+					FadeOnNodeLocomotion(true);
+				}
+				else if (NoramlizeDifference >= 0.9f && bBeganFadeOnNode)
+				{
+					bBeganFadeOnNode = false;
+					FadeOnNodeLocomotion(false);
+				}
+				UE_LOG(LogTemp, Error, TEXT("VectorNormalized: %f"), NoramlizeDifference);
+			}
+
 			//UE_LOG(LogTemp, Warning, TEXT("XResult is %f, and YResult is %f"), XResult, YResult);
 			if (XResult <= 2.0f && YResult <= 2.0f)
 			{

@@ -97,6 +97,9 @@ private:
 
 	float XResult;
 	float YResult;
+
+	//used to track when the fade should begin or end on the 
+	bool bBeganFadeOnNode = false;
 	//Methods
 	
 public:	
@@ -114,6 +117,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Node Fading")
+		void FadeOnNodeLocomotion(bool bShouldFadeDark);
 
 private:	
 
