@@ -87,17 +87,32 @@ void ANavigationManager::BeginPlay()
 	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
 
 	//DEBUG Just to change the type to quickly test
-	//DataInstance->SetLocomotionType(ELocomotionType::NODE_BASED);
-	DataInstance->SetLocomotionType(ELocomotionType::POINT_AND_TELEPORT);
 
-	//Lets allow the arc to happen or not happen depending, will be checked in main player controller blueprint
-	if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
+	//Do it normally from the data instance if we are not in debug
+	if (!bIsInDebug) 
 	{
-		CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(false);
+		//Lets allow the arc to happen or not happen depending, will be checked in main player controller blueprint
+		if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED)
+		{
+			CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(false);
+		}
+		else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT)
+		{
+			CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(true);
+		}
 	}
-	else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT) 
+	//Read the debug value and do the same instruction but based on the debug value
+	else 
 	{
-		CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(true);
+		DataInstance->SetLocomotionType(LocoType);
+		if (LocoType == ELocomotionType::NODE_BASED) 
+		{
+			CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(false);
+		}
+		else if (LocoType == ELocomotionType::POINT_AND_TELEPORT) 
+		{
+			CustomPlayerController->SetIfAllowedToTeleportViaArcForDuration(true);
+		}
 	}
 
 	//Sets the locomotionModiferToUse
@@ -138,6 +153,12 @@ void ANavigationManager::Tick(float DeltaTime)
 
 				//TODO: Add a delay based on when the player is in the correct position
 				EnemySpawner->UpdateSection(CurrentSection);
+
+				//If we are in node based and we are forced into a rotation then lets tell the customer manager to do so
+				if (ModType == EModifierTypes::FORCED_ROTATION || ModType == EModifierTypes::ANNOTATED_ROTATION) 
+				{
+					CustomPlayerController->RotatePlayerAfterTeleport();
+				}
 			}
 		}
 	}
@@ -152,27 +173,61 @@ void ANavigationManager::SetLocomotionModifer()
 		return;
 	}
 
-	switch (DataInstance->GetCurrentTrail())
+	//If we are not in debug then we pick the modifier based on the trail otherwise load the modtype loaded
+	if (!bIsInDebug) 
 	{
-	case 0:
-		ModType = EModifierTypes::NONE;
-		UE_LOG(LogTemp, Error, TEXT("No modifer applied"));
-		break;
-	case 1:
-		ModType = EModifierTypes::FADE;
-		UE_LOG(LogTemp, Error, TEXT("Fade applied"));
-		break;
-	case 2:
-		ModType = EModifierTypes::FORCED_ROTATION;
-		UE_LOG(LogTemp, Error, TEXT("Forced Rotation applied"));
-		break;
-	case 3:
-		ModType = EModifierTypes::ANNOTATED_ROTATION;
-		UE_LOG(LogTemp, Error, TEXT("Annotated Rotation applied"));
-		break;
-	default:
-		break;
+		switch (DataInstance->GetCurrentTrail())
+		{
+		case 0:
+			ModType = EModifierTypes::NONE;
+			DataInstance->SetModifierType(ModType);
+			UE_LOG(LogTemp, Error, TEXT("No modifer applied"));
+			break;
+		case 1:
+			ModType = EModifierTypes::FADE;
+			DataInstance->SetModifierType(ModType);
+			UE_LOG(LogTemp, Error, TEXT("Fade applied"));
+			break;
+		case 2:
+			ModType = EModifierTypes::FORCED_ROTATION;
+			DataInstance->SetModifierType(ModType);
+			UE_LOG(LogTemp, Error, TEXT("Forced Rotation applied"));
+			break;
+		case 3:
+			ModType = EModifierTypes::ANNOTATED_ROTATION;
+			DataInstance->SetModifierType(ModType);
+			UE_LOG(LogTemp, Error, TEXT("Annotated Rotation applied"));
+			break;
+		default:
+			break;
+		}
 	}
+	else 
+	{
+		DataInstance->SetModifierType(ModType);
+	}
+
+	//Sets up the visuals of all the locomotion points to either an arrow mesh or an orb mesh depending on the locomotion type
+	if (LocoType == ELocomotionType::NODE_BASED) 
+	{
+		for (auto& LocoNode : LocomotionPoints) 
+		{
+			if (ModType == EModifierTypes::ANNOTATED_ROTATION) 
+			{
+				LocoNode->SetArrowMeshes(true);
+			}
+			else 
+			{
+				LocoNode->SetArrowMeshes(false);
+			}
+
+		}
+	}
+	else 
+	{
+		//SHOW OR HIDE THE ARROW TEXTURE ON THE WALLS
+	}
+
 }
 
 void ANavigationManager::UpdateCurrentSection() 
@@ -300,6 +355,11 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		//Show the locomotion arrow as we are in node based 
 		LocomotionPoints[CurrentSection]->ShowArrow(true);
 		TimeManager->PauseOrResumeTimer(true);
+
+		//Send over the data now as we need it before the delegate is called for rotations and locations
+		CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
+		//CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
+
 	}
 	else if (DataInstance->GetLocomotionType() == ELocomotionType::POINT_AND_TELEPORT)
 	{
@@ -327,11 +387,25 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		}
 		//Show the teleport pad as we are in point and teleport
 		PointAndTPAreas[CurrentSection]->ShowTeleportPad(true);
-		UE_LOG(LogTemp, Warning, TEXT("Should have revealed %d"), CurrentSection);
+
+		//Only show the annoation arrow if required
+		if (ModType == EModifierTypes::ANNOTATED_ROTATION) 
+		{
+			PointAndTPAreas[CurrentSection]->ShowTeleportPadAnnotation(true);
+		}
+		else 
+		{
+			PointAndTPAreas[CurrentSection]->ShowTeleportPadAnnotation(false);
+		}
+
 		TimeManager->PauseOrResumeTimer(true);
 
 		//Allows the point and teleportation to be used when all enemies are dead
 		CustomPlayerController->AllowTeleportationAfterAllEnemiesAreDead();
+
+		//Send over the data now as we need it before the delegate is called for rotations and locations
+		CustomPlayerController->SetLocationToMoveAndRotation(LocomotionPoints[CurrentSection]->GetActorLocation(), LocomotionPoints[CurrentSection]->GetActorRotation());
+		CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
 	}
 
 	

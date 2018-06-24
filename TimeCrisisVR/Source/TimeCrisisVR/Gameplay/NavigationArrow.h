@@ -21,7 +21,11 @@ public:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Meshes")
+		UStaticMesh* ArrowMesh;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Meshes")
+		UStaticMesh* OrbMesh;
 
 private:
 
@@ -37,6 +41,9 @@ private:
 public:
 
 	void ShowArrow(bool bShouldShow);
+	
+	void SetArrowMeshes(bool bIsAnnotatedRotation);
+
 	bool GetTutorialArrowState();
 
 protected:

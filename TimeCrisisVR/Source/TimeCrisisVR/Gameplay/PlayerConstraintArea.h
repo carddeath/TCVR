@@ -16,6 +16,12 @@ public:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = "Additional Mesh")
+		class USceneComponent* RootComp = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Additional Mesh")
+		class UStaticMeshComponent* AnnotatedArrowMesh = nullptr;
+
 private:
 	//If the object is visible
 	bool bIsVisible = false;
@@ -31,6 +37,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void ShowTeleportPad(bool bShouldShow);
+
+	//Only true if we are on annotated rotation
+	void ShowTeleportPadAnnotation(bool bShouldShow);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Visuals")
 		void ChangePanelColor(bool bWasHovered);

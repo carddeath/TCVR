@@ -62,6 +62,10 @@ protected:
 
 private:
 
+	//Used to allow custom locomotion technique to be loaded when required
+	UPROPERTY(EditInstanceOnly, Category = "Locomotion Debug")
+		bool bIsInDebug = false;
+
 	class AEnemySpawner* EnemySpawner = nullptr;
 
 	class AEventManager* EventManager = nullptr;
@@ -85,8 +89,10 @@ private:
 	//The tutorial instance for getting the locomotion type
 	UTutorialToGameSaveInstance* DataInstance = nullptr;
 
+	UPROPERTY(EditInstanceOnly, Category = "Locomotion Debug")
 	EModifierTypes ModType;
 
+	UPROPERTY(EditInstanceOnly, Category = "Locomotion Debug")
 	ELocomotionType LocoType;
 
 	float XResult;

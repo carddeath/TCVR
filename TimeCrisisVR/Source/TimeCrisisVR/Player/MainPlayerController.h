@@ -72,6 +72,9 @@ public:
 		UFUNCTION(BlueprintCallable, Category = "TeleportLocomotion")
 			void UpdateSectionViaNavManager();
 
+		UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Locomotion")
+			void RotatePlayerAfterTeleport();
+
 protected:
 
 	

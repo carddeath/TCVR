@@ -23,6 +23,11 @@ void UTutorialToGameSaveInstance::SetLocomotionType(ELocomotionType LocoType)
 	CurrentLocomotionType = LocoType;
 }
 
+void UTutorialToGameSaveInstance::SetModifierType(EModifierTypes ModType)
+{
+	ModifierType = ModType;
+}
+
 void UTutorialToGameSaveInstance::SetCurrentTrial(int32 CurTrial) 
 {
 	CurrentTrail = CurTrial;
@@ -43,4 +48,9 @@ ELocomotionType UTutorialToGameSaveInstance::GetLocomotionType()
 int32 UTutorialToGameSaveInstance::GetCurrentTrail() 
 {
 	return CurrentTrail;
+}
+
+EModifierTypes UTutorialToGameSaveInstance::GetModifierType() 
+{
+	return ModifierType;
 }

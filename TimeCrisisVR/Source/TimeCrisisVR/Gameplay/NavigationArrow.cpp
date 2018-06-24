@@ -20,6 +20,24 @@ void ANavigationArrow::ShowArrow(bool bShouldShow)
 	this->SetActorTickEnabled(bShouldShow);
 }
 
+void ANavigationArrow::SetArrowMeshes(bool bIsAnnotatedRotation) 
+{
+	if (bIsAnnotatedRotation) 
+	{
+		if (ArrowMesh)
+		{
+			Cast<UStaticMeshComponent>(GetRootComponent())->SetStaticMesh(ArrowMesh);
+		}
+	}
+	else 
+	{
+		if (OrbMesh)
+		{
+			Cast<UStaticMeshComponent>(GetRootComponent())->SetStaticMesh(OrbMesh);
+		}
+	}
+}
+
 bool ANavigationArrow::GetTutorialArrowState() 
 {
 	return bIsTutorialArrow;

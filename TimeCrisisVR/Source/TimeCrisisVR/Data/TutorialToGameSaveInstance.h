@@ -49,6 +49,8 @@ protected:
 
 		ELocomotionType CurrentLocomotionType;
 
+		EModifierTypes ModifierType;
+
 private:
 
 	EHand PlayerHandPreference;
@@ -64,6 +66,9 @@ public:
 
 	ELocomotionType GetLocomotionType();
 
+	UFUNCTION(BlueprintCallable, Category = "Mods")
+	EModifierTypes GetModifierType();
+
 	int32 GetCurrentTrail();
 
 	UFUNCTION()
@@ -72,6 +77,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Experiment")
 		void SetLocomotionType(ELocomotionType LocoType);
+
+	UFUNCTION(BlueprintCallable, Category = "Experiment")
+		void SetModifierType(EModifierTypes ModType);
 
 		UFUNCTION(BlueprintCallable, Category = "Experiment")
 		void SetCurrentTrial(int32 CurTrial);
