@@ -20,6 +20,8 @@
 #include "Data/TutorialToGameSaveInstance.h"
 #include "Player/MainPlayerController.h"
 #include "UI/Timer.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Gameplay/NavigationArrow.h"
 
 // Sets default values
 AVRPawn::AVRPawn()
@@ -57,6 +59,9 @@ AVRPawn::AVRPawn()
 
 	UIDisplay = CreateDefaultSubobject<UChildActorComponent>(FName("UI Display Child Comp"));
 	UIDisplay->SetupAttachment(VRCamera);
+
+	ArrowPointChild = CreateDefaultSubobject<UChildActorComponent>(FName("Arrow Navigation Pointer"));
+	ArrowPointChild->SetupAttachment(VRCamera);
 }
 
 // Called when the game starts or when spawned
@@ -106,6 +111,9 @@ void AVRPawn::BeginPlay()
 		SMLeftWatchTimeWidget->SetVisibility(false, true);
 		SMLeftWatch->SetVisibility(false, true);
 	}
+
+	//Hide it on beginplay, we have no locomotion point to look at
+	ArrowPointChild->SetVisibility(false);
 }
 
 // Called every frame
@@ -117,6 +125,48 @@ void AVRPawn::Tick(float DeltaTime)
 	if (bTutorialIsSearchingForHands && bIsTutorial)
 	{
 		TutorialGunHandSearch(DeltaTime);
+	}
+
+	if (ToggleOnNavArrow) 
+	{
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjQuery;
+		ObjQuery.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel3));
+		TArray<AActor*> IgnoredActs;
+		FHitResult HitRes;
+
+		FVector EndPoint = VRCamera->GetComponentLocation() + (VRCamera->GetForwardVector() * 1000);
+
+		//THIS WILL BE FINE FOR NOW
+		if (UKismetSystemLibrary::BoxTraceSingleForObjects(GetWorld(), VRCamera->GetComponentLocation(), EndPoint,
+			FVector(5, 650, 500), VRCamera->GetComponentRotation(), ObjQuery, false, IgnoredActs, EDrawDebugTrace::ForOneFrame, HitRes, true))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Found object called: %s"), *HitRes.GetActor()->GetName());
+
+			ArrowPointChild->SetVisibility(false);
+		}
+		else 
+		{
+
+			ArrowPointChild->SetVisibility(true);
+			if (NextLocoPointVec.Y < this->GetActorLocation().Y && !bWasNAvOnLeft) 
+			{
+				bWasNAvOnLeft = true;
+				bWasNAvOnRight = false;
+				ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowLeft, 0.0f));
+				//ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotLeft));
+			}
+			else if (NextLocoPointVec.Y > this->GetActorLocation().Y && !bWasNAvOnRight)
+			{
+				bWasNAvOnLeft = false;
+				bWasNAvOnRight = true;
+				ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowRight, 0.0f));
+				//ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotRight));
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *ArrowPointChild->GetComponentLocation().ToString());
+		}
+
+
 	}
 }
 
@@ -818,4 +868,10 @@ EHand AVRPawn::CheckWhichHandIsEmpty()
 		return EHand::LEFT;
 	}
 	return EHand::NONE;
+}
+
+void AVRPawn::AssignNextLocoPosition(FVector LocoPointDistance) 
+{
+	NextLocoPointVec = LocoPointDistance;
+	ToggleOnNavArrow = true;
 }

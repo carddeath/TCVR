@@ -63,10 +63,6 @@ public:
 		UMotionControllerComponent* MCRight = nullptr;
 
 protected:
-
-
-
-
 	//The static mesh components attached to both hands for visual representation
 	UPROPERTY(EditDefaultsOnly, Category = "VR")
 	class UStaticMeshComponent* SMLeft = nullptr;
@@ -118,6 +114,12 @@ protected:
 
 	APlayersGun* PlayersGun = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+		class UChildActorComponent* ArrowPointChild = nullptr;
+
+	//Used to tick over to show the arrow on
+	UPROPERTY(BlueprintReadWrite, Category = "Nav Guideance")
+		bool ToggleOnNavArrow = false;
 
 private:
 
@@ -154,6 +156,18 @@ private:
 	//The time spent hovering over a certain object
 	float TimeSpendHoveredOverOption = 0.0f;
 
+	float GuideanceArrowLeft = -105.f;
+	float GuideanceArrowRight = 105.f;
+	float GuideanceArrowRotLeft = -180.0f;
+	float GuideanceArrowRotRight = 0.f;
+
+	FVector NextLocoPointVec;
+
+
+	//Will hide the arrow if the actor search finds a locomotion point
+	bool bWasNAvOnLeft = false;
+	bool bWasNAvOnRight = false;
+
 	//Methods
 
 public:
@@ -176,6 +190,8 @@ public:
 	int32 GetTotalTimesHit();
 
 	APlayersGun* GetPlayersGun();
+
+	void AssignNextLocoPosition(FVector LocoPointDistance);
 
 protected:
 	virtual void BeginPlay() override;
@@ -223,5 +239,6 @@ private:
 
 	//Used to pick which hand to put the gun into when chosen
 	void TutorialGunSpawn(EHand HandType);
+
 
 };

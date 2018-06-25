@@ -75,6 +75,9 @@ public:
 		UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Locomotion")
 			void RotatePlayerAfterTeleport();
 
+		//Passes the nav location the player
+			void PassNextSectionLocationToPlayer(FVector Location);
+
 protected:
 
 	

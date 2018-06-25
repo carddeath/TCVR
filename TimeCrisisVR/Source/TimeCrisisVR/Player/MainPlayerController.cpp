@@ -4,6 +4,8 @@
 #include "GameFramework/Pawn.h"
 #include "Engine.h"
 
+#include "Player/VRPawn.h"
+
 void AMainPlayerController::MovePlayerViaNavManagerTeleport()
 {
 	//For now lets just teleport to test the logic
@@ -63,6 +65,12 @@ void AMainPlayerController::UpdateSectionViaNavManager()
 	{
 		TeleportLocomodeDataBaseUpdate.Broadcast();
 	}
+}
+
+//Just passes the location via nav manager through to the player
+void AMainPlayerController::PassNextSectionLocationToPlayer(FVector Location) 
+{
+	Cast<AVRPawn>(GetPawn())->AssignNextLocoPosition(Location);
 }
 
 

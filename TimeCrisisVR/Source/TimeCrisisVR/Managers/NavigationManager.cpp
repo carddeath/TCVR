@@ -430,7 +430,8 @@ void ANavigationManager::RevealNextLocomotionArrow(int junk)
 		CustomPlayerController->SetModiferState(ModType, DataInstance->GetLocomotionType());
 	}
 
-	
+	//Passes the location 
+	CustomPlayerController->PassNextSectionLocationToPlayer(LocomotionPoints[CurrentSection]->GetActorLocation());
 
 		//We want to display the text of Proceed so the player knows to shoot the next arrow as all enemies have been killed. Send true as we want to display
 		if (ToggleProceedDisplayDelegate.IsBound())
