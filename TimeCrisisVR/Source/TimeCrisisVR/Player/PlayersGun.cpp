@@ -133,6 +133,7 @@ void APlayersGun::Fire()
 		Params.AddObjectTypesToQuery(ECC_PhysicsBody);
 		Params.AddObjectTypesToQuery(ECC_WorldDynamic);
 		Params.AddObjectTypesToQuery(ECC_Destructible);
+		Params.AddObjectTypesToQuery(ECC_GameTraceChannel3);
 
 		TArray<FHitResult> Hits;
 		//Invert the Range as it points the other way.
@@ -160,8 +161,12 @@ void APlayersGun::Fire()
 					//Tutorial logic, we have no navigation manager
 					else 
 					{
+						if (LocoArrowInTutorial.IsBound()) 
+						{
+							LocoArrowInTutorial.Broadcast(0);
+						}
 						//Load the main level from the tutorial level when shot
-						EventManager->LoadMainLevelFromTutorial();
+						//EventManager->LoadMainLevelFromTutorial();
 					}
 				}
 				else if (Cast<UShapeComponent>(actor.GetComponent()))

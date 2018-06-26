@@ -153,7 +153,7 @@ void ANavigationManager::Tick(float DeltaTime)
 					bBeganFadeOnNode = false;
 					FadeOnNodeLocomotion(false);
 				}
-				UE_LOG(LogTemp, Error, TEXT("VectorNormalized: %f"), NoramlizeDifference);
+				//UE_LOG(LogTemp, Error, TEXT("VectorNormalized: %f"), NoramlizeDifference);
 			}
 
 			//UE_LOG(LogTemp, Warning, TEXT("XResult is %f, and YResult is %f"), XResult, YResult);
@@ -255,6 +255,8 @@ void ANavigationManager::SetLocomotionModifer()
 void ANavigationManager::UpdateCurrentSection() 
 {
 	//We dont increment at first as the current section is one value ahead of the 0 array of locomotion points
+	//Turn off the the guidance arrow when we proceed
+	CustomPlayerController->DisableNavGuidanceArrowStatus();
 
 	//Doing all checks required for node based locomotion
 	if (DataInstance->GetLocomotionType() == ELocomotionType::NODE_BASED) 
@@ -340,8 +342,9 @@ void ANavigationManager::UpdateCurrentSection()
 		}
 
 		//UE_LOG(LogTemp, Error, TEXT("Should send index %d to enemy spawner"), CurrentSection);
-		//TODO: Add a delay based on when the player is in the correct position
 		EnemySpawner->UpdateSection(CurrentSection);
+
+
 	}
 }
 

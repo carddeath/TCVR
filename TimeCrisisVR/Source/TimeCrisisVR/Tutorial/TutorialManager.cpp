@@ -17,6 +17,8 @@
 #include "Gameplay/NavigationArrow.h"
 #include "Data/TutorialToGameSaveInstance.h"
 #include "DataStructures/Hand.h"
+#include "Gameplay/PlayerConstraintArea.h"
+#include "Player/MainPlayerController.h"
 
 // Sets default values
 ATutorialManager::ATutorialManager()
@@ -89,15 +91,17 @@ void ATutorialManager::GenerateTutorialMessageScreens()
 		, 1);
 	TutorialMessages.Insert("Please tell us, are you left or right handed? Just stare at the box stated 'Left' or 'Right' depending on your preference!"
 		, 2);
-	TutorialMessages.Insert("You can swap hands at anytime as long as the other hand is empty! Just point your empty hand towards the hand holding the gun. Press the 'Grip' button to take the gun. If you're having trouble move your hands closer together!"
-		, 3);
+	//TutorialMessages.Insert("You can swap hands at anytime as long as the other hand is empty! Just point your empty hand towards the hand holding the gun. Press the 'Grip' button to take the gun. If you're having trouble move your hands closer together!"
+	//	, 3);
 	TutorialMessages.Insert("Now that you know how to change hands let's look at firing your weapon. Point the gun at the target and press the trigger on the hand holding the gun to fire a shot. Notice how you only have 6 bullets."
-		, 4);
+		, 3);
 	TutorialMessages.Insert("Good job if you hit the target, if not you'll just keep trying in the experiment. If you look down now you'll notice some ammo pouches where you can ammo. Place your empty hand into the pouch and hold the grab button. Raise the ammo clip towards your gun to reload!"
-		, 5);
+		, 4);
 	TutorialMessages.Insert("You now know how to reload your gun. See those enemy soldiers? They are your real targets. Once all enemies in an area are dead you'll see an arrow. Shoot it to proceed through the level! Kill all of the soldiers to proceed!"
+		, 5);
+	TutorialMessages.Insert("Well done. Now shoot the object to proceed. This is one method of teleportation in the game to move around!"
 		, 6);
-	TutorialMessages.Insert("Well done. Now shoot the arrow to proceed to the experiment. If you need to take a break, remove the headset and speak to the experiment lead. Good luck!"
+	TutorialMessages.Insert("The other method is teleportation. In your empty hand press in the analog stick to produce a line. Release the stick when it hovers inside the area. Good luck in the experiment!"
 		, 7);
 }
 
@@ -152,7 +156,7 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 		}
 		break;
 		//Will spawn the gun in the players hand and allows them to be swapped to trigger the delegate once and destroy the boxes
-	case 3:
+	/*case 3:
 		PlayersGun = PlayerCharacter->GetPlayersGun();
 		if (PlayersGun)
 		{
@@ -163,14 +167,18 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 		{
 			Box->Destroy();
 		}
-		break;
+		break;*/
 		//Allows the player to shoot and will spawn a target for them to shoot, if they run out of ammo it ends anyway
-	case 4:
+	case 3:
+		PlayersGun = PlayerCharacter->GetPlayersGun();
+
 		if (PlayersGun)
 		{
+			PlayersGun->bTutorialEnabled = true;
 			PlayersGun->bTutorialHandSwap = false;
 			//Assign the delegate so that when we shoot the target we call this function and increment the number
 			PlayersGun->TutorialTargetShotDelegate.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
+			PlayersGun->LocoArrowInTutorial.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
 		}
 		if (TargetTemplate)
 		{
@@ -178,9 +186,15 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 			CurrentTarget->SetActorLocation(FVector(310.0f, -670.0f, 100.0f));
 			CurrentTarget->SetActorRotation(FRotator(90.0f, 0.0f, 0.0f));
 		}
+
+		for (auto& Box : HandSelectionBoxes)
+		{
+			Box->Destroy();
+		}
+
 		break;
 		//Spawns ammo pouches on the player and removes the target from the scene and adds a delegate to the players gun
-	case 5:
+	case 4:
 		CurrentTarget->Destroy();
 		//Make the ammo pouch
 		PlayerCharacter->CreateAmmoPouch();
@@ -188,14 +202,31 @@ void ATutorialManager::ProceedTutorialStep(int junk)
 		PlayersGun->TutorialReloadedGun.AddDynamic(this, &ATutorialManager::ProceedTutorialStep);
 		break;
 		//Just spawns enemies via the Enemy Spawner
-	case 6:
+	case 5:
 		EnemySpawner->SpawnTutorialEnemies();
 		break;
-		//Reveal the end of level arrow and allow it to be shot to go to main game
-	case 7:
+		//Reveal the end of level arrow and allow it to be shot to show the locomotion arrow
+	case 6:
 		if (EndLevelArrow)
 		{
 			EndLevelArrow->ShowArrow(true);
+		}
+
+		Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController())->SetLocationToMoveAndRotation(EndLevelArrow->GetActorLocation(), GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation());
+
+		break;
+	case 7:
+		if (EndLevelArrow)
+		{
+			EndLevelArrow->ShowArrow(false);
+		}
+
+		Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController())->MovePlayerViaNavManagerNodeBased();
+		if (TeleportLocomotionArea) 
+		{
+			TeleportLocomotionArea->ShowTeleportPad(true);
+			Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController())->SetValidTutorialStateForLocomotion();
+			Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController())->bIsTutorial = true;
 		}
 		break;
 	}

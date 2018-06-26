@@ -114,6 +114,10 @@ void AVRPawn::BeginPlay()
 
 	//Hide it on beginplay, we have no locomotion point to look at
 	ArrowPointChild->SetVisibility(false);
+
+	//Store the viewport size
+	GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
+	MyController = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
 }
 
 // Called every frame
@@ -129,44 +133,70 @@ void AVRPawn::Tick(float DeltaTime)
 
 	if (ToggleOnNavArrow) 
 	{
+		GetWorld()->GetGameViewport()->GetViewportSize(ViewportSize);
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjQuery;
 		ObjQuery.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel3));
 		TArray<AActor*> IgnoredActs;
 		FHitResult HitRes;
 
+		MyController->ProjectWorldLocationToScreen(GetActorLocation(), PlayControllerScreenVec, false);
+
 		FVector EndPoint = VRCamera->GetComponentLocation() + (VRCamera->GetForwardVector() * 1000);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
+			FString::Printf(TEXT("Locopoint Coor is %f --- Vs OurLocation %f"), LocoPointScreenVec.X, ViewportSize.X), true, FVector2D(3.0f, 3.0f));
 
 		//THIS WILL BE FINE FOR NOW
 		if (UKismetSystemLibrary::BoxTraceSingleForObjects(GetWorld(), VRCamera->GetComponentLocation(), EndPoint,
 			FVector(5, 650, 500), VRCamera->GetComponentRotation(), ObjQuery, false, IgnoredActs, EDrawDebugTrace::ForOneFrame, HitRes, true))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Found object called: %s"), *HitRes.GetActor()->GetName());
+			//UE_LOG(LogTemp, Warning, TEXT("Found object called: %s"), *HitRes.GetActor()->GetName());
+
+			bFocusedOnLocomotionPoint = true;
 
 			ArrowPointChild->SetVisibility(false);
 		}
 		else 
 		{
+			 MyController->ProjectWorldLocationToScreen(NextLocoPointVec, LocoPointScreenVec, false);
 
-			ArrowPointChild->SetVisibility(true);
-			if (NextLocoPointVec.Y < this->GetActorLocation().Y && !bWasNAvOnLeft) 
+			if (LocoPointScreenVec.X < ViewportSize.X && !bWasNAvOnLeft)
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ON THE LEFT"), true, FVector2D(3.0f, 3.0f));
 				bWasNAvOnLeft = true;
 				bWasNAvOnRight = false;
 				ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowLeft, 0.0f));
-				//ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotLeft));
+				ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotLeft));
+				ArrowPointChild->SetVisibility(true);
 			}
-			else if (NextLocoPointVec.Y > this->GetActorLocation().Y && !bWasNAvOnRight)
+			else if( LocoPointScreenVec.X > ViewportSize.X && !bWasNAvOnRight)
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ON THE RIGHT"), true, FVector2D(3.0f, 3.0f));
 				bWasNAvOnLeft = false;
 				bWasNAvOnRight = true;
 				ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowRight, 0.0f));
-				//ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotRight));
+				ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotRight));
+				ArrowPointChild->SetVisibility(true);
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *ArrowPointChild->GetComponentLocation().ToString());
+
+
+			//if (NextLocoPointVec.Y < this->GetActorLocation().Y && !bWasNAvOnLeft) 
+			//{
+			//	bWasNAvOnLeft = true;
+			//	bWasNAvOnRight = false;
+			//	ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowLeft, 0.0f));
+			//	//ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotLeft));
+			//}
+			//else if (NextLocoPointVec.Y > this->GetActorLocation().Y && !bWasNAvOnRight)
+			//{
+			//	bWasNAvOnLeft = false;
+			//	bWasNAvOnRight = true;
+			//	ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowRight, 0.0f));
+			//	//ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotRight));
+			//}
+
+			//UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *ArrowPointChild->GetComponentLocation().ToString());
 		}
-
-
 	}
 }
 
@@ -874,4 +904,12 @@ void AVRPawn::AssignNextLocoPosition(FVector LocoPointDistance)
 {
 	NextLocoPointVec = LocoPointDistance;
 	ToggleOnNavArrow = true;
+}
+
+void AVRPawn::TurnOffNavigationGuidanceArrow() 
+{
+	ToggleOnNavArrow = false;
+	ArrowPointChild->SetVisibility(false);
+	bWasNAvOnLeft = false;
+	bWasNAvOnRight = false;
 }

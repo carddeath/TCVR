@@ -35,6 +35,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 		class USoundBase* PhaseMoveSFX = nullptr;
+
+	UPROPERTY(EditInstanceOnly, Category = "Objects")
+		class APlayerConstraintArea* TeleportLocomotionArea = nullptr;
 	
 private:
 	class AVRPawn* PlayerCharacter = nullptr;

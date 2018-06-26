@@ -11,6 +11,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FShotTargetInTutorial, int32, junk);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FReloadedInTutorial, int32, junk);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLocomotionArrowInTutorial, int32, junk);
 
 
 UCLASS()
@@ -31,6 +32,8 @@ public:
 	bool bTutorialEnabled = false;
 
 	FReloadedInTutorial TutorialReloadedGun;
+
+	FLocomotionArrowInTutorial LocoArrowInTutorial;
 
 protected:
 

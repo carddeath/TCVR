@@ -73,6 +73,17 @@ void AMainPlayerController::PassNextSectionLocationToPlayer(FVector Location)
 	Cast<AVRPawn>(GetPawn())->AssignNextLocoPosition(Location);
 }
 
+void AMainPlayerController::DisableNavGuidanceArrowStatus() 
+{
+	Cast<AVRPawn>(GetPawn())->TurnOffNavigationGuidanceArrow();
+}
+
+void AMainPlayerController::SetValidTutorialStateForLocomotion() 
+{
+	bAllowToTeleportThisGame = true;
+	bCanTeleportAfterAllEnemiesDead = true;
+}
+
 
 
 

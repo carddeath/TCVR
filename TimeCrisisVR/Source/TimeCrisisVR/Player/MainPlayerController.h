@@ -26,6 +26,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "State")
 		bool bCanFireTeleportArc = false;
 
+	UPROPERTY(BlueprintReadOnly, Category = "State")
+	bool bIsTutorial = false;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Values")
@@ -77,6 +80,11 @@ public:
 
 		//Passes the nav location the player
 			void PassNextSectionLocationToPlayer(FVector Location);
+
+			//Instruction passed through to the player
+			void DisableNavGuidanceArrowStatus();
+
+			void SetValidTutorialStateForLocomotion();
 
 protected:
 

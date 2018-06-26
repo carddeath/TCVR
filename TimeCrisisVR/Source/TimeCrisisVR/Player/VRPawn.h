@@ -156,17 +156,25 @@ private:
 	//The time spent hovering over a certain object
 	float TimeSpendHoveredOverOption = 0.0f;
 
+	//All related to the navigation guiadance arrow
+
 	float GuideanceArrowLeft = -105.f;
 	float GuideanceArrowRight = 105.f;
 	float GuideanceArrowRotLeft = -180.0f;
 	float GuideanceArrowRotRight = 0.f;
 
 	FVector NextLocoPointVec;
-
-
 	//Will hide the arrow if the actor search finds a locomotion point
 	bool bWasNAvOnLeft = false;
 	bool bWasNAvOnRight = false;
+
+	//Sets to true when we have seen the locomotion point via the cast
+	bool bFocusedOnLocomotionPoint = false;
+
+	FVector2D ViewportSize;
+	class AMainPlayerController* MyController;
+	FVector2D LocoPointScreenVec;
+	FVector2D PlayControllerScreenVec;
 
 	//Methods
 
@@ -192,6 +200,8 @@ public:
 	APlayersGun* GetPlayersGun();
 
 	void AssignNextLocoPosition(FVector LocoPointDistance);
+
+	void TurnOffNavigationGuidanceArrow();
 
 protected:
 	virtual void BeginPlay() override;
