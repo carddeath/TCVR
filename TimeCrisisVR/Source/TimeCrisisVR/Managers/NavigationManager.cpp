@@ -86,6 +86,8 @@ void ANavigationManager::BeginPlay()
 	//Get the data instance
 	DataInstance = Cast<UTutorialToGameSaveInstance>(GetWorld()->GetGameInstance());
 
+	//DataInstance->SetLocomotionType(ELocomotionType::NODE_BASED);
+
 	//DEBUG Just to change the type to quickly test
 
 	//Do it normally from the data instance if we are not in debug
@@ -264,7 +266,7 @@ void ANavigationManager::UpdateCurrentSection()
 		if (LocomotionPoints.Num() <= 0 || CurrentSection >= LocomotionPoints.Num())
 		{
 			UE_LOG(LogTemp, Error, TEXT("Missing Locomotion points on %s"), *this->GetName());
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing locomotion points on Navigation Manager or too few sub stage locomotion points"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing locomotion points on Navigation Manager or too few sub stage locomotion points"));
 			return;
 		}
 
@@ -285,7 +287,7 @@ void ANavigationManager::UpdateCurrentSection()
 		if (PointAndTPAreas.Num() <= 0 || CurrentSection >= PointAndTPAreas.Num())
 		{
 			UE_LOG(LogTemp, Error, TEXT("Missing PointAndTPAreas on %s"), *this->GetName());
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing PointAndTPAreas on Navigation Manager or too few sub stage PointAndTPAreas points"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Missing PointAndTPAreas on Navigation Manager or too few sub stage PointAndTPAreas points"));
 			return;
 		}
 

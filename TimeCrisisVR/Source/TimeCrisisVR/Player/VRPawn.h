@@ -3,6 +3,7 @@
 #pragma once
 
 #include "DataStructures/Hand.h"
+#include "Particles/ParticleSystemComponent.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -62,6 +63,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VR")
 		UMotionControllerComponent* MCRight = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		class UParticleSystemComponent* LocomotionTrail = nullptr;
+
 protected:
 	//The static mesh components attached to both hands for visual representation
 	UPROPERTY(EditDefaultsOnly, Category = "VR")
@@ -120,6 +124,8 @@ protected:
 	//Used to tick over to show the arrow on
 	UPROPERTY(BlueprintReadWrite, Category = "Nav Guideance")
 		bool ToggleOnNavArrow = false;
+
+
 
 private:
 

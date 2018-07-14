@@ -54,7 +54,7 @@ void UEndOfTrialTimer::GenerateNewLocomotionModifier()
 
 	DataInstance->SetCurrentTrial(CurrentIndex);
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("DataInstance Trail is now: %d"), DataInstance->GetCurrentTrail()));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("DataInstance Trail is now: %d"), DataInstance->GetCurrentTrail()));
 	//TODO: Write all the times and the name of the technique to a file 
 
 	//TODO: DO a comparisson here of the number, if the trial number is 4. Do not load the level. Quit the game
@@ -77,7 +77,9 @@ void UEndOfTrialTimer::PickLocomotionTypeToWrite()
 void UEndOfTrialTimer::PickModiferTypeToWrite() 
 {
 	FString TimerStringWithNewLine;
-	FString SaveDirectory = FString("F:/GSD2017Work/Masters/Trimester 3/Final Project/DATA");
+	//FString SaveDirectory = FString("F:/GSD2017Work/Masters/Trimester 3/Final Project/DATA");
+	FString SaveDirectory = FPaths::GameDir();
+	SaveDirectory += "DATA";
 	FString FinalisedFilePath;
 	UE_LOG(LogTemp, Warning, TEXT("Total time taken is %f"), TotalTimeTakenInStage);
 

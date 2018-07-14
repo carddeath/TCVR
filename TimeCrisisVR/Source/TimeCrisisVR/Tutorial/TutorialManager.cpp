@@ -85,7 +85,7 @@ void ATutorialManager::Tick(float DeltaTime)
 
 void ATutorialManager::GenerateTutorialMessageScreens() 
 {
-	TutorialMessages.Insert("Welcome to the experiment. This level aims to get you familiar with the environment and controls that you'll be using for around 10 minutes. Rotate your head and look up and down to get a feel for the movement.To proceed press A or X."
+	TutorialMessages.Insert("Welcome to the experiment. This level aims to get you familiar with the environment and controls that you'll be using for approximately 10 minutes. Rotate your head and look up and down to get a feel for the movement.To proceed press A or X."
 		, 0);
 	TutorialMessages.Insert("Notice the boxes to your left and right. In the experiment you'll aim to avoid being hit as much as possible by enemies. Learn to peek out of cover to shoot and to hide when bullets are coming towards you. To proceed press A or X."
 		, 1);
@@ -95,13 +95,13 @@ void ATutorialManager::GenerateTutorialMessageScreens()
 	//	, 3);
 	TutorialMessages.Insert("Now that you know how to change hands let's look at firing your weapon. Point the gun at the target and press the trigger on the hand holding the gun to fire a shot. Notice how you only have 6 bullets."
 		, 3);
-	TutorialMessages.Insert("Good job if you hit the target, if not you'll just keep trying in the experiment. If you look down now you'll notice some ammo pouches where you can ammo. Place your empty hand into the pouch and hold the grab button. Raise the ammo clip towards your gun to reload!"
+	TutorialMessages.Insert("Good job if you hit the target, if not you will in the experiment. If you look down you'll notice some ammo pouches where you can acquire ammo. Place your empty hand into the pouch and hold the grab button. Raise the ammo clip towards your gun to reload!"
 		, 4);
-	TutorialMessages.Insert("You now know how to reload your gun. See those enemy soldiers? They are your real targets. Once all enemies in an area are dead you'll see an arrow. Shoot it to proceed through the level! Kill all of the soldiers to proceed!"
+	TutorialMessages.Insert("You now know how to reload your gun. See those enemy soldiers? They are real targets. Once all enemies in an area are dead you'll see an proceed point. Using it will proceed you through the level! Kill all of the soldiers to proceed!"
 		, 5);
 	TutorialMessages.Insert("Well done. Now shoot the object to proceed. This is one method of teleportation in the game to move around!"
 		, 6);
-	TutorialMessages.Insert("The other method is teleportation. In your empty hand press in the analog stick to produce a line. Release the stick when it hovers inside the area. Good luck in the experiment!"
+	TutorialMessages.Insert("The other method is teleportation. In your empty hand press the analog stick to produce a curved line. Release the stick when it hovers inside the area to teleport. Good luck in the experiment!"
 		, 7);
 }
 

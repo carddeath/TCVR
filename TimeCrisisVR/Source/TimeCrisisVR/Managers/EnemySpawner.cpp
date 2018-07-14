@@ -92,7 +92,7 @@ void AEnemySpawner::DecreaseEnemyCount(AAIEnemyCharacter* Char)
 	CurrentEnemiesAliveInSection--;
 	TotalEnemiesShot++;
 	//UE_LOG(LogTemp, Warning, TEXT("Amount of soldiers left = %d"), CurrentEnemiesAliveInSection);
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("Enemy Count is now: %d"), CurrentEnemiesAliveInSection));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Orange, FString::Printf(TEXT("Enemy Count is now: %d"), CurrentEnemiesAliveInSection));
 
 	//If we are in the tutorial and have killed all enemies
 	if (bIsTutorial && TotalEnemiesShot >= 3)

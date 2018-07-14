@@ -62,6 +62,9 @@ AVRPawn::AVRPawn()
 
 	ArrowPointChild = CreateDefaultSubobject<UChildActorComponent>(FName("Arrow Navigation Pointer"));
 	ArrowPointChild->SetupAttachment(VRCamera);
+
+	LocomotionTrail = CreateDefaultSubobject<UParticleSystemComponent>(FName("Teleport line Particle system"));
+	LocomotionTrail->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -142,41 +145,42 @@ void AVRPawn::Tick(float DeltaTime)
 		MyController->ProjectWorldLocationToScreen(GetActorLocation(), PlayControllerScreenVec, false);
 
 		FVector EndPoint = VRCamera->GetComponentLocation() + (VRCamera->GetForwardVector() * 1000);
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
-			FString::Printf(TEXT("Locopoint Coor is %f --- Vs OurLocation %f"), LocoPointScreenVec.X, ViewportSize.X), true, FVector2D(3.0f, 3.0f));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow,
+			//FString::Printf(TEXT("Locopoint Coor is %f --- Vs OurLocation %f"), LocoPointScreenVec.X, ViewportSize.X), true, FVector2D(3.0f, 3.0f));
 
 		//THIS WILL BE FINE FOR NOW
-		if (UKismetSystemLibrary::BoxTraceSingleForObjects(GetWorld(), VRCamera->GetComponentLocation(), EndPoint,
-			FVector(5, 650, 500), VRCamera->GetComponentRotation(), ObjQuery, false, IgnoredActs, EDrawDebugTrace::ForOneFrame, HitRes, true))
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("Found object called: %s"), *HitRes.GetActor()->GetName());
+		//FIX THIS LATER FOR THE ARROW PROBLEM
+		//if (UKismetSystemLibrary::BoxTraceSingleForObjects(GetWorld(), VRCamera->GetComponentLocation(), EndPoint,
+		//	FVector(5, 650, 500), VRCamera->GetComponentRotation(), ObjQuery, false, IgnoredActs, EDrawDebugTrace::None, HitRes, true))
+		//{
+		//	//UE_LOG(LogTemp, Warning, TEXT("Found object called: %s"), *HitRes.GetActor()->GetName());
 
-			bFocusedOnLocomotionPoint = true;
+		//	bFocusedOnLocomotionPoint = true;
 
-			ArrowPointChild->SetVisibility(false);
-		}
-		else 
-		{
-			 MyController->ProjectWorldLocationToScreen(NextLocoPointVec, LocoPointScreenVec, false);
+		//	ArrowPointChild->SetVisibility(false);
+		//}
+		//else 
+		//{
+		//	 MyController->ProjectWorldLocationToScreen(NextLocoPointVec, LocoPointScreenVec, false);
 
-			if (LocoPointScreenVec.X < ViewportSize.X && !bWasNAvOnLeft)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ON THE LEFT"), true, FVector2D(3.0f, 3.0f));
-				bWasNAvOnLeft = true;
-				bWasNAvOnRight = false;
-				ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowLeft, 0.0f));
-				ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotLeft));
-				ArrowPointChild->SetVisibility(true);
-			}
-			else if( LocoPointScreenVec.X > ViewportSize.X && !bWasNAvOnRight)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ON THE RIGHT"), true, FVector2D(3.0f, 3.0f));
-				bWasNAvOnLeft = false;
-				bWasNAvOnRight = true;
-				ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowRight, 0.0f));
-				ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotRight));
-				ArrowPointChild->SetVisibility(true);
-			}
+		//	if (LocoPointScreenVec.X < ViewportSize.X && !bWasNAvOnLeft)
+		//	{
+		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ON THE LEFT"), true, FVector2D(3.0f, 3.0f));
+		//		bWasNAvOnLeft = true;
+		//		bWasNAvOnRight = false;
+		//		ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowLeft, 0.0f));
+		//		ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotLeft));
+		//		ArrowPointChild->SetVisibility(true);
+		//	}
+		//	else if( LocoPointScreenVec.X > ViewportSize.X && !bWasNAvOnRight)
+		//	{
+		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, TEXT("ON THE RIGHT"), true, FVector2D(3.0f, 3.0f));
+		//		bWasNAvOnLeft = false;
+		//		bWasNAvOnRight = true;
+		//		ArrowPointChild->SetRelativeLocation(FVector(300.0f, GuideanceArrowRight, 0.0f));
+		//		ArrowPointChild->SetRelativeRotation(FRotator(0.0f, -180.0f, GuideanceArrowRotRight));
+		//		ArrowPointChild->SetVisibility(true);
+		//	}
 
 
 
@@ -196,7 +200,7 @@ void AVRPawn::Tick(float DeltaTime)
 			//}
 
 			//UE_LOG(LogTemp, Warning, TEXT("Location: %s"), *ArrowPointChild->GetComponentLocation().ToString());
-		}
+		//}
 	}
 }
 
